@@ -50,6 +50,17 @@ module.exports = (resolve, rootDir) => {
         tsConfigFile: paths.appTsConfig,
       },
     },
+    moduleFileExtensions: [
+      'web.ts',
+      'ts',
+      'web.tsx',
+      'tsx',
+      'web.js',
+      'js',
+      'json',
+      'web.jsx',
+      'jsx',
+    ],
   };
   if (rootDir) {
     config.rootDir = rootDir;
