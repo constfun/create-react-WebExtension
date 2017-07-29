@@ -26,7 +26,9 @@ const getClientEnvironment = require('./env');
 const getConfig = pack => {
   const rootPaths = getPaths();
   const paths = getPaths(Pack.dir(pack));
-  const packAsset = assetPath => path.join(Pack.name(pack), assetPath);
+  const packName = Pack.name(pack);
+  // const packAsset = assetPath => path.join(packName, assetPath);
+  const packAsset = assetPath => assetPath;
 
   // Webpack uses `publicPath` to determine where the app is being served from.
   // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -48,7 +50,7 @@ const getConfig = pack => {
   }
 
   // Note: defined here because it will be used more than once.
-  const cssFilename = packAsset('static/css/[name].[contenthash:8].css');
+  const cssFilename = packAsset('static/css/[name].css');
 
   // ExtractTextPlugin expects the build output to be flat.
   // (See https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/27)
@@ -72,11 +74,11 @@ const getConfig = pack => {
     entry: [require.resolve('./polyfills'), paths.appIndexJs],
     output: {
       // The build folder.
-      path: paths.appBuild,
+      path: path.join(paths.appBuild, packName),
       // Generated JS file names (with nested folders).
       // There will be one main bundle, and one file per asynchronous chunk.
       // We don't currently advertise code splitting but Webpack supports it.
-      filename: packAsset('static/js/[name].[chunkhash:8].js'),
+      filename: packAsset('static/js/[name].js'),
       chunkFilename: packAsset('static/js/[name].[chunkhash:8].chunk.js'),
       // We inferred the "public path" (such as / or /my-project) from homepage.
       publicPath: publicPath,
