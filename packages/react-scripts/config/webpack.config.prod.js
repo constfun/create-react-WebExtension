@@ -194,7 +194,7 @@ const getConfig = pack => {
         {
           test: /\.(ts|tsx)$/,
           include: '/Users/nick/projects/jobly/src',
-          loader: require.resolve('awesome-typescript-loader'),
+          loader: require.resolve('ts-loader'),
         },
         // The notation here is somewhat confusing.
         // "postcss" loader applies autoprefixer to our CSS.
