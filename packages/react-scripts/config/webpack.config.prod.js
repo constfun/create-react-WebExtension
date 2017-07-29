@@ -23,15 +23,14 @@ const { getPaths } = require('./paths');
 const getClientEnvironment = require('./env');
 
 const getConfig = pack => {
-  const rootPaths = getPaths();
-  const paths = getPaths(Pack.dir(pack));
+  const paths = getPaths(pack);
   const packName = Pack.name(pack);
   // const packAsset = assetPath => path.join(packName, assetPath);
   const packAsset = assetPath => assetPath;
 
   // Webpack uses `publicPath` to determine where the app is being served from.
   // It requires a trailing slash, or the file assets will get an incorrect path.
-  const publicPath = rootPaths.servedPath;
+  const publicPath = paths.servedPath;
   // Some apps do not use client-side routing with pushState.
   // For these, "homepage" can be set to "." to enable relative asset paths.
   const shouldUseRelativeAssetPaths = publicPath === './';
@@ -115,13 +114,6 @@ const getConfig = pack => {
       ],
       alias: {
         // @remove-on-eject-begin
-        // Resolve Babel runtime relative to react-scripts.
-        // It usually still works on npm 3 without this but it would be
-        // unfortunate to rely on, as react-scripts could be symlinked,
-        // and thus babel-runtime might not be resolvable from the source.
-        'babel-runtime': path.dirname(
-          require.resolve('babel-runtime/package.json')
-        ),
         // @remove-on-eject-end
         // Support React Native Web
         // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
