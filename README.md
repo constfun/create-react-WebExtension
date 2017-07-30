@@ -1,4 +1,36 @@
-# Create React App [![Build Status](https://travis-ci.org/facebookincubator/create-react-app.svg?branch=master)](https://travis-ci.org/facebookincubator/create-react-app)
+# Create React WebExtension [![Build Status](https://travis-ci.org/pacemkr/create-react-web-ext.svg?branch=master)](https://travis-ci.org/facebookincubator/create-react-app)
+
+Create React and TypeScript powered web extensions with no build configuration.  
+
+WebExtensions API's is the cross-browser system for extending and modifying the capability of a browser. [Read more on MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions).
+
+This project is a fork of the excellent [create-react-app](https://github.com/facebookincubator/create-react-app) project.  
+The focus is on simplicity and compatibility with the upstream project.
+
+## Differences to Create React App (upstream)
+
+### TypeScript
+
+It keeps me sane. If you wan't a version without TypeScript, open an issue.
+
+As the basis for this project I've forked `create-react-typescript#2.5.0` and pulled in the latest release version of `create-react-app#1.0.10`. _(July 2017)_
+
+### Multiple create-react-app "packs"
+
+WebExtensions are comprised of background scripts, content scripts, option pages, and popup pages. Each of these is a separate set of HTML, CSS, and JavaScript.
+
+However, `create-react-app` produces a single set of `index.html`, `main.js`, and `main.css` as its build output. This is a simple and sensible default considering the goals of the upstream project. 
+
+As noted above, the need for multiple sets of HTML, CSS, and JS files is unavoidable even for the simplest of extensions. Create React WebExtensions addresses this need by introducing a simple concept of packs on top of `create-react-app`.
+
+**Any subdirectory containing an empty file named `.pack` will produce its own set of HTML, CSS, and JavaScript, using the same rules as any stand alone Create React app. This feature is strictly opt-in.**
+
+Mostly, this is a difference that you don't have to worry about. This addition does not change the workflow at all. Simply create a new project and use the same workflow as with any Create React app, the directory structure should make sense.
+
+*The rest of this document is taken almost entirely verbatim from Create React App.*  
+*All the same rules apply.*
+
+# Create React App
 
 Create React apps with no build configuration.
 
