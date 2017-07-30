@@ -22,6 +22,10 @@ const getPaths = pack => {
   // https://github.com/facebookincubator/create-react-app/issues/637
   const appDirectory = fs.realpathSync(process.cwd());
   const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
+  const resolveBuild = relativePath => {
+    const appBuildDir = resolveApp(relativePath);
+    return pack ? path.join(appBuildDir, Pack.name(pack)) : appBuildDir;
+  };
   const resolvePack = relativePath => {
     if (!pack) {
       return resolveApp(relativePath);
@@ -63,14 +67,16 @@ const getPaths = pack => {
   function getServedPath(appPackageJson) {
     const publicUrl = getPublicUrl(appPackageJson);
     const servedUrl =
-      envPublicUrl || (publicUrl ? url.parse(publicUrl).pathname : '/');
+      (pack
+        ? ensureSlash(envPublicUrl, true) + Pack.name(pack)
+        : envPublicUrl) || (publicUrl ? url.parse(publicUrl).pathname : '/');
     return ensureSlash(servedUrl, true);
   }
 
   // config after eject: we're in ./config/
   paths = {
     dotenv: resolveApp('.env'),
-    appBuild: resolveApp('build'),
+    appBuild: resolveBuild('build'),
     appPublic: resolvePack('public'),
     appHtml: resolvePack('public/index.html'),
     appIndexJs: resolvePack('src/index.tsx'),
@@ -92,7 +98,7 @@ const getPaths = pack => {
   paths = {
     dotenv: resolveApp('.env'),
     appPath: resolveApp('.'),
-    appBuild: resolveApp('build'),
+    appBuild: resolveBuild('build'),
     appPublic: resolvePack('public'),
     appHtml: resolvePack('public/index.html'),
     appIndexJs: resolvePack('src/index.tsx'),
@@ -123,7 +129,7 @@ const getPaths = pack => {
     paths = {
       dotenv: resolveOwn('template/.env'),
       appPath: resolveApp('.'),
-      appBuild: resolveOwn('../../build'),
+      appBuild: resolveBuild('../../build'),
       appPublic: resolveOwn('template/public'),
       appHtml: resolveOwn('template/public/index.html'),
       appIndexJs: resolveOwn('template/src/index.tsx'),

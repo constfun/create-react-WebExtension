@@ -23,10 +23,8 @@ const { getPaths } = require('./paths');
 const getClientEnvironment = require('./env');
 
 const getConfig = pack => {
+  const appPaths = getPaths();
   const paths = getPaths(pack);
-  const packName = Pack.name(pack);
-  // const packAsset = assetPath => path.join(packName, assetPath);
-  const packAsset = assetPath => assetPath;
 
   // Webpack uses `publicPath` to determine where the app is being served from.
   // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -48,7 +46,7 @@ const getConfig = pack => {
   }
 
   // Note: defined here because it will be used more than once.
-  const cssFilename = packAsset('static/css/[name].css');
+  const cssFilename = 'static/css/[name].css';
 
   // ExtractTextPlugin expects the build output to be flat.
   // (See https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/27)
@@ -72,12 +70,12 @@ const getConfig = pack => {
     entry: [require.resolve('./polyfills'), paths.appIndexJs],
     output: {
       // The build folder.
-      path: path.join(paths.appBuild, packName),
+      path: paths.appBuild,
       // Generated JS file names (with nested folders).
       // There will be one main bundle, and one file per asynchronous chunk.
       // We don't currently advertise code splitting but Webpack supports it.
-      filename: packAsset('static/js/[name].js'),
-      chunkFilename: packAsset('static/js/[name].[chunkhash:8].chunk.js'),
+      filename: 'static/js/[name].js',
+      chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
       // We inferred the "public path" (such as / or /my-project) from homepage.
       publicPath: publicPath,
       // Point sourcemap entries to original disk location (format as URL on Windows)
@@ -113,8 +111,6 @@ const getConfig = pack => {
         '.jsx',
       ],
       alias: {
-        // @remove-on-eject-begin
-        // @remove-on-eject-end
         // Support React Native Web
         // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
         'react-native': 'react-native-web',
@@ -125,7 +121,7 @@ const getConfig = pack => {
         // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
         // please link the files into your node_modules/ and let module-resolution kick in.
         // Make sure your source files are compiled, as they will not be processed in any way.
-        // new ModuleScopePlugin(paths.appSrc),
+        new ModuleScopePlugin(appPaths.appSrc),
       ],
     },
     module: {
@@ -187,7 +183,7 @@ const getConfig = pack => {
         // Compile .tsx?
         {
           test: /\.(ts|tsx)$/,
-          include: '/Users/nick/projects/jobly/src',
+          include: appPaths.appSrc,
           loader: require.resolve('ts-loader'),
         },
         // The notation here is somewhat confusing.

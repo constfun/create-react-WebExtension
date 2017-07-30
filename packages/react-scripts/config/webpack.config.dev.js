@@ -18,10 +18,14 @@ const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
+const Pack = require('./pack');
 const getClientEnvironment = require('./env');
 const { getPaths } = require('./paths');
 
-const getConfig = paths => {
+const getConfig = pack => {
+  const appPaths = getPaths();
+  const paths = getPaths(pack);
+
   // Webpack uses `publicPath` to determine where the app is being served from.
   // In development, we always serve from the root. This makes config easier.
   const publicPath = '/';
@@ -127,7 +131,7 @@ const getConfig = paths => {
         // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
         // please link the files into your node_modules/ and let module-resolution kick in.
         // Make sure your source files are compiled, as they will not be processed in any way.
-        // new ModuleScopePlugin(paths.appSrc),
+        new ModuleScopePlugin(appPaths.appSrc),
       ],
     },
     module: {
@@ -197,7 +201,7 @@ const getConfig = paths => {
         // Compile .tsx?
         {
           test: /\.(ts|tsx)$/,
-          include: '/Users/nick/projects/jobly/src',
+          include: appPaths.appSrc,
           loader: require.resolve('ts-loader'),
         },
         // "postcss" loader applies autoprefixer to our CSS.
@@ -292,20 +296,5 @@ const getConfig = paths => {
   };
 };
 
-// Compiler builds all packs and the app at the same time, using
-// webpack's built in support for multiple configurations.
-//
-// Dev server uses this compiler, exactly the same way as the original.
-
-// - get list of packs
-// - make pack paths
-// - make pack configs
-// - make app config
-
-const pack = require('./pack');
-const packs = pack.findAll('src');
-const packPaths = packs.map(p => getPaths(pack.dir(p)));
-const packConfigs = packPaths.map(paths => getConfig(paths));
-console.log('packs', packConfigs);
-
+const packConfigs = Pack.findAll('src').map(getConfig);
 module.exports = packConfigs;
