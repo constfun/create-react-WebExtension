@@ -27,9 +27,12 @@ const makeServer = (compiler, opts = {}) => {
 
 const makeClient = address => {
   const url = require('url');
+  const stripAnsi = require('strip-ansi');
+  var formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 
+  let _connectionFailureReported = false;
   const loadedHashes = new Set();
-  console.log(address);
+
   const connection = new window.EventSource(url.resolve(address, PATH));
 
   connection.onmessage = e => {
@@ -45,15 +48,11 @@ const makeClient = address => {
         loadedHashes.add(message.hash);
         break;
       case 'built':
-        if (!loadedHashes.has(message.hash)) {
-          browser.runtime.reload();
-        }
+        handleBuilt(message);
         break;
       default:
     }
   };
-
-  let _connectionFailureReported = false;
 
   connection.onopen = () => {
     console.info('Connected to hot reload development server.');
@@ -71,6 +70,33 @@ const makeClient = address => {
     }
     console.info('Connection to hot reload development server failed.');
     _connectionFailureReported = true;
+  };
+
+  const handleBuilt = message => {
+    if (loadedHashes.has(message.hash)) {
+      return;
+    }
+
+    if (message.errors.length) {
+      printErrors(message.errors);
+      return;
+    }
+
+    browser.runtime.reload();
+  };
+
+  const printErrors = errors => {
+    var formatted = formatWebpackMessages({
+      errors: errors,
+      warnings: [],
+    });
+
+    // Also log them to the console.
+    if (typeof console !== 'undefined' && typeof console.error === 'function') {
+      for (var i = 0; i < formatted.errors.length; i++) {
+        console.error(stripAnsi(formatted.errors[i]));
+      }
+    }
   };
 
   return connection;
