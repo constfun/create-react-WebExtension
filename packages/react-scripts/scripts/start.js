@@ -34,9 +34,10 @@ const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const { setupBuildDir } = require('./utils/common');
 const devMiddleware = require('webpack-dev-middleware');
 const hotReload = require('./utils/hot-reload');
-
 var http = require('http');
 var express = require('express');
+
+const isInteractive = process.stdout.isTTY;
 
 // Warn and crash if required files are missing
 // if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
@@ -51,28 +52,28 @@ const startServer = (host, port, config) => {
     devMiddleware(compiler, {
       noInfo: true,
       publicPath: '/',
+      reporter: reporter,
     })
   );
   app.use(hotReload.makeServer(compiler));
 
   const server = http.createServer(app);
   server.listen(port, host, () => {
-    console.log('listening', server.address());
-    // if (err) {
-    //   console.log(err, '\nWatch failed');
-    // }
-
-    // if (isInteractive) {
-    //   clearConsole();
-    // }
-
-    // const messages = formatWebpackMessages(stats.toJson({}, true));
-    // if (messages.errors.length) {
-    //   printErrors(messages.errors);
-    // } else {
-    //   printWarnings(messages.warnings);
-    // }
+    console.log(chalk.cyan('Starting the development server...\n'));
   });
+};
+
+const reporter = report => {
+  if (isInteractive) {
+    clearConsole();
+  }
+
+  const messages = formatWebpackMessages(report.stats.toJson({}, true));
+  if (messages.errors.length) {
+    printErrors(messages.errors);
+  } else {
+    printWarnings(messages.warnings);
+  }
 };
 
 const printWarnings = warnings => {
@@ -102,6 +103,5 @@ const printErrors = errors => {
   console.log(errors.join('\n\n') + '\n');
 };
 
-console.log(chalk.cyan('Starting the development server...\n'));
 setupBuildDir();
 startServer(HOST, PORT, config);
