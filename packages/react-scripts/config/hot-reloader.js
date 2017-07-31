@@ -1,8 +1,6 @@
 /* globals browser */
 'use strict';
 
-// const LockableStorage = require('lockable-storage');
-
 const isBackgroundOrOptionsScript = !!browser.runtime.getBackgroundPage;
 if (isBackgroundOrOptionsScript) {
   const url = require('url');
