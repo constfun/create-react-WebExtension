@@ -45,16 +45,24 @@ const makeClient = address => {
     }
   };
 
+  let _connectionFailureReported = false;
+
   connection.onopen = () => {
     console.info('Connected to hot reload development server.');
+    _connectionFailureReported = false;
   };
 
   connection.onclose = () => {
     console.info('Disconnected from hot reload development server.');
+    _connectionFailureReported = false;
   };
 
   connection.onerror = () => {
+    if (_connectionFailureReported) {
+      return;
+    }
     console.info('Connection to hot reload development server failed.');
+    _connectionFailureReported = true;
   };
 
   return connection;
