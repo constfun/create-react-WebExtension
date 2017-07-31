@@ -26,11 +26,14 @@ require('../config/env');
 
 const chalk = require('chalk');
 const webpack = require('webpack');
+const clearConsole = require('react-dev-utils/clearConsole');
 const config = require('../config/webpack.config.dev');
 const getPaths = require('../config/paths');
 // const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const { setupBuildDir } = require('./utils/common');
+
+const isInteractive = process.stdout.isTTY;
 
 // Warn and crash if required files are missing
 // if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
@@ -48,9 +51,16 @@ const startWatch = (config, paths) => {
       console.log(err, '\nWatch failed');
     }
 
+    if (isInteractive) {
+      clearConsole();
+    }
+
     const messages = formatWebpackMessages(stats.toJson({}, true));
-    printErrors(messages.errors);
-    printWarnings(messages.warnings);
+    if (messages.errors.length) {
+      printErrors(messages.errors);
+    } else {
+      printWarnings(messages.warnings);
+    }
   });
 };
 

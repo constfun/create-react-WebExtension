@@ -59,6 +59,7 @@ const getConfig = pack => {
     // You may want 'eval' instead if you prefer to see the compiled output in DevTools.
     // See the discussion in https://github.com/facebookincubator/create-react-app/issues/343.
     devtool: 'cheap-module-source-map',
+    context: path.join(paths.appPath, Pack.dir(pack)),
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
     // The first two entry points enable "hot" CSS and auto-refreshes for JS.
@@ -106,7 +107,7 @@ const getConfig = pack => {
       // We placed these paths second because we want `node_modules` to "win"
       // if there are any conflicts. This matches Node resolution mechanism.
       // https://github.com/facebookincubator/create-react-app/issues/253
-      modules: ['node_modules', paths.appNodeModules].concat(
+      modules: ['node_modules', appPaths.appNodeModules].concat(
         // It is guaranteed to exist because we tweak it in `env.js`
         process.env.NODE_PATH.split(path.delimiter).filter(Boolean)
       ),
@@ -163,13 +164,13 @@ const getConfig = pack => {
           test: /\.(ts|tsx)$/,
           loader: require.resolve('tslint-loader'),
           enforce: 'pre',
-          include: paths.appSrc,
+          include: appPaths.appSrc,
         },
         {
           test: /\.js$/,
           loader: require.resolve('source-map-loader'),
           enforce: 'pre',
-          include: paths.appSrc,
+          include: appPaths.appSrc,
         },
         // ** ADDING/UPDATING LOADERS **
         // The "file" loader handles all assets unless explicitly excluded.
@@ -296,7 +297,7 @@ const getConfig = pack => {
       // to restart the development server for Webpack to discover it. This plugin
       // makes the discovery automatic so you don't have to restart.
       // See https://github.com/facebookincubator/create-react-app/issues/186
-      new WatchMissingNodeModulesPlugin(paths.appNodeModules),
+      new WatchMissingNodeModulesPlugin(appPaths.appNodeModules),
       // Moment.js is an extremely popular library that bundles large locale files
       // by default due to how Webpack interprets its code. This is a practical
       // solution that requires the user to opt into importing specific locales.

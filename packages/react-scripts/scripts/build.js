@@ -29,13 +29,14 @@ const chalk = require('chalk');
 const fs = require('fs-extra');
 const webpack = require('webpack');
 const config = require('../config/webpack.config.prod');
-const paths = require('../config/paths').getPaths();
+const getPaths = require('../config/paths');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const printHostingInstructions = require('react-dev-utils/printHostingInstructions');
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
-const { setupBuildDir } = require('./common');
+const setupBuildDir = require('./common');
 
+const paths = getPaths();
 const measureFileSizesBeforeBuild =
   FileSizeReporter.measureFileSizesBeforeBuild;
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
@@ -54,7 +55,7 @@ const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
 // This lets us display how much they changed later.
 measureFileSizesBeforeBuild(paths.appBuild)
   .then(previousFileSizes => {
-    setupBuildDir();
+    setupBuildDir(paths);
     // Start the webpack build
     return build(previousFileSizes);
   })
