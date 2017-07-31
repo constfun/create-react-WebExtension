@@ -10,6 +10,7 @@
 // @remove-on-eject-end
 'use strict';
 
+const url = require('url');
 const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
@@ -24,6 +25,10 @@ const getClientEnvironment = require('./env');
 const paths = require('./paths');
 const Pack = require('./pack');
 
+const PORT = parseInt(process.env.PORT, 10) || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
+const PROTOCOL = process.env.HTTPS === 'true' ? 'https' : 'http';
+
 const getConfig = pack => {
   // Webpack uses `publicPath` to determine where the app is being served from.
   // In development, we always serve from the root. This makes config easier.
@@ -37,10 +42,12 @@ const getConfig = pack => {
   const publicUrl = '';
   // Get environment variables to inject into our app.
   const env = getClientEnvironment(publicUrl);
-
+  // We need the absolute url since we can't use window.location on the client,
+  // since client is running in an extension content script. And, the location
+  // will be something like moz-extension://123-123-123/rel/path/here.html
+  const hotReloadServerUrl = `${PROTOCOL}://${HOST}:${PORT}`;
   // Note: defined here because it will be used more than once.
   const cssFilename = 'static/css/[name].css';
-
   // ExtractTextPlugin expects the build output to be flat.
   // (See https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/27)
   // However, our output is structured with css, js and media folders.
@@ -72,13 +79,14 @@ const getConfig = pack => {
       // the line below with these two lines if you prefer the stock client:
       // require.resolve('webpack-dev-server/client') + '?/',
       // require.resolve('webpack/hot/dev-server'),
-      require.resolve('./hot-reloader'),
+      require.resolve('../scripts/utils/hot-reload-runtime') +
+        `?server_url=${encodeURIComponent(hotReloadServerUrl)}`,
       // We ship a few polyfills by default:
       require.resolve('./polyfills'),
       // Errors should be considered fatal in development
       require.resolve('react-error-overlay'),
       // Finally, this is your app's code:
-      './src/index.tsx',
+      Pack.indexJs(pack),
       // We include the app code last so that if there is a runtime error during
       // initialization, it doesn't blow up the WebpackDevServer client, and
       // changing JS code would still trigger a refresh.
@@ -321,5 +329,10 @@ const getConfig = pack => {
   };
 };
 
-const packConfigs = Pack.findAll('src').map(getConfig);
-module.exports = packConfigs;
+const config = Pack.findAll('src').map(getConfig);
+module.exports = {
+  config,
+  PORT,
+  HOST,
+  PROTOCOL,
+};

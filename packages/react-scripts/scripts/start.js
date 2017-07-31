@@ -27,48 +27,36 @@ require('../config/env');
 const chalk = require('chalk');
 const webpack = require('webpack');
 const clearConsole = require('react-dev-utils/clearConsole');
-const config = require('../config/webpack.config.dev');
+const { config, PORT, HOST } = require('../config/webpack.config.dev');
 const paths = require('../config/paths');
 // const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const { setupBuildDir } = require('./utils/common');
+const devMiddleware = require('webpack-dev-middleware');
+const hotReload = require('./utils/hot-reload');
 
 var http = require('http');
 var express = require('express');
-
-const isInteractive = process.stdout.isTTY;
 
 // Warn and crash if required files are missing
 // if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
 //   process.exit(1);
 // }
 
-const startWatch = config => {
-  console.log('Starting development server...');
-
-  setupBuildDir(paths);
-
+const startServer = (host, port, config) => {
   const app = express();
   const compiler = webpack(config);
 
-  // Step 2: Attach the dev middleware to the compiler & the server
   app.use(
-    require('webpack-dev-middleware')(compiler, {
+    devMiddleware(compiler, {
       noInfo: true,
       publicPath: '/',
     })
   );
-
-  // Step 3: Attach the hot middleware to the compiler & the server
-  app.use(
-    require('webpack-hot-middleware')(compiler, {
-      path: '/__webpack_hmr',
-      heartbeat: 10e3,
-    })
-  );
+  app.use(hotReload.makeServer(compiler));
 
   const server = http.createServer(app);
-  server.listen(3000, () => {
+  server.listen(port, host, () => {
     console.log('listening', server.address());
     // if (err) {
     //   console.log(err, '\nWatch failed');
@@ -114,4 +102,6 @@ const printErrors = errors => {
   console.log(errors.join('\n\n') + '\n');
 };
 
-startWatch(config);
+console.log(chalk.cyan('Starting the development server...\n'));
+setupBuildDir();
+startServer(HOST, PORT, config);

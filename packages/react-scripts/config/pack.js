@@ -10,6 +10,7 @@ const servedPath = pack => path.join(paths.servedPath, name(pack));
 const contextPath = pack => path.join(paths.appPath, dir(pack));
 const buildPath = pack => path.join(paths.appBuild, name(pack));
 const indexHtml = pack => path.join(contextPath(pack), 'public/index.html');
+const indexJs = () => './src/index.tsx';
 
 module.exports = {
   findAll,
@@ -19,4 +20,5 @@ module.exports = {
   contextPath,
   buildPath,
   indexHtml,
+  indexJs,
 };
