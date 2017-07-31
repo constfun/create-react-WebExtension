@@ -34,8 +34,6 @@ const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const { setupBuildDir } = require('./utils/common');
 const devMiddleware = require('webpack-dev-middleware');
 const hotReload = require('./utils/hot-reload');
-var http = require('http');
-var express = require('express');
 
 const isInteractive = process.stdout.isTTY;
 
@@ -45,35 +43,29 @@ const isInteractive = process.stdout.isTTY;
 // }
 
 const startServer = (host, port, config) => {
-  const app = express();
   const compiler = webpack(config);
 
-  app.use(
-    devMiddleware(compiler, {
-      noInfo: true,
-      publicPath: '/',
-      reporter: reporter,
-    })
-  );
-  app.use(hotReload.makeServer(compiler));
+  compiler.watch({}, (err, stats) => {
+    if (err) {
+      console.log(err, chalk.red('\nCompiler watch failed'));
+    }
 
-  const server = http.createServer(app);
-  server.listen(port, host, () => {
+    if (isInteractive) {
+      clearConsole();
+    }
+
+    const messages = formatWebpackMessages(stats.toJson({}, true));
+    if (messages.errors.length) {
+      printErrors(messages.errors);
+    } else {
+      printWarnings(messages.warnings);
+    }
+  });
+
+  const hotReloadServer = hotReload.makeServer(compiler);
+  hotReloadServer.listen(port, host, () => {
     console.log(chalk.cyan('Starting the development server...\n'));
   });
-};
-
-const reporter = report => {
-  if (isInteractive) {
-    clearConsole();
-  }
-
-  const messages = formatWebpackMessages(report.stats.toJson({}, true));
-  if (messages.errors.length) {
-    printErrors(messages.errors);
-  } else {
-    printWarnings(messages.warnings);
-  }
 };
 
 const printWarnings = warnings => {

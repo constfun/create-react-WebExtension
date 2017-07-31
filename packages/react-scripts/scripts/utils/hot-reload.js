@@ -1,25 +1,33 @@
 /* globals browser */
 'use strict';
 
-const url = require('url');
-const hotMiddleware = require('webpack-hot-middleware');
-
 const PATH = '/__hot-reload';
 
 const makeServer = (compiler, opts = {}) => {
-  return hotMiddleware(
-    compiler,
-    Object.assign(
-      {
-        path: PATH,
-        heartbeat: 10e3,
-      },
-      opts
+  const http = require('http');
+  const express = require('express');
+  const hotMiddleware = require('webpack-hot-middleware');
+
+  const app = express();
+  app.use(
+    hotMiddleware(
+      compiler,
+      Object.assign(
+        {
+          path: PATH,
+          heartbeat: 10e3,
+        },
+        opts
+      )
     )
   );
+
+  return http.createServer(app);
 };
 
 const makeClient = address => {
+  const url = require('url');
+
   const loadedHashes = new Set();
   console.log(address);
   const connection = new window.EventSource(url.resolve(address, PATH));

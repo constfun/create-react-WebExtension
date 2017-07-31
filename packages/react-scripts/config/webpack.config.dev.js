@@ -10,7 +10,6 @@
 // @remove-on-eject-end
 'use strict';
 
-const url = require('url');
 const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
@@ -20,7 +19,6 @@ const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
-const WriteFilePlugin = require('write-file-webpack-plugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 const Pack = require('./pack');
@@ -310,7 +308,6 @@ const getConfig = pack => {
       // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
       // You can remove this if you don't use Moment.js:
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-      new WriteFilePlugin(),
     ],
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.
