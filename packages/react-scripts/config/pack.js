@@ -9,6 +9,7 @@ const dir = pack => path.dirname(pack);
 const servedPath = pack => path.join(paths.servedPath, name(pack));
 const contextPath = pack => path.join(paths.appPath, dir(pack));
 const buildPath = pack => path.join(paths.appBuild, name(pack));
+const indexHtml = pack => path.join(contextPath(pack), 'public/index.html');
 
 module.exports = {
   findAll,
@@ -17,4 +18,5 @@ module.exports = {
   servedPath,
   contextPath,
   buildPath,
+  indexHtml,
 };

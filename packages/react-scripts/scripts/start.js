@@ -33,6 +33,9 @@ const paths = require('../config/paths');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const { setupBuildDir } = require('./utils/common');
 
+var http = require('http');
+var express = require('express');
+
 const isInteractive = process.stdout.isTTY;
 
 // Warn and crash if required files are missing
@@ -45,22 +48,42 @@ const startWatch = config => {
 
   setupBuildDir(paths);
 
+  const app = express();
   const compiler = webpack(config);
-  compiler.watch({}, (err, stats) => {
-    if (err) {
-      console.log(err, '\nWatch failed');
-    }
 
-    if (isInteractive) {
-      clearConsole();
-    }
+  // Step 2: Attach the dev middleware to the compiler & the server
+  app.use(
+    require('webpack-dev-middleware')(compiler, {
+      noInfo: true,
+      publicPath: '/',
+    })
+  );
 
-    const messages = formatWebpackMessages(stats.toJson({}, true));
-    if (messages.errors.length) {
-      printErrors(messages.errors);
-    } else {
-      printWarnings(messages.warnings);
-    }
+  // Step 3: Attach the hot middleware to the compiler & the server
+  app.use(
+    require('webpack-hot-middleware')(compiler, {
+      path: '/__webpack_hmr',
+      heartbeat: 10e3,
+    })
+  );
+
+  const server = http.createServer(app);
+  server.listen(3000, () => {
+    console.log('listening', server.address());
+    // if (err) {
+    //   console.log(err, '\nWatch failed');
+    // }
+
+    // if (isInteractive) {
+    //   clearConsole();
+    // }
+
+    // const messages = formatWebpackMessages(stats.toJson({}, true));
+    // if (messages.errors.length) {
+    //   printErrors(messages.errors);
+    // } else {
+    //   printWarnings(messages.warnings);
+    // }
   });
 };
 
