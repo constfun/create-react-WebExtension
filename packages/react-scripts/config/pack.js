@@ -1,8 +1,7 @@
 'use strict';
 
 const path = require('path');
-const getPaths = require('./paths');
-const paths = getPaths();
+const paths = require('./paths');
 
 const findAll = dir => require('find').fileSync(/\.pack/, dir);
 const name = pack => path.basename(dir(pack));

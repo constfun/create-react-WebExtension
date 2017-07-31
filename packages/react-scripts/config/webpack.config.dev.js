@@ -20,12 +20,10 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
-const getPaths = require('./paths');
+const paths = require('./paths');
 const Pack = require('./pack');
 
 const getConfig = pack => {
-  const paths = getPaths();
-
   // Webpack uses `publicPath` to determine where the app is being served from.
   // In development, we always serve from the root. This makes config easier.
   const publicPath = Pack.servedPath(pack);

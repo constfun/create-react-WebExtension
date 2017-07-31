@@ -28,7 +28,7 @@ const chalk = require('chalk');
 const webpack = require('webpack');
 const clearConsole = require('react-dev-utils/clearConsole');
 const config = require('../config/webpack.config.dev');
-const getPaths = require('../config/paths');
+const paths = require('../config/paths');
 // const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const { setupBuildDir } = require('./utils/common');
@@ -40,7 +40,7 @@ const isInteractive = process.stdout.isTTY;
 //   process.exit(1);
 // }
 
-const startWatch = (config, paths) => {
+const startWatch = config => {
   console.log('Starting development server...');
 
   setupBuildDir(paths);
@@ -91,4 +91,4 @@ const printErrors = errors => {
   console.log(errors.join('\n\n') + '\n');
 };
 
-startWatch(config, getPaths());
+startWatch(config);
