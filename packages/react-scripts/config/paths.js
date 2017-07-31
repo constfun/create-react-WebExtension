@@ -151,4 +151,4 @@ const getPaths = pack => {
   return paths;
 };
 
-module.exports = { getPaths };
+module.exports = getPaths;

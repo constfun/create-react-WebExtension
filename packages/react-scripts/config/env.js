@@ -12,7 +12,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const paths = require('./paths').getPaths();
+const getPaths = require('./paths');
+
+const paths = getPaths();
 
 // Make sure that including paths.js after env.js will read .env variables.
 delete require.cache[require.resolve('./paths')];

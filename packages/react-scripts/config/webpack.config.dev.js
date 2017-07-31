@@ -14,14 +14,14 @@ const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
-const WriteFilePlugin = require('write-file-webpack-plugin');
 const Pack = require('./pack');
 const getClientEnvironment = require('./env');
-const { getPaths } = require('./paths');
+const getPaths = require('./paths');
 
 const getConfig = pack => {
   const appPaths = getPaths();
@@ -30,12 +30,27 @@ const getConfig = pack => {
   // Webpack uses `publicPath` to determine where the app is being served from.
   // In development, we always serve from the root. This makes config easier.
   const publicPath = paths.servedPath;
+  // Some apps do not use client-side routing with pushState.
+  // For these, "homepage" can be set to "." to enable relative asset paths.
+  const shouldUseRelativeAssetPaths = publicPath === './';
   // `publicUrl` is just like `publicPath`, but we will provide it to our app
   // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
   // Omit trailing slash as %PUBLIC_PATH%/xyz looks better than %PUBLIC_PATH%xyz.
   const publicUrl = '';
   // Get environment variables to inject into our app.
   const env = getClientEnvironment(publicUrl);
+
+  // Note: defined here because it will be used more than once.
+  const cssFilename = 'static/css/[name].css';
+
+  // ExtractTextPlugin expects the build output to be flat.
+  // (See https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/27)
+  // However, our output is structured with css, js and media folders.
+  // To have this structure working with relative paths, we have to use custom options.
+  const extractTextPluginOptions = shouldUseRelativeAssetPaths
+    ? // Making sure that the publicPath goes back to to build folder.
+      { publicPath: Array(cssFilename.split('/').length).join('../') }
+    : {};
 
   // This is the development configuration.
   // It is focused on developer experience and fast rebuilds.
@@ -77,7 +92,7 @@ const getConfig = pack => {
       // This does not produce a real file. It's just the virtual path that is
       // served by WebpackDevServer in development. This is the JS bundle
       // containing code from all our entry points, and the Webpack runtime.
-      filename: 'static/js/bundle.js',
+      filename: 'static/js/[name].js',
       // There are also additional JS chunk files if you use code splitting.
       chunkFilename: 'static/js/[name].chunk.js',
       // This is the URL that app is served from. We use "/" in development.
@@ -212,35 +227,42 @@ const getConfig = pack => {
         // in development "style" loader enables hot editing of CSS.
         {
           test: /\.css$/,
-          use: [
-            require.resolve('style-loader'),
-            {
-              loader: require.resolve('css-loader'),
-              options: {
-                importLoaders: 1,
-              },
-            },
-            {
-              loader: require.resolve('postcss-loader'),
-              options: {
-                // Necessary for external CSS imports to work
-                // https://github.com/facebookincubator/create-react-app/issues/2677
-                ident: 'postcss',
-                plugins: () => [
-                  require('postcss-flexbugs-fixes'),
-                  autoprefixer({
-                    browsers: [
-                      '>1%',
-                      'last 4 versions',
-                      'Firefox ESR',
-                      'not ie < 9', // React doesn't support IE8 anyway
-                    ],
-                    flexbox: 'no-2009',
-                  }),
+          loader: ExtractTextPlugin.extract(
+            Object.assign(
+              {
+                fallback: require.resolve('style-loader'),
+                use: [
+                  {
+                    loader: require.resolve('css-loader'),
+                    options: {
+                      importLoaders: 1,
+                    },
+                  },
+                  {
+                    loader: require.resolve('postcss-loader'),
+                    options: {
+                      // Necessary for external CSS imports to work
+                      // https://github.com/facebookincubator/create-react-app/issues/2677
+                      ident: 'postcss',
+                      plugins: () => [
+                        require('postcss-flexbugs-fixes'),
+                        autoprefixer({
+                          browsers: [
+                            '>1%',
+                            'last 4 versions',
+                            'Firefox ESR',
+                            'not ie < 9', // React doesn't support IE8 anyway
+                          ],
+                          flexbox: 'no-2009',
+                        }),
+                      ],
+                    },
+                  },
                 ],
               },
-            },
-          ],
+              extractTextPluginOptions
+            )
+          ),
         },
         // ** STOP ** Are you adding a new loader?
         // Remember to add the new extension(s) to the "url" loader exclusion list.
@@ -262,6 +284,10 @@ const getConfig = pack => {
       // Makes some environment variables available to the JS code, for example:
       // if (process.env.NODE_ENV === 'development') { ... }. See `./env.js`.
       new webpack.DefinePlugin(env.stringified),
+      // Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
+      new ExtractTextPlugin({
+        filename: cssFilename,
+      }),
       // Watcher doesn't work well if you mistype casing in a path so we use
       // a plugin that prints an error when you attempt to do this.
       // See https://github.com/facebookincubator/create-react-app/issues/240
@@ -277,9 +303,6 @@ const getConfig = pack => {
       // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
       // You can remove this if you don't use Moment.js:
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-      // WebExtensions require that files be preset on disk,
-      // since this is the only way to install a temprorary extension in development.
-      new WriteFilePlugin(),
     ],
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.

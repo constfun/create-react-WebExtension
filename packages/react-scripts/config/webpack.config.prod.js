@@ -19,7 +19,7 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const Pack = require('./pack');
-const { getPaths } = require('./paths');
+const getPaths = require('./paths');
 const getClientEnvironment = require('./env');
 
 const getConfig = pack => {
@@ -74,7 +74,7 @@ const getConfig = pack => {
       // Generated JS file names (with nested folders).
       // There will be one main bundle, and one file per asynchronous chunk.
       // We don't currently advertise code splitting but Webpack supports it.
-      filename: 'static/js/bundle.js',
+      filename: 'static/js/[name].js',
       chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
       // We inferred the "public path" (such as / or /my-project) from homepage.
       publicPath: publicPath,
