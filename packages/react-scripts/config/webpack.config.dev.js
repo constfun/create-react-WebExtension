@@ -18,6 +18,7 @@ const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
+const WriteFilePlugin = require('write-file-webpack-plugin');
 const Pack = require('./pack');
 const getClientEnvironment = require('./env');
 const { getPaths } = require('./paths');
@@ -28,7 +29,7 @@ const getConfig = pack => {
 
   // Webpack uses `publicPath` to determine where the app is being served from.
   // In development, we always serve from the root. This makes config easier.
-  const publicPath = '/';
+  const publicPath = paths.servedPath;
   // `publicUrl` is just like `publicPath`, but we will provide it to our app
   // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
   // Omit trailing slash as %PUBLIC_PATH%/xyz looks better than %PUBLIC_PATH%xyz.
@@ -57,7 +58,7 @@ const getConfig = pack => {
       // the line below with these two lines if you prefer the stock client:
       // require.resolve('webpack-dev-server/client') + '?/',
       // require.resolve('webpack/hot/dev-server'),
-      require.resolve('react-dev-utils/webpackHotDevClient'),
+      require.resolve('./hot-reloader'),
       // We ship a few polyfills by default:
       require.resolve('./polyfills'),
       // Errors should be considered fatal in development
@@ -278,6 +279,9 @@ const getConfig = pack => {
       // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
       // You can remove this if you don't use Moment.js:
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+      // WebExtensions require that files be preset on disk,
+      // since this is the only way to install a temprorary extension in development.
+      new WriteFilePlugin(),
     ],
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.
