@@ -13,9 +13,9 @@
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
-const Pack = require('./pack');
 
 const getPaths = pack => {
+  const Pack = require('./pack');
   let paths = {};
 
   // Make sure any symlinks in the project folder are resolved:

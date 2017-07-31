@@ -19,17 +19,16 @@ const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
-const Pack = require('./pack');
 const getClientEnvironment = require('./env');
 const getPaths = require('./paths');
+const Pack = require('./pack');
 
 const getConfig = pack => {
-  const appPaths = getPaths();
-  const paths = getPaths(pack);
+  const paths = getPaths();
 
   // Webpack uses `publicPath` to determine where the app is being served from.
   // In development, we always serve from the root. This makes config easier.
-  const publicPath = paths.servedPath;
+  const publicPath = Pack.servedPath(pack);
   // Some apps do not use client-side routing with pushState.
   // For these, "homepage" can be set to "." to enable relative asset paths.
   const shouldUseRelativeAssetPaths = publicPath === './';
@@ -59,7 +58,7 @@ const getConfig = pack => {
     // You may want 'eval' instead if you prefer to see the compiled output in DevTools.
     // See the discussion in https://github.com/facebookincubator/create-react-app/issues/343.
     devtool: 'cheap-module-source-map',
-    context: path.join(paths.appPath, Pack.dir(pack)),
+    context: Pack.contextPath(pack),
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
     // The first two entry points enable "hot" CSS and auto-refreshes for JS.
@@ -80,14 +79,14 @@ const getConfig = pack => {
       // Errors should be considered fatal in development
       require.resolve('react-error-overlay'),
       // Finally, this is your app's code:
-      paths.appIndexJs,
+      './src/index.tsx',
       // We include the app code last so that if there is a runtime error during
       // initialization, it doesn't blow up the WebpackDevServer client, and
       // changing JS code would still trigger a refresh.
     ],
     output: {
       // Next line is not used in dev but WebpackDevServer crashes without it:
-      path: paths.appBuild,
+      path: Pack.buildPath(pack),
       // Add /* filename */ comments to generated require()s in the output.
       pathinfo: true,
       // This does not produce a real file. It's just the virtual path that is
@@ -107,7 +106,7 @@ const getConfig = pack => {
       // We placed these paths second because we want `node_modules` to "win"
       // if there are any conflicts. This matches Node resolution mechanism.
       // https://github.com/facebookincubator/create-react-app/issues/253
-      modules: ['node_modules', appPaths.appNodeModules].concat(
+      modules: ['node_modules', paths.appNodeModules].concat(
         // It is guaranteed to exist because we tweak it in `env.js`
         process.env.NODE_PATH.split(path.delimiter).filter(Boolean)
       ),
@@ -148,7 +147,7 @@ const getConfig = pack => {
         // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
         // please link the files into your node_modules/ and let module-resolution kick in.
         // Make sure your source files are compiled, as they will not be processed in any way.
-        new ModuleScopePlugin(appPaths.appSrc),
+        new ModuleScopePlugin(paths.appSrc),
       ],
     },
     module: {
@@ -164,13 +163,13 @@ const getConfig = pack => {
           test: /\.(ts|tsx)$/,
           loader: require.resolve('tslint-loader'),
           enforce: 'pre',
-          include: appPaths.appSrc,
+          include: paths.appSrc,
         },
         {
           test: /\.js$/,
           loader: require.resolve('source-map-loader'),
           enforce: 'pre',
-          include: appPaths.appSrc,
+          include: paths.appSrc,
         },
         // ** ADDING/UPDATING LOADERS **
         // The "file" loader handles all assets unless explicitly excluded.
@@ -218,7 +217,7 @@ const getConfig = pack => {
         // Compile .tsx?
         {
           test: /\.(ts|tsx)$/,
-          include: appPaths.appSrc,
+          include: paths.appSrc,
           loader: require.resolve('ts-loader'),
         },
         // "postcss" loader applies autoprefixer to our CSS.
@@ -297,7 +296,7 @@ const getConfig = pack => {
       // to restart the development server for Webpack to discover it. This plugin
       // makes the discovery automatic so you don't have to restart.
       // See https://github.com/facebookincubator/create-react-app/issues/186
-      new WatchMissingNodeModulesPlugin(appPaths.appNodeModules),
+      new WatchMissingNodeModulesPlugin(paths.appNodeModules),
       // Moment.js is an extremely popular library that bundles large locale files
       // by default due to how Webpack interprets its code. This is a practical
       // solution that requires the user to opt into importing specific locales.
