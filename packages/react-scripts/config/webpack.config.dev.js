@@ -26,6 +26,10 @@ const Pack = require('./pack');
 const PORT = parseInt(process.env.PORT, 10) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 const PROTOCOL = process.env.HTTPS === 'true' ? 'https' : 'http';
+// We need to know the absolute url since we can't use window.location to infer
+// it on the client. On the client is running in an extension content script.
+// And, the location will be something like moz-extension://123-123-123/rel/path.html
+const URL = `${PROTOCOL}://${HOST}:${PORT}`;
 
 const getConfig = pack => {
   // Webpack uses `publicPath` to determine where the app is being served from.
@@ -40,10 +44,6 @@ const getConfig = pack => {
   const publicUrl = '';
   // Get environment variables to inject into our app.
   const env = getClientEnvironment(publicUrl);
-  // We need the absolute url since we can't use window.location on the client,
-  // since client is running in an extension content script. And, the location
-  // will be something like moz-extension://123-123-123/rel/path/here.html
-  const hotReloadServerUrl = `${PROTOCOL}://${HOST}:${PORT}`;
   // Note: defined here because it will be used more than once.
   const cssFilename = 'static/css/[name].css';
   // ExtractTextPlugin expects the build output to be flat.
@@ -78,7 +78,7 @@ const getConfig = pack => {
       // require.resolve('webpack-dev-server/client') + '?/',
       // require.resolve('webpack/hot/dev-server'),
       require.resolve('../scripts/utils/hot-reload-runtime') +
-        `?server_url=${encodeURIComponent(hotReloadServerUrl)}`,
+        `?server_url=${encodeURIComponent(URL)}`,
       // We ship a few polyfills by default:
       require.resolve('./polyfills'),
       // Errors should be considered fatal in development
@@ -332,4 +332,5 @@ module.exports = {
   PORT,
   HOST,
   PROTOCOL,
+  URL,
 };
