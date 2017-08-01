@@ -10,6 +10,8 @@
 // @remove-on-eject-end
 'use strict';
 
+const fs = require('fs');
+const chalk = require('chalk');
 const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
@@ -20,6 +22,7 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
+const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const Pack = require('./pack');
 
 const PORT = parseInt(process.env.PORT, 10) || 3000;
@@ -356,10 +359,57 @@ const makePackConfig = pack => {
     : config;
 };
 
+const makeAppConfig = () => {
+  const appPaths = require('./paths');
+  const shouldBuildApp =
+    fs.existsSync(appPaths.appHtml) || fs.existsSync(appPaths.appIndexJs);
+  if (!shouldBuildApp) {
+    console.log(
+      chalk.yellow(
+        'Skipping building the root app since neither of the following files exists:'
+      )
+    );
+    console.log(`\t${appPaths.appHtml}`);
+    console.log(`\t${appPaths.appIndexJs}`);
+    return null;
+  }
+  // Warn and crash if required files are missing
+  if (!checkRequiredFiles([appPaths.appHtml, appPaths.appIndexJs])) {
+    process.exit(1);
+  }
+
+  // Webpack uses `publicPath` to determine where the app is being served from.
+  // It requires a trailing slash, or the file assets will get an incorrect path.
+  const publicPath = appPaths.servedPath;
+  // `publicUrl` is just like `publicPath`, but we will provide it to our app
+  // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
+  // Omit trailing slash as %PUBLIC_PATH%/xyz looks better than %PUBLIC_PATH%xyz.
+  const publicUrl = publicPath.slice(0, -1);
+  // Env variables that will be injected into the app.
+  const clientEnv = getClientEnvironment(publicUrl);
+
+  return withIndexHtml(
+    makeDevConfig({
+      clientEnv,
+      publicPath,
+      // Context is the directory to which entry points and loaders are relative to.
+      context: fs.realpathSync(process.cwd()),
+      // The build pack changes, along with the context, to support different build packs.
+      buildPath: appPaths.appBuild,
+      // At the very minimum we need a js entry point.
+      indexJs: appPaths.appIndexJs,
+    }),
+    clientEnv,
+    appPaths.appHtml
+  );
+};
+
 // const makeMultiConfig = () => {
 // };
 
-const config = Pack.findAll('src').map(makePackConfig);
+const packConfigs = Pack.findAll('src').map(makePackConfig);
+const appConfig = makeAppConfig();
+const config = [appConfig].concat(packConfigs).filter(c => c);
 
 module.exports = {
   config,
