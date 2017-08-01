@@ -10,9 +10,10 @@ const name = pack => path.basename(dir(pack));
 const dir = pack => path.dirname(pack);
 const servedPath = pack => path.join(paths.servedPath, name(pack));
 const contextPath = pack => path.join(paths.appPath, dir(pack));
+const publicPath = pack => path.join(contextPath(pack), 'public');
 const buildPath = pack => path.join(paths.appBuild, name(pack));
 const indexHtml = pack => {
-  const indexFile = path.join(contextPath(pack), 'public/index.html');
+  const indexFile = path.join(publicPath(pack), 'index.html');
   if (fs.existsSync(indexFile)) {
     return indexFile;
   } else {
@@ -30,4 +31,5 @@ module.exports = {
   buildPath,
   indexHtml,
   indexJs,
+  publicPath,
 };

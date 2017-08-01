@@ -366,11 +366,12 @@ const makeAppConfig = () => {
   if (!shouldBuildApp) {
     console.log(
       chalk.yellow(
-        'Skipping building the root app since neither of the following files exists:'
+        'Skipping building of the root app since neither of the following files exists:'
       )
     );
     console.log(`\t${appPaths.appHtml}`);
     console.log(`\t${appPaths.appIndexJs}`);
+    console.log(chalk.yellow('Note that the public folder is still coppied.'));
     return null;
   }
   // Warn and crash if required files are missing
