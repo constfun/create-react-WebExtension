@@ -2,46 +2,33 @@
 
 const fs = require('fs-extra');
 const path = require('path');
-const Pack = require('../../config/pack');
-const APP_PATHS = require('../../config/paths');
+const { loadApp, loadPacks } = require('./build-pack');
 
-const copyPublicFolders = () => {
-  const { appPublic, appBuild, appHtml } = APP_PATHS;
-  // console.log(Pack.buildPath(pack), Pack.publicPath(pack));
-  fs.copySync(appPublic, appBuild, {
+const copyPublicFolder = pack => {
+  fs.copySync(pack.publicPath, pack.buildPath, {
     dereference: true,
-    filter: file => file !== appHtml,
-  });
-
-  Pack.findAll('src').map(pack => {
-    if (!fs.existsSync(Pack.publicPath(pack))) {
-      return;
-    }
-    fs.copySync(Pack.publicPath(pack), Pack.buildPath(pack), {
-      dereference: true,
-      filter: file => file !== Pack.indexHtml(pack),
-    });
+    filter: file => file !== pack.indexHtml,
   });
 };
 
-const manifestPaths = () => {
-  const { appPublic, appBuild } = APP_PATHS;
+const manifestPaths = appPaths => {
+  const { appPublic, appBuild } = appPaths;
   const manifestSrc = path.join(appPublic, 'manifest.json');
   const manifestDest = path.join(appBuild, 'manifest.json');
   return { manifestSrc, manifestDest };
 };
 
-const copyProdManifest = () => {
-  const { manifestSrc, manifestDest } = manifestPaths();
+const copyProdManifest = appPaths => {
+  const { manifestSrc, manifestDest } = manifestPaths(appPaths);
   fs.copySync(manifestSrc, manifestDest);
 };
 
-const copyDevManifest = () => {
+const copyDevManifest = appPaths => {
   if (process.env.NODE_ENV !== 'development') {
     throw 'Asked to copy development version of the manifest in a non-development environment.';
   }
 
-  const { manifestSrc, manifestDest } = manifestPaths();
+  const { manifestSrc, manifestDest } = manifestPaths(appPaths);
   const manifest = require(manifestSrc);
   fs.writeFile(
     manifestDest,
@@ -60,20 +47,29 @@ const injectDevServerPermissions = manifest => {
   return manifest;
 };
 
-const setupBuildDir = () => {
-  const { appBuild } = APP_PATHS;
-  // We needs the files on disk for installing a temporary extension.
-  fs.emptyDirSync(appBuild);
-  // Merge with the public folder
-  copyPublicFolders();
-
+const setupBuildDir = (appPaths, packs) => {
+  // Clean.
+  fs.emptyDirSync(appPaths.appBuild);
+  // Merge public folders.
+  packs.forEach(copyPublicFolder);
+  // In development we inject extra permissions to support hot reload.
   if (process.env.NODE_ENV === 'development') {
-    copyDevManifest();
+    copyDevManifest(appPaths);
   } else {
-    copyProdManifest();
+    copyProdManifest(appPaths);
   }
 };
 
+const setupBuild = () => {
+  const appPaths = require('../../config/paths');
+  const app = loadApp(appPaths);
+  const appPacks = loadPacks(app);
+  const allPacks = [].concat(app, appPacks);
+  setupBuildDir(appPaths, allPacks);
+
+  return allPacks.filter(p => p.shouldBuild);
+};
+
 module.exports = {
-  setupBuildDir,
+  setupBuild,
 };

@@ -27,20 +27,10 @@ require('../config/env');
 const chalk = require('chalk');
 const webpack = require('webpack');
 const clearConsole = require('react-dev-utils/clearConsole');
-const { config, PORT, HOST } = require('../config/webpack.config.dev');
-const paths = require('../config/paths');
-// const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
+const { makeDevConfig, PORT, HOST } = require('../config/webpack.config.dev');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
-const { setupBuildDir } = require('./utils/common');
-const devMiddleware = require('webpack-dev-middleware');
+const { setupBuild } = require('./utils/common');
 const hotReload = require('./utils/hot-reload');
-
-const isInteractive = process.stdout.isTTY;
-
-// Warn and crash if required files are missing
-// if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
-//   process.exit(1);
-// }
 
 const startServer = (host, port, config) => {
   const compiler = webpack(config);
@@ -50,6 +40,7 @@ const startServer = (host, port, config) => {
       console.log(err, chalk.red('\nCompiler watch failed'));
     }
 
+    const isInteractive = process.stdout.isTTY;
     if (isInteractive) {
       clearConsole();
     }
@@ -95,5 +86,5 @@ const printErrors = errors => {
   console.log(errors.join('\n\n') + '\n');
 };
 
-setupBuildDir();
-startServer(HOST, PORT, config);
+const configs = setupBuild().map(makeDevConfig);
+startServer(HOST, PORT, configs);

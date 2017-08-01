@@ -10,8 +10,6 @@
 // @remove-on-eject-end
 'use strict';
 
-const fs = require('fs');
-const chalk = require('chalk');
 const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
@@ -22,8 +20,6 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
-const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
-const Pack = require('./pack');
 
 const PORT = parseInt(process.env.PORT, 10) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
@@ -33,13 +29,19 @@ const PROTOCOL = process.env.HTTPS === 'true' ? 'https' : 'http';
 // And, the location will be something like moz-extension://123-123-123/rel/path.html
 const URL = `${PROTOCOL}://${HOST}:${PORT}`;
 
-const makeDevConfig = opts => {
-  const { clientEnv, context, publicPath, buildPath, indexJs } = opts;
-  // These paths are global to the project and do not vary.
+const makeDevConfig = pack => {
+  const { contextPath, servedPath, buildPath, indexJs } = pack;
+  // These paths are global to the project and do not vary by pack.
   const { appSrc, appNodeModules } = require('./paths');
+  // `publicUrl` is just like `publicPath`, but we will provide it to our app
+  // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
+  // Omit trailing slash as %PUBLIC_PATH%/xyz looks better than %PUBLIC_PATH%xyz.
+  const publicUrl = servedPath.slice(0, -1);
+  // Env variables that will be injected into the app.
+  const clientEnv = getClientEnvironment(publicUrl);
   // Some apps do not use client-side routing with pushState.
   // For these, "homepage" can be set to "." to enable relative asset paths.
-  const shouldUseRelativeAssetPaths = publicPath === './';
+  const shouldUseRelativeAssetPaths = servedPath === './';
   // Note: defined here because it will be used more than once.
   const cssFilename = 'static/css/[name].css';
   // ExtractTextPlugin expects the build output to be flat.
@@ -51,6 +53,21 @@ const makeDevConfig = opts => {
       { publicPath: Array(cssFilename.split('/').length).join('../') }
     : {};
 
+  let plugins = pack.indexHtml
+    ? [
+        // Makes some environment variables available in index.html.
+        // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
+        // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+        // In development, this will be an empty string.
+        new InterpolateHtmlPlugin(clientEnv.raw),
+        // Generates an `index.html` file with the <script> injected.
+        new HtmlWebpackPlugin({
+          inject: true,
+          template: pack.indexHtml,
+        }),
+      ]
+    : [];
+
   // This is the development configuration.
   // It is focused on developer experience and fast rebuilds.
   // The production configuration is different and lives in a separate file.
@@ -58,7 +75,7 @@ const makeDevConfig = opts => {
     // You may want 'eval' instead if you prefer to see the compiled output in DevTools.
     // See the discussion in https://github.com/facebookincubator/create-react-app/issues/343.
     devtool: 'cheap-module-source-map',
-    context,
+    context: contextPath,
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
     // The first two entry points enable "hot" CSS and auto-refreshes for JS.
@@ -96,8 +113,8 @@ const makeDevConfig = opts => {
       filename: 'static/js/[name].js',
       // There are also additional JS chunk files if you use code splitting.
       chunkFilename: 'static/js/[name].chunk.js',
-      // This is the URL that app is served from. We use "/" in development.
-      publicPath: publicPath,
+      // This is the URL that app is served from.
+      publicPath: servedPath,
       // Point sourcemap entries to original disk location (format as URL on Windows)
       devtoolModuleFilenameTemplate: info =>
         path.resolve(info.absoluteResourcePath).replace(/\\/g, '/'),
@@ -271,7 +288,7 @@ const makeDevConfig = opts => {
         // Remember to add the new extension(s) to the "url" loader exclusion list.
       ],
     },
-    plugins: [
+    plugins: plugins.concat([
       // Add module names to factory functions so they appear in browser profiler.
       new webpack.NamedModulesPlugin(),
       // Makes some environment variables available to the JS code, for example:
@@ -296,7 +313,7 @@ const makeDevConfig = opts => {
       // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
       // You can remove this if you don't use Moment.js:
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    ],
+    ]),
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.
     node: {
@@ -314,106 +331,8 @@ const makeDevConfig = opts => {
   };
 };
 
-const withIndexHtml = (config, clientEnv, indexHtml) => {
-  config.plugins = [
-    // Makes some environment variables available in index.html.
-    // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
-    // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-    // In development, this will be an empty string.
-    new InterpolateHtmlPlugin(clientEnv.raw),
-    // Generates an `index.html` file with the <script> injected.
-    new HtmlWebpackPlugin({
-      inject: true,
-      template: indexHtml,
-    }),
-  ].concat(config.plugins);
-
-  return config;
-};
-
-const makePackConfig = pack => {
-  // Webpack uses `publicPath` to determine where the app is being served from.
-  // It requires a trailing slash, or the file assets will get an incorrect path.
-  const publicPath = Pack.servedPath(pack);
-  // `publicUrl` is just like `publicPath`, but we will provide it to our app
-  // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
-  // Omit trailing slash as %PUBLIC_PATH%/xyz looks better than %PUBLIC_PATH%xyz.
-  const publicUrl = publicPath.slice(0, -1);
-  // Env variables that will be injected into the app.
-  const clientEnv = getClientEnvironment(publicUrl);
-
-  const config = makeDevConfig({
-    clientEnv,
-    publicPath,
-    // Context is the directory to which entry points and loaders are relative to.
-    context: Pack.contextPath(pack),
-    // The build pack changes, along with the context, to support different build packs.
-    buildPath: Pack.buildPath(pack),
-    // At the very minimum we need a js entry point.
-    indexJs: Pack.indexJs(pack),
-  });
-
-  const packIndexHtml = Pack.indexHtml(pack);
-  return packIndexHtml
-    ? withIndexHtml(config, clientEnv, packIndexHtml)
-    : config;
-};
-
-const makeAppConfig = () => {
-  const appPaths = require('./paths');
-  const shouldBuildApp =
-    fs.existsSync(appPaths.appHtml) || fs.existsSync(appPaths.appIndexJs);
-  if (!shouldBuildApp) {
-    console.log(
-      chalk.yellow(
-        'Skipping building of the root app since neither of the following files exists:'
-      )
-    );
-    console.log(`\t${appPaths.appHtml}`);
-    console.log(`\t${appPaths.appIndexJs}`);
-    console.log(chalk.yellow('Note that the public folder is still coppied.'));
-    return null;
-  }
-  // Warn and crash if required files are missing
-  if (!checkRequiredFiles([appPaths.appHtml, appPaths.appIndexJs])) {
-    process.exit(1);
-  }
-
-  // Webpack uses `publicPath` to determine where the app is being served from.
-  // It requires a trailing slash, or the file assets will get an incorrect path.
-  const publicPath = appPaths.servedPath;
-  // `publicUrl` is just like `publicPath`, but we will provide it to our app
-  // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
-  // Omit trailing slash as %PUBLIC_PATH%/xyz looks better than %PUBLIC_PATH%xyz.
-  const publicUrl = publicPath.slice(0, -1);
-  // Env variables that will be injected into the app.
-  const clientEnv = getClientEnvironment(publicUrl);
-
-  return withIndexHtml(
-    makeDevConfig({
-      clientEnv,
-      publicPath,
-      // Context is the directory to which entry points and loaders are relative to.
-      context: fs.realpathSync(process.cwd()),
-      // The build pack changes, along with the context, to support different build packs.
-      buildPath: appPaths.appBuild,
-      // At the very minimum we need a js entry point.
-      indexJs: appPaths.appIndexJs,
-    }),
-    clientEnv,
-    appPaths.appHtml
-  );
-};
-
-// const makeMultiConfig = () => {
-// };
-
-const packConfigs = Pack.findAll('src').map(makePackConfig);
-const appConfig = makeAppConfig();
-const config = [appConfig].concat(packConfigs).filter(c => c);
-
 module.exports = {
-  config,
+  makeDevConfig,
   PORT,
   HOST,
   PROTOCOL,
