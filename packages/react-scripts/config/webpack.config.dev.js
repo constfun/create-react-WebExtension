@@ -339,20 +339,21 @@ const makePackConfig = pack => {
   // Env variables that will be injected into the app.
   const clientEnv = getClientEnvironment(publicUrl);
 
-  return withIndexHtml(
-    makeDevConfig({
-      clientEnv,
-      // Context is the directory to which entry points and loaders are relative to.
-      context: Pack.contextPath(pack),
-      publicPath,
-      publicUrl,
-      // The build pack changes, along with the context, to support different build packs.
-      buildPath: Pack.buildPath(pack),
-      indexJs: Pack.indexJs(pack),
-    }),
+  const config = makeDevConfig({
     clientEnv,
-    Pack.indexHtml(pack)
-  );
+    publicPath,
+    // Context is the directory to which entry points and loaders are relative to.
+    context: Pack.contextPath(pack),
+    // The build pack changes, along with the context, to support different build packs.
+    buildPath: Pack.buildPath(pack),
+    // At the very minimum we need a js entry point.
+    indexJs: Pack.indexJs(pack),
+  });
+
+  const packIndexHtml = Pack.indexHtml(pack);
+  return packIndexHtml
+    ? withIndexHtml(config, clientEnv, packIndexHtml)
+    : config;
 };
 
 // const makeMultiConfig = () => {
