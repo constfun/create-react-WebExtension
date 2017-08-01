@@ -2,8 +2,9 @@
 
 const path = require('path');
 const paths = require('./paths');
+const find = require('find');
 
-const findAll = dir => require('find').fileSync(/\.pack/, dir);
+const findAll = dir => find.fileSync(/\.pack/, dir);
 const name = pack => path.basename(dir(pack));
 const dir = pack => path.dirname(pack);
 const servedPath = pack => path.join(paths.servedPath, name(pack));

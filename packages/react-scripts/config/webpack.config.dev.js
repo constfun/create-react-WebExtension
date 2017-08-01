@@ -20,7 +20,6 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
-const paths = require('./paths');
 const Pack = require('./pack');
 
 const PORT = parseInt(process.env.PORT, 10) || 3000;
@@ -31,19 +30,13 @@ const PROTOCOL = process.env.HTTPS === 'true' ? 'https' : 'http';
 // And, the location will be something like moz-extension://123-123-123/rel/path.html
 const URL = `${PROTOCOL}://${HOST}:${PORT}`;
 
-const getConfig = pack => {
-  // Webpack uses `publicPath` to determine where the app is being served from.
-  // In development, we always serve from the root. This makes config easier.
-  const publicPath = Pack.servedPath(pack);
+const makeDevConfig = opts => {
+  const { clientEnv, context, publicPath, buildPath, indexJs } = opts;
+  // These paths are global to the project and do not vary.
+  const { appSrc, appNodeModules } = require('./paths');
   // Some apps do not use client-side routing with pushState.
   // For these, "homepage" can be set to "." to enable relative asset paths.
   const shouldUseRelativeAssetPaths = publicPath === './';
-  // `publicUrl` is just like `publicPath`, but we will provide it to our app
-  // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
-  // Omit trailing slash as %PUBLIC_PATH%/xyz looks better than %PUBLIC_PATH%xyz.
-  const publicUrl = '';
-  // Get environment variables to inject into our app.
-  const env = getClientEnvironment(publicUrl);
   // Note: defined here because it will be used more than once.
   const cssFilename = 'static/css/[name].css';
   // ExtractTextPlugin expects the build output to be flat.
@@ -62,7 +55,7 @@ const getConfig = pack => {
     // You may want 'eval' instead if you prefer to see the compiled output in DevTools.
     // See the discussion in https://github.com/facebookincubator/create-react-app/issues/343.
     devtool: 'cheap-module-source-map',
-    context: Pack.contextPath(pack),
+    context,
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
     // The first two entry points enable "hot" CSS and auto-refreshes for JS.
@@ -84,14 +77,14 @@ const getConfig = pack => {
       // Errors should be considered fatal in development
       require.resolve('react-error-overlay'),
       // Finally, this is your app's code:
-      Pack.indexJs(pack),
+      indexJs,
       // We include the app code last so that if there is a runtime error during
       // initialization, it doesn't blow up the WebpackDevServer client, and
       // changing JS code would still trigger a refresh.
     ],
     output: {
       // Next line is not used in dev but WebpackDevServer crashes without it:
-      path: Pack.buildPath(pack),
+      path: buildPath,
       // Add /* filename */ comments to generated require()s in the output.
       pathinfo: true,
       // This does not produce a real file. It's just the virtual path that is
@@ -111,7 +104,9 @@ const getConfig = pack => {
       // We placed these paths second because we want `node_modules` to "win"
       // if there are any conflicts. This matches Node resolution mechanism.
       // https://github.com/facebookincubator/create-react-app/issues/253
-      modules: ['node_modules', paths.appNodeModules].concat(
+      // NOTE: NODE_PATH is not used by TypeScript, so not sure if this code does anything.
+      //       It's left here from create-react-app, for some form of compatibility.
+      modules: ['node_modules', appNodeModules].concat(
         // It is guaranteed to exist because we tweak it in `env.js`
         process.env.NODE_PATH.split(path.delimiter).filter(Boolean)
       ),
@@ -152,7 +147,7 @@ const getConfig = pack => {
         // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
         // please link the files into your node_modules/ and let module-resolution kick in.
         // Make sure your source files are compiled, as they will not be processed in any way.
-        new ModuleScopePlugin(paths.appSrc),
+        new ModuleScopePlugin(appSrc),
       ],
     },
     module: {
@@ -168,13 +163,13 @@ const getConfig = pack => {
           test: /\.(ts|tsx)$/,
           loader: require.resolve('tslint-loader'),
           enforce: 'pre',
-          include: paths.appSrc,
+          include: appSrc,
         },
         {
           test: /\.js$/,
           loader: require.resolve('source-map-loader'),
           enforce: 'pre',
-          include: paths.appSrc,
+          include: appSrc,
         },
         // ** ADDING/UPDATING LOADERS **
         // The "file" loader handles all assets unless explicitly excluded.
@@ -222,7 +217,7 @@ const getConfig = pack => {
         // Compile .tsx?
         {
           test: /\.(ts|tsx)$/,
-          include: paths.appSrc,
+          include: appSrc,
           loader: require.resolve('ts-loader'),
         },
         // "postcss" loader applies autoprefixer to our CSS.
@@ -274,21 +269,11 @@ const getConfig = pack => {
       ],
     },
     plugins: [
-      // Makes some environment variables available in index.html.
-      // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
-      // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-      // In development, this will be an empty string.
-      new InterpolateHtmlPlugin(env.raw),
-      // Generates an `index.html` file with the <script> injected.
-      new HtmlWebpackPlugin({
-        inject: true,
-        template: Pack.indexHtml(pack),
-      }),
       // Add module names to factory functions so they appear in browser profiler.
       new webpack.NamedModulesPlugin(),
       // Makes some environment variables available to the JS code, for example:
       // if (process.env.NODE_ENV === 'development') { ... }. See `./env.js`.
-      new webpack.DefinePlugin(env.stringified),
+      new webpack.DefinePlugin(clientEnv.stringified),
       // Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
       new ExtractTextPlugin({
         filename: cssFilename,
@@ -301,7 +286,7 @@ const getConfig = pack => {
       // to restart the development server for Webpack to discover it. This plugin
       // makes the discovery automatic so you don't have to restart.
       // See https://github.com/facebookincubator/create-react-app/issues/186
-      new WatchMissingNodeModulesPlugin(paths.appNodeModules),
+      new WatchMissingNodeModulesPlugin(appNodeModules),
       // Moment.js is an extremely popular library that bundles large locale files
       // by default due to how Webpack interprets its code. This is a practical
       // solution that requires the user to opt into importing specific locales.
@@ -326,7 +311,55 @@ const getConfig = pack => {
   };
 };
 
-const config = Pack.findAll('src').map(getConfig);
+const withIndexHtml = (config, clientEnv, indexHtml) => {
+  config.plugins = [
+    // Makes some environment variables available in index.html.
+    // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
+    // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+    // In development, this will be an empty string.
+    new InterpolateHtmlPlugin(clientEnv.raw),
+    // Generates an `index.html` file with the <script> injected.
+    new HtmlWebpackPlugin({
+      inject: true,
+      template: indexHtml,
+    }),
+  ].concat(config.plugins);
+
+  return config;
+};
+
+const makePackConfig = pack => {
+  // Webpack uses `publicPath` to determine where the app is being served from.
+  // It requires a trailing slash, or the file assets will get an incorrect path.
+  const publicPath = Pack.servedPath(pack);
+  // `publicUrl` is just like `publicPath`, but we will provide it to our app
+  // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
+  // Omit trailing slash as %PUBLIC_PATH%/xyz looks better than %PUBLIC_PATH%xyz.
+  const publicUrl = publicPath.slice(0, -1);
+  // Env variables that will be injected into the app.
+  const clientEnv = getClientEnvironment(publicUrl);
+
+  return withIndexHtml(
+    makeDevConfig({
+      clientEnv,
+      // Context is the directory to which entry points and loaders are relative to.
+      context: Pack.contextPath(pack),
+      publicPath,
+      publicUrl,
+      // The build pack changes, along with the context, to support different build packs.
+      buildPath: Pack.buildPath(pack),
+      indexJs: Pack.indexJs(pack),
+    }),
+    clientEnv,
+    Pack.indexHtml(pack)
+  );
+};
+
+// const makeMultiConfig = () => {
+// };
+
+const config = Pack.findAll('src').map(makePackConfig);
+
 module.exports = {
   config,
   PORT,
