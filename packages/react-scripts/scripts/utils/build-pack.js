@@ -13,7 +13,7 @@ const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 //   buildPath,
 // }
 const loadPacks = app => {
-  const searchPath = path.join(app.contextPath, 'src');
+  const searchPath = path.join(app.packPath, 'src');
   return find
     .fileSync(/\/_pack$/, searchPath)
     .filter(packFile => path.dirname(packFile) !== searchPath)
@@ -25,6 +25,7 @@ const loadOnePack = (app, packFile) => {
   const packName = path.basename(packPath);
 
   const paths = {
+    packPath,
     shouldBuild: true,
     // Packs are always served from [servedPath]/packs/packName.
     servedPath: path.join(app.servedPath, 'packs', packName),
@@ -35,14 +36,11 @@ const loadOnePack = (app, packFile) => {
   // If there is a public sub-directory, treat the pack as if it was an entire create-react-app.
   if (fs.existsSync(publicPath) && fs.lstatSync(publicPath).isDirectory()) {
     Object.assign(paths, {
-      // Where are entry points and loaders resolved from?
-      // This might have other side-effects in webpack, and is recommended that it is set.
-      contextPath: packPath,
-      // *Must* have its own public dir.
+      // Must have its own public dir.
       publicPath,
-      // *Must* have an index html in public dir.
+      // Must have an index html in public dir.
       indexHtml: path.join(publicPath, 'index.html'),
-      // *Must* have an index tsx file in public dir.
+      // Must have an index tsx file in src dir.
       indexJs: path.join(packPath, 'src/index.tsx'),
     });
 
@@ -51,9 +49,20 @@ const loadOnePack = (app, packFile) => {
       process.exit(1);
     }
   } else {
-    // If there is no public sub-directory treat the pack as if it was an app
-    // containing only src directory with an indexJs and no public files.
-    throw false; // assert
+    // If there is no public sub-directory treat the pack as if it was just the src directory, with no public files.
+    Object.assign(paths, {
+      // Will not have its own public dir.
+      publicPath: null,
+      // Will not have an index html in public dir.
+      indexHtml: null,
+      // Must have an index tsx file in pack dir.
+      indexJs: path.join(packPath, 'index.tsx'),
+    });
+
+    // Warn and crash if required files are missing for the pack.
+    if (!checkRequiredFiles([paths.indexJs])) {
+      process.exit(1);
+    }
   }
 
   return Object.freeze(paths);
@@ -82,28 +91,12 @@ const loadApp = paths => {
     shouldBuild,
     servedPath: paths.servedPath,
     buildPath: paths.appBuild,
-    contextPath: path.dirname(paths.dotenv),
+    packPath: path.dirname(paths.dotenv),
     publicPath: paths.appPublic,
     indexHtml: paths.appHtml,
     indexJs: paths.appIndexJs,
   });
 };
-
-// const name = pack => path.basename(dir(pack));
-// const dir = pack => path.dirname(pack);
-// const servedPath = pack => path.join(paths.servedPath, name(pack));
-// const contextPath = pack => path.join(paths.appPath, dir(pack));
-// const publicPath = pack => path.join(contextPath(pack), 'public');
-// const buildPath = pack => path.join(paths.appBuild, name(pack));
-// const indexHtml = pack => {
-//   const indexFile = path.join(publicPath(pack), 'index.html');
-//   if (fs.existsSync(indexFile)) {
-//     return indexFile;
-//   } else {
-//     return null;
-//   }
-// };
-// const indexJs = () => './src/index.tsx';
 
 module.exports = {
   loadPacks,

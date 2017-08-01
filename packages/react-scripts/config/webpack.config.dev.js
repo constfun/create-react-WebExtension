@@ -30,7 +30,7 @@ const PROTOCOL = process.env.HTTPS === 'true' ? 'https' : 'http';
 const URL = `${PROTOCOL}://${HOST}:${PORT}`;
 
 const makeDevConfig = pack => {
-  const { contextPath, servedPath, buildPath, indexJs } = pack;
+  const { servedPath, buildPath, indexJs } = pack;
   // These paths are global to the project and do not vary by pack.
   const { appSrc, appNodeModules } = require('./paths');
   // `publicUrl` is just like `publicPath`, but we will provide it to our app
@@ -53,20 +53,21 @@ const makeDevConfig = pack => {
       { publicPath: Array(cssFilename.split('/').length).join('../') }
     : {};
 
-  let plugins = pack.indexHtml
-    ? [
-        // Makes some environment variables available in index.html.
-        // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
-        // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-        // In development, this will be an empty string.
-        new InterpolateHtmlPlugin(clientEnv.raw),
-        // Generates an `index.html` file with the <script> injected.
-        new HtmlWebpackPlugin({
-          inject: true,
-          template: pack.indexHtml,
-        }),
-      ]
-    : [];
+  let plugins =
+    pack.indexHtml !== null
+      ? [
+          // Makes some environment variables available in index.html.
+          // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
+          // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+          // In development, this will be an empty string.
+          new InterpolateHtmlPlugin(clientEnv.raw),
+          // Generates an `index.html` file with the <script> injected.
+          new HtmlWebpackPlugin({
+            inject: true,
+            template: pack.indexHtml,
+          }),
+        ]
+      : [];
 
   // This is the development configuration.
   // It is focused on developer experience and fast rebuilds.
@@ -75,7 +76,6 @@ const makeDevConfig = pack => {
     // You may want 'eval' instead if you prefer to see the compiled output in DevTools.
     // See the discussion in https://github.com/facebookincubator/create-react-app/issues/343.
     devtool: 'cheap-module-source-map',
-    context: contextPath,
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
     // The first two entry points enable "hot" CSS and auto-refreshes for JS.

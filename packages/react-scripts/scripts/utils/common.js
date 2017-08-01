@@ -5,6 +5,9 @@ const path = require('path');
 const { loadApp, loadPacks } = require('./build-pack');
 
 const copyPublicFolder = pack => {
+  if (pack.publicPath === null) {
+    return;
+  }
   fs.copySync(pack.publicPath, pack.buildPath, {
     dereference: true,
     filter: file => file !== pack.indexHtml,
