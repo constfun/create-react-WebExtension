@@ -43,11 +43,11 @@ export default class extends Component {
   render() {
     return (
       <div id="feature-destructuring-and-await">
-        {this.state.users.map(user => (
+        {this.state.users.map(user =>
           <div key={user.id}>
             {user.name}
           </div>
-        ))}
+        )}
       </div>
     );
   }

@@ -18,6 +18,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
+const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
 
@@ -136,17 +137,7 @@ const makeDevConfig = bundle => {
       // https://github.com/facebookincubator/create-react-app/issues/290
       // `web` extension prefixes have been added for better support
       // for React Native Web.
-      extensions: [
-        '.web.ts',
-        '.ts',
-        '.web.tsx',
-        '.tsx',
-        '.web.js',
-        '.js',
-        '.json',
-        '.web.jsx',
-        '.jsx',
-      ],
+      extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
       alias: {
         // @remove-on-eject-begin
         // Resolve Babel runtime relative to react-scripts.
@@ -180,15 +171,29 @@ const makeDevConfig = bundle => {
         // First, run the linter.
         // It's important to do this before Babel processes the JS.
         {
-          test: /\.(ts|tsx)$/,
-          loader: require.resolve('tslint-loader'),
+          test: /\.(js|jsx)$/,
           enforce: 'pre',
+          use: [
+            {
+              options: {
+                formatter: eslintFormatter,
+                // @remove-on-eject-begin
+                baseConfig: {
+                  extends: [require.resolve('eslint-config-react-app')],
+                },
+                ignore: false,
+                useEslintrc: false,
+                // @remove-on-eject-end
+              },
+              loader: require.resolve('eslint-loader'),
+            },
+          ],
           include: appSrc,
         },
         {
-          test: /\.js$/,
-          loader: require.resolve('source-map-loader'),
+          test: /\.(ts|tsx)$/,
           enforce: 'pre',
+          loader: require.resolve('tslint-loader'),
           include: appSrc,
         },
         // ** ADDING/UPDATING LOADERS **
@@ -203,14 +208,7 @@ const makeDevConfig = bundle => {
         {
           exclude: [
             /\.html$/,
-            // We have to write /\.(js|jsx)(\?.*)?$/ rather than just /\.(js|jsx)$/
-            // because you might change the hot reloading server from the custom one
-            // to Webpack's built-in webpack-dev-server/client?/, which would not
-            // get properly excluded by /\.(js|jsx)$/ because of the query string.
-            // Webpack 2 fixes this, but for now we include this hack.
-            // https://github.com/facebookincubator/create-react-app/issues/1713
-            /\.(js|jsx)(\?.*)?$/,
-            /\.(ts|tsx)(\?.*)?$/,
+            /\.(js|jsx)$/,
             /\.css$/,
             /\.json$/,
             /\.bmp$/,
@@ -234,14 +232,28 @@ const makeDevConfig = bundle => {
             name: 'media/[name].[hash:8].[ext]',
           },
         },
-        // Compile .tsx?
+        // Process JS with Babel.
+        {
+          test: /\.(js|jsx)$/,
+          include: appSrc,
+          loader: require.resolve('babel-loader'),
+          options: {
+            // @remove-on-eject-begin
+            babelrc: false,
+            presets: [require.resolve('babel-preset-react-app')],
+            // @remove-on-eject-end
+            // This is a feature of `babel-loader` for webpack (not Babel itself).
+            // It enables caching results in ./node_modules/.cache/babel-loader/
+            // directory for faster rebuilds.
+            cacheDirectory: true,
+          },
+        },
         {
           test: /\.(ts|tsx)$/,
           include: appSrc,
-          loader: require.resolve(
-            'awesome-typescript-loader'
-          ) /* + '?silent=true'*/,
+          loader: require.resolve('awesome-typescript-loader'),
           options: {
+            //silent: true,
             configFileName: appTsConfig,
           },
         },
