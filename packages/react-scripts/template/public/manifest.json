@@ -16,6 +16,7 @@
       "scripts": ["js/main.js"],
       "persistent": false
   },
+  "web_accessible_resources": ["bundles/content/media/*"],
   "permissions": [
       "activeTab"
   ],

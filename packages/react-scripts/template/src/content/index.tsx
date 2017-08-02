@@ -1,17 +1,20 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './index.css';
-// import * as donutSvg from 'file-loader!./donut.svg';
 
-// declare module "file-loader!*" {
+// declare module "*.svg" {
 //     const value: any;
 //     export default value;
 // }
 
+const donut = browser.extension.getURL(require('./donut.svg'));
+
+// import * as donutSvg from 'file-loader!./donut.svg';
+
 // const a = require('file-module!./donut.svg');
 // const donutSvg = require(a);
 
-const Donut = () => <img className="donut" src="donut.svg" />;
+const Donut = () => <img className="donut" src={donut} />;
 
 browser.runtime.onMessage.addListener(() => {
     const mainEl = document.createElement('div');
