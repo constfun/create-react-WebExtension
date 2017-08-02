@@ -238,7 +238,7 @@ const makeDevConfig = pack => {
         {
           test: /\.(ts|tsx)$/,
           include: appSrc,
-          loader: require.resolve('ts-loader'),
+          loader: require.resolve('awesome-typescript-loader'),
         },
         // "postcss" loader applies autoprefixer to our CSS.
         // "css" loader resolves paths in CSS and adds assets as dependencies.
