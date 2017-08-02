@@ -40,22 +40,19 @@ const startServer = (host, port, config) => {
       console.log(err, chalk.red('\nCompiler watch failed'));
     }
 
-    // const isInteractive = process.stdout.isTTY;
-    // if (isInteractive) {
-    //   clearConsole();
-    // }
+    const isInteractive = process.stdout.isTTY;
+    if (isInteractive) {
+      clearConsole();
+    }
 
-    console.log('ERRORS', stats.toJson().errors);
-    // const messages = formatWebpackMessages(stats.toJson({}, true));
-    // if (messages.errors.length) {
-    //   printErrors(messages.errors);
-    // }
-    // else if (messages.warnings.length) {
-    //   printWarnings(messages.warnings);
-    // }
-    // else {
-    //   console.log(chalk.green('Compiled successfully.\n'));
-    // }
+    const messages = formatWebpackMessages(stats.toJson({}, true));
+    if (messages.errors.length) {
+      printErrors(messages.errors);
+    } else if (messages.warnings.length) {
+      printWarnings(messages.warnings);
+    } else {
+      console.log(chalk.green('Compiled successfully.\n'));
+    }
   });
 
   hotReloadServer(compiler).listen(port, host, () => {
