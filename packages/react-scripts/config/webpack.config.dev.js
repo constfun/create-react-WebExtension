@@ -29,10 +29,10 @@ const PROTOCOL = process.env.HTTPS === 'true' ? 'https' : 'http';
 // And, the location will be something like moz-extension://123-123-123/rel/path.html
 const URL = `${PROTOCOL}://${HOST}:${PORT}`;
 
-const makeDevConfig = pack => {
-  const { servedPath, buildPath, indexJs } = pack;
-  // These paths are global to the project and do not vary by pack.
-  const { appSrc, appNodeModules } = require('./paths');
+const makeDevConfig = bundle => {
+  const { servedPath, buildPath, indexJs } = bundle;
+  // These paths are global to the project and do not vary between bundles.
+  const { appTsConfig, appSrc, appNodeModules } = require('./paths');
   // `publicUrl` is just like `publicPath`, but we will provide it to our app
   // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
   // Omit trailing slash as %PUBLIC_PATH%/xyz looks better than %PUBLIC_PATH%xyz.
@@ -54,7 +54,7 @@ const makeDevConfig = pack => {
     : {};
 
   let plugins =
-    pack.indexHtml !== null
+    bundle.indexHtml !== null
       ? [
           // Makes some environment variables available in index.html.
           // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
@@ -64,7 +64,7 @@ const makeDevConfig = pack => {
           // Generates an `index.html` file with the <script> injected.
           new HtmlWebpackPlugin({
             inject: true,
-            template: pack.indexHtml,
+            template: bundle.indexHtml,
           }),
         ]
       : [];
@@ -238,7 +238,12 @@ const makeDevConfig = pack => {
         {
           test: /\.(ts|tsx)$/,
           include: appSrc,
-          loader: require.resolve('awesome-typescript-loader') + '?silent=true',
+          loader: require.resolve(
+            'awesome-typescript-loader'
+          ) /* + '?silent=true'*/,
+          options: {
+            configFileName: appTsConfig,
+          },
         },
         // "postcss" loader applies autoprefixer to our CSS.
         // "css" loader resolves paths in CSS and adds assets as dependencies.

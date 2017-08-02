@@ -50,24 +50,6 @@ const loadOnePack = (app, packFile) => {
 };
 
 const loadApp = paths => {
-  // const shouldBuild =
-  //   fs.existsSync(paths.appHtml) || fs.existsSync(paths.appIndexJs);
-  // if (!shouldBuild) {
-  //   console.log(
-  //     chalk.yellow(
-  //       'Skipping building of the top level app since neither of the following files exists.\n' +
-  //       'Note that the public folder is still coppied to the build directory.\n'
-  //     ) +
-  //     `\t${paths.appHtml}\n` +
-  //     `\t${paths.appIndexJs}\n`
-  //   );
-  // } else {
-  //   // Warn and crash if required files are missing for the app.
-  //   if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
-  //     process.exit(1);
-  //   }
-  // }
-
   return Object.freeze({
     servedPath: paths.servedPath,
     buildPath: paths.appBuild,

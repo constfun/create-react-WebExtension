@@ -1,15 +1,26 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
-  "icons": [
+  "manifest_version": 2,
+  "name": "Donut",
+  "version": "1.0",
+  "icons": {
+    "48": "icon.svg"
+  },
+  "content_scripts": [
     {
-      "src": "favicon.ico",
-      "sizes": "192x192",
-      "type": "image/png"
+      "matches": ["<all_urls>"],
+      "js": ["bundles/content/js/main.js"],
+      "css": ["bundles/content/css/main.css"]
     }
   ],
-  "start_url": "./index.html",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background": {
+      "scripts": ["js/main.js"],
+      "persistent": false
+  },
+  "permissions": [
+      "activeTab"
+  ],
+  "browser_action": {
+    "default_icon": "icon.svg",
+    "default_title": "Create React WebExtension"
+  }
 }
