@@ -1,3 +1,5 @@
+/* globals browser */
+
 import { hello } from './other';
 
 console.log(hello, 'and thisx');
