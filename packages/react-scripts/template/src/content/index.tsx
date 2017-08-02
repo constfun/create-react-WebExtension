@@ -2,11 +2,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './index.css';
 
-// declare module "*.svg" {
-//     const value: any;
-//     export default value;
-// }
-
 const donut = browser.extension.getURL(require('./donut.svg'));
 
 // import * as donutSvg from 'file-loader!./donut.svg';
