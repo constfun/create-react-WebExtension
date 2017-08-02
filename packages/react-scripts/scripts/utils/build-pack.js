@@ -10,6 +10,15 @@ const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 
 const existsOrNull = path => (fs.existsSync(path) ? path : null);
 
+const selectIndexFile = packPath => {
+  return (
+    ['ml', 're', 'tsx', 'ts', 'jsx', 'js']
+      .map(ext => path.join(packPath, `index.${ext}`))
+      // .forEach(p => console.log(p))
+      .find(p => fs.existsSync(p)) || null
+  );
+};
+
 // opts: {
 //   servedPath,
 //   buildPath,
@@ -38,7 +47,7 @@ const loadOnePack = (app, packFile) => {
     // May have an index html in public dir.
     indexHtml: existsOrNull(path.join(publicPath, 'index.html')),
     // Must have an index tsx file in pack dir.
-    indexJs: path.join(packPath, 'index.tsx'),
+    indexJs: selectIndexFile(packPath),
   };
 
   // Warn and crash if required files are missing for the pack.
@@ -51,12 +60,12 @@ const loadOnePack = (app, packFile) => {
 
 const loadApp = paths => {
   return Object.freeze({
+    packPath: path.dirname(paths.dotenv),
     servedPath: paths.servedPath,
     buildPath: paths.appBuild,
-    packPath: path.dirname(paths.dotenv),
     publicPath: paths.appPublic,
     indexHtml: existsOrNull(paths.appHtml),
-    indexJs: existsOrNull(paths.appIndexJs),
+    indexJs: selectIndexFile(paths.appSrc),
   });
 };
 
