@@ -70,5 +70,5 @@ module.exports = () => {
   const allPacks = [].concat(app, appPacks);
   setupBuildDir(appPaths, allPacks);
 
-  return allPacks.filter(p => p.shouldBuild);
+  return allPacks.filter(p => p.indexJs);
 };

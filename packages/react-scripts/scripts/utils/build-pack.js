@@ -5,8 +5,10 @@
 const fs = require('fs');
 const path = require('path');
 const find = require('find');
-const chalk = require('chalk');
+// const chalk = require('chalk');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
+
+const existsOrNull = path => (fs.existsSync(path) ? path : null);
 
 // opts: {
 //   servedPath,
@@ -15,7 +17,7 @@ const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const loadPacks = app => {
   const searchPath = path.join(app.packPath, 'src');
   return find
-    .fileSync(/\/_pack$/, searchPath)
+    .fileSync(/\/\.bundle$/, searchPath)
     .filter(packFile => path.dirname(packFile) !== searchPath)
     .map(packFile => loadOnePack(app, packFile));
 };
@@ -23,78 +25,56 @@ const loadPacks = app => {
 const loadOnePack = (app, packFile) => {
   const packPath = path.dirname(packFile);
   const packName = path.basename(packPath);
-
-  const paths = {
-    packPath,
-    shouldBuild: true,
-    // Packs are always served from [servedPath]/packs/packName.
-    servedPath: path.join(app.servedPath, 'packs', packName),
-    // Packs are built into a flat namespace under [buildPath]/packs/.
-    buildPath: path.join(app.buildPath, 'packs', packName),
-  };
   const publicPath = path.join(packPath, 'public');
-  // If there is a public sub-directory, treat the pack as if it was an entire create-react-app.
-  if (fs.existsSync(publicPath) && fs.lstatSync(publicPath).isDirectory()) {
-    Object.assign(paths, {
-      // Must have its own public dir.
-      publicPath,
-      // Must have an index html in public dir.
-      indexHtml: path.join(publicPath, 'index.html'),
-      // Must have an index tsx file in src dir.
-      indexJs: path.join(packPath, 'src/index.tsx'),
-    });
 
-    // Warn and crash if required files are missing for the pack.
-    if (!checkRequiredFiles([paths.indexHtml, paths.indexJs])) {
-      process.exit(1);
-    }
-  } else {
-    // If there is no public sub-directory treat the pack as if it was just the src directory, with no public files.
-    Object.assign(paths, {
-      // Will not have its own public dir.
-      publicPath: null,
-      // Will not have an index html in public dir.
-      indexHtml: null,
-      // Must have an index tsx file in pack dir.
-      indexJs: path.join(packPath, 'index.tsx'),
-    });
+  const bundle = {
+    packPath,
+    // Packs are always served from [servedPath]/packs/packName.
+    servedPath: path.join(app.servedPath, 'bundles', packName),
+    // Packs are built into a flat namespace under [buildPath]/packs/.
+    buildPath: path.join(app.buildPath, 'bundles', packName),
+    // May have its own public dir.
+    publicPath: existsOrNull(publicPath),
+    // May have an index html in public dir.
+    indexHtml: existsOrNull(path.join(publicPath, 'index.html')),
+    // Must have an index tsx file in pack dir.
+    indexJs: path.join(packPath, 'index.tsx'),
+  };
 
-    // Warn and crash if required files are missing for the pack.
-    if (!checkRequiredFiles([paths.indexJs])) {
-      process.exit(1);
-    }
+  // Warn and crash if required files are missing for the pack.
+  if (!checkRequiredFiles([bundle.indexJs])) {
+    process.exit(1);
   }
 
-  return Object.freeze(paths);
+  return Object.freeze(bundle);
 };
 
 const loadApp = paths => {
-  const shouldBuild =
-    fs.existsSync(paths.appHtml) || fs.existsSync(paths.appIndexJs);
-  if (!shouldBuild) {
-    console.log(
-      chalk.yellow(
-        'Skipping building of the top level app since neither of the following files exists.\n' +
-          'Note that the public folder is still coppied.\n'
-      ) +
-        `\t${paths.appHtml}\n` +
-        `\t${paths.appIndexJs}\n`
-    );
-  } else {
-    // Warn and crash if required files are missing for the app.
-    if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
-      process.exit(1);
-    }
-  }
+  // const shouldBuild =
+  //   fs.existsSync(paths.appHtml) || fs.existsSync(paths.appIndexJs);
+  // if (!shouldBuild) {
+  //   console.log(
+  //     chalk.yellow(
+  //       'Skipping building of the top level app since neither of the following files exists.\n' +
+  //       'Note that the public folder is still coppied to the build directory.\n'
+  //     ) +
+  //     `\t${paths.appHtml}\n` +
+  //     `\t${paths.appIndexJs}\n`
+  //   );
+  // } else {
+  //   // Warn and crash if required files are missing for the app.
+  //   if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
+  //     process.exit(1);
+  //   }
+  // }
 
   return Object.freeze({
-    shouldBuild,
     servedPath: paths.servedPath,
     buildPath: paths.appBuild,
     packPath: path.dirname(paths.dotenv),
     publicPath: paths.appPublic,
-    indexHtml: paths.appHtml,
-    indexJs: paths.appIndexJs,
+    indexHtml: existsOrNull(paths.appHtml),
+    indexJs: existsOrNull(paths.appIndexJs),
   });
 };
 

@@ -27,6 +27,7 @@ require('../config/env');
 const chalk = require('chalk');
 const webpack = require('webpack');
 const { makeDevConfig, PORT, HOST } = require('../config/webpack.config.dev');
+const clearConsole = require('react-dev-utils/clearConsole');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const setupBuild = require('./utils/setup-build');
 const hotReloadServer = require('./utils/hot-reload/server');
@@ -39,12 +40,22 @@ const startServer = (host, port, config) => {
       console.log(err, chalk.red('\nCompiler watch failed'));
     }
 
-    const messages = formatWebpackMessages(stats.toJson({}, true));
-    if (messages.errors.length) {
-      printErrors(messages.errors);
-    } else {
-      printWarnings(messages.warnings);
-    }
+    // const isInteractive = process.stdout.isTTY;
+    // if (isInteractive) {
+    //   clearConsole();
+    // }
+
+    console.log('ERRORS', stats.toJson().errors);
+    // const messages = formatWebpackMessages(stats.toJson({}, true));
+    // if (messages.errors.length) {
+    //   printErrors(messages.errors);
+    // }
+    // else if (messages.warnings.length) {
+    //   printWarnings(messages.warnings);
+    // }
+    // else {
+    //   console.log(chalk.green('Compiled successfully.\n'));
+    // }
   });
 
   hotReloadServer(compiler).listen(port, host, () => {
@@ -53,28 +64,29 @@ const startServer = (host, port, config) => {
 };
 
 const printWarnings = warnings => {
-  if (warnings.length) {
-    console.log(chalk.yellow('Compiled with warnings.\n'));
-    console.log(warnings.join('\n\n'));
-    console.log(
-      '\nSearch for the ' +
-        chalk.underline(chalk.yellow('keywords')) +
-        ' to learn more about each warning.'
-    );
-    console.log(
-      'To ignore, add ' +
-        chalk.cyan('// eslint-disable-next-line') +
-        ' to the line before.\n'
-    );
-  } else {
-    console.log(chalk.green('Compiled successfully.\n'));
+  if (!warnings.length) {
+    return;
   }
+
+  console.log(chalk.yellow('Compiled with warnings.\n'));
+  console.log(warnings.join('\n\n'));
+  console.log(
+    '\nSearch for the ' +
+      chalk.underline(chalk.yellow('keywords')) +
+      ' to learn more about each warning.'
+  );
+  console.log(
+    'To ignore, add ' +
+      chalk.cyan('// eslint-disable-next-line') +
+      ' to the line before.\n'
+  );
 };
 
 const printErrors = errors => {
   if (!errors.length) {
     return;
   }
+
   console.log(chalk.red('Failed to compile.\n'));
   console.log(errors.join('\n\n') + '\n');
 };
