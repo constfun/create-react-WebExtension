@@ -63,7 +63,7 @@ const setupBuildDir = (appPaths, packs) => {
   }
 };
 
-const setupBuild = () => {
+module.exports = () => {
   const appPaths = require('../../config/paths');
   const app = loadApp(appPaths);
   const appPacks = loadPacks(app);
@@ -71,8 +71,4 @@ const setupBuild = () => {
   setupBuildDir(appPaths, allPacks);
 
   return allPacks.filter(p => p.shouldBuild);
-};
-
-module.exports = {
-  setupBuild,
 };

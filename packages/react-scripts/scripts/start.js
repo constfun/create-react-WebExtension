@@ -28,7 +28,7 @@ const chalk = require('chalk');
 const webpack = require('webpack');
 const { makeDevConfig, PORT, HOST } = require('../config/webpack.config.dev');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
-const { setupBuild } = require('./utils/common');
+const setupBuild = require('./utils/setup-build');
 const hotReloadServer = require('./utils/hot-reload/server');
 
 const startServer = (host, port, config) => {
