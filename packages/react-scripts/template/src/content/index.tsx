@@ -1,7 +1,15 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './index.css';
-// import donut from './donut.svg';
+// import * as donutSvg from 'file-loader!./donut.svg';
+
+// declare module "file-loader!*" {
+//     const value: any;
+//     export default value;
+// }
+
+// const a = require('file-module!./donut.svg');
+// const donutSvg = require(a);
 
 const Donut = () => <img className="donut" src="donut.svg" />;
 

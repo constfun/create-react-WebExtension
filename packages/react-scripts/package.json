@@ -22,6 +22,7 @@
     "react-scripts-web-ext": "./bin/react-scripts-web-ext.js"
   },
   "dependencies": {
+    "@types/webpack": "^3.0.5",
     "app-root-path": "^2.0.1",
     "autoprefixer": "7.1.1",
     "awesome-typescript-loader": "^3.2.2",
@@ -57,7 +58,7 @@
     "tslint": "^5.2.0",
     "tslint-loader": "^3.5.3",
     "tslint-react": "^3.0.0",
-    "typescript": "~2.4.0",
+    "typescript": "^2.4.2",
     "url-loader": "0.5.9",
     "webpack": "2.6.1",
     "webpack-dev-server": "2.5.0",
@@ -67,6 +68,7 @@
   },
   "devDependencies": {
     "@types/jquery": "^3.2.10",
+    "@types/node": "^8.0.19",
     "@types/react": "^16.0.0",
     "@types/react-dom": "^15.5.1",
     "jquery": "^3.2.1",

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "esnext",
     "target": "es5",
     "lib": ["es6", "dom"],
     "sourceMap": true,
@@ -18,8 +18,8 @@
     "noUnusedLocals": true,
     "allowSyntheticDefaultImports": true,
     "typeRoots": [
-      "@types",
-      "../node_modules/web-ext-types",
+      "../node_modules/@types",
+      "../node_modules/web-ext-types"
     ]
   },
   "exclude": [

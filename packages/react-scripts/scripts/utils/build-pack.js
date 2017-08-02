@@ -30,7 +30,7 @@ const loadOnePack = (app, packFile) => {
   const bundle = {
     packPath,
     // Packs are always served from [servedPath]/packs/packName.
-    servedPath: path.join(app.servedPath, 'bundles', packName),
+    servedPath: path.join(app.servedPath, 'bundles', packName) + '/',
     // Packs are built into a flat namespace under [buildPath]/packs/.
     buildPath: path.join(app.buildPath, 'bundles', packName),
     // May have its own public dir.
