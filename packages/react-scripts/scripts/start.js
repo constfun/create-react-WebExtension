@@ -26,11 +26,10 @@ require('../config/env');
 
 const chalk = require('chalk');
 const webpack = require('webpack');
-const clearConsole = require('react-dev-utils/clearConsole');
 const { makeDevConfig, PORT, HOST } = require('../config/webpack.config.dev');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const { setupBuild } = require('./utils/common');
-const hotReload = require('./utils/hot-reload');
+const hotReloadServer = require('./utils/hot-reload/server');
 
 const startServer = (host, port, config) => {
   const compiler = webpack(config);
@@ -38,11 +37,6 @@ const startServer = (host, port, config) => {
   compiler.watch({}, (err, stats) => {
     if (err) {
       console.log(err, chalk.red('\nCompiler watch failed'));
-    }
-
-    const isInteractive = process.stdout.isTTY;
-    if (isInteractive) {
-      clearConsole();
     }
 
     const messages = formatWebpackMessages(stats.toJson({}, true));
@@ -53,8 +47,7 @@ const startServer = (host, port, config) => {
     }
   });
 
-  const hotReloadServer = hotReload.makeServer(compiler);
-  hotReloadServer.listen(port, host, () => {
+  hotReloadServer(compiler).listen(port, host, () => {
     console.log(chalk.cyan('Starting the development server...\n'));
   });
 };

@@ -1,31 +1,9 @@
 /* globals browser */
 'use strict';
 
-const PATH = '/__hot-reload';
+const { hotReloadUrl } = require('./_shared');
 
-const makeServer = (compiler, opts = {}) => {
-  const http = require('http');
-  const express = require('express');
-  const hotMiddleware = require('webpack-hot-middleware');
-
-  const app = express();
-  app.use(
-    hotMiddleware(
-      compiler,
-      Object.assign(
-        {
-          path: PATH,
-          heartbeat: 10e3,
-        },
-        opts
-      )
-    )
-  );
-
-  return http.createServer(app);
-};
-
-const makeClient = address => {
+module.exports = address => {
   const url = require('url');
   const stripAnsi = require('strip-ansi');
   var formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
@@ -33,7 +11,7 @@ const makeClient = address => {
   let _connectionFailureReported = false;
   const loadedHashes = new Set();
 
-  const connection = new window.EventSource(url.resolve(address, PATH));
+  const connection = new window.EventSource(url.resolve(address, hotReloadUrl));
 
   connection.onmessage = e => {
     // This is heart emoji... wish it was action === 'heartbeat'.
@@ -100,9 +78,4 @@ const makeClient = address => {
   };
 
   return connection;
-};
-
-module.exports = {
-  makeServer,
-  makeClient,
 };

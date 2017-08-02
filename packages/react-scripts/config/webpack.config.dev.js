@@ -90,7 +90,7 @@ const makeDevConfig = pack => {
       // the line below with these two lines if you prefer the stock client:
       // require.resolve('webpack-dev-server/client') + '?/',
       // require.resolve('webpack/hot/dev-server'),
-      require.resolve('../scripts/utils/hot-reload-runtime') +
+      require.resolve('../scripts/utils/hot-reload/runtime') +
         `?server_url=${encodeURIComponent(URL)}`,
       // We ship a few polyfills by default:
       require.resolve('./polyfills'),
