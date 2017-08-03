@@ -71,6 +71,18 @@ module.exports = function(
     return;
   }
 
+  // Fix relative paths for type roots.
+  // While in packages/react-scripts/template tsconfig.json typeRoots refer to
+  // node_modules in the parent directory. In a new app, they should point to
+  // node_modules in the current directory instead.
+  const appTsconfigPath = path.join(appPath, 'tsconfig.json');
+  const appTsconfig = require(appTsconfigPath);
+  // Turn ../node_modules into ./node_modules
+  appTsconfig.compilerOptions.typeRoots = appTsconfig.compilerOptions.typeRoots.map(
+    path => path.substring(1)
+  );
+  fs.writeFileSync(appTsconfigPath, JSON.stringify(appTsconfig, null, 2));
+
   // Rename gitignore after the fact to prevent npm from renaming it to .npmignore
   // See: https://github.com/npm/npm/issues/1862
   fs.move(
@@ -122,6 +134,7 @@ module.exports = function(
     '@types/node',
     '@types/react',
     '@types/react-dom',
+    'web-ext-types',
     '@types/jest',
   ];
 

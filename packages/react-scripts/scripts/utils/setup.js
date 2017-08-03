@@ -2,15 +2,15 @@
 
 const fs = require('fs-extra');
 const path = require('path');
-const { loadApp, loadPacks } = require('./build-pack');
+const { loadApp, loadBundles } = require('./bundle');
 
-const copyPublicFolder = pack => {
-  if (pack.publicPath === null) {
+const copyPublicFolder = bundle => {
+  if (bundle.publicPath === null) {
     return;
   }
-  fs.copySync(pack.publicPath, pack.buildPath, {
+  fs.copySync(bundle.publicPath, bundle.buildPath, {
     dereference: true,
-    filter: file => file !== pack.indexHtml,
+    filter: file => file !== bundle.indexHtml,
   });
 };
 
@@ -33,7 +33,7 @@ const copyDevManifest = appPaths => {
 
   const { manifestSrc, manifestDest } = manifestPaths(appPaths);
   const manifest = require(manifestSrc);
-  fs.writeFile(
+  fs.writeFileSync(
     manifestDest,
     JSON.stringify(injectDevServerPermissions(manifest), null, 2)
   );
@@ -50,11 +50,11 @@ const injectDevServerPermissions = manifest => {
   return manifest;
 };
 
-const setupBuildDir = (appPaths, packs) => {
+const setupBuildDir = (appPaths, bundles) => {
   // Clean.
   fs.emptyDirSync(appPaths.appBuild);
   // Merge public folders.
-  packs.forEach(copyPublicFolder);
+  bundles.forEach(copyPublicFolder);
   // In development we inject extra permissions to support hot reload.
   if (process.env.NODE_ENV === 'development') {
     copyDevManifest(appPaths);
@@ -66,9 +66,8 @@ const setupBuildDir = (appPaths, packs) => {
 module.exports = () => {
   const appPaths = require('../../config/paths');
   const app = loadApp(appPaths);
-  const appPacks = loadPacks(app);
-  const allPacks = [].concat(app, appPacks);
-  setupBuildDir(appPaths, allPacks);
+  const bundles = [].concat(app, loadBundles(app));
 
-  return allPacks.filter(p => p.indexJs);
+  setupBuildDir(appPaths, bundles);
+  return bundles.filter(p => p.indexJs);
 };
