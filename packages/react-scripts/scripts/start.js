@@ -35,13 +35,15 @@ const hotReloadServer = require('./utils/hot-reload/server');
 const startServer = (host, port, config) => {
   const compiler = webpack(config);
 
+  let firstCompilation = true;
   compiler.watch({}, (err, stats) => {
     if (err) {
       console.log(err, chalk.red('\nCompiler watch failed'));
     }
 
     const isInteractive = process.stdout.isTTY;
-    if (isInteractive) {
+    if (isInteractive && !firstCompilation) {
+      firstCompilation = false;
       clearConsole();
     }
 

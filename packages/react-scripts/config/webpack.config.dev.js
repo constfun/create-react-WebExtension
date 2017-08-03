@@ -209,6 +209,7 @@ const makeDevConfig = bundle => {
           exclude: [
             /\.html$/,
             /\.(js|jsx)$/,
+            /\.(ts|tsx)$/,
             /\.css$/,
             /\.json$/,
             /\.bmp$/,

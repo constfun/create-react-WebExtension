@@ -1,3 +1,3 @@
 module.exports = {
-  hello: 'world nahuy bluat',
+  hello: 'Hello World!',
 };
