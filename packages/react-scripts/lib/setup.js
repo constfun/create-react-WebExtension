@@ -12,6 +12,7 @@ const copyPublicFolder = appPaths => {
 
   // In development we inject extra permissions to support hot reload.
   if (process.env.NODE_ENV === 'development') {
+    delete require.cache[require.resolve(appPaths.appManifest)];
     const manifest = require(appPaths.appManifest);
     fs.writeFileSync(
       path.join(appPaths.appBuild, 'manifest.json'),

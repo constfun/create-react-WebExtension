@@ -102,11 +102,12 @@ choosePort(HOST, DEFAULT_PORT)
     const appPublicWatch = chokidar
       .watch(appPaths.appPublic, {
         ignoreInitial: true,
-        awaitWriteFinish: true,
       })
       .on('all', () => {
+        console.log('Coppying public folder...');
         copyPublicFolder(appPaths);
         hotReload.force();
+        console.log('Done.');
       });
 
     ['SIGINT', 'SIGTERM'].forEach(function(sig) {
