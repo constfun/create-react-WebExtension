@@ -11,7 +11,7 @@
     "start": "node packages/react-scripts/scripts/start.js",
     "test": "node packages/react-scripts/scripts/test.js --env=jsdom",
     "format": "prettier --trailing-comma es5 --single-quote --write 'packages/*/*.js' 'packages/*/!(node_modules)/**/*.js'",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged && git rm --cached yarn.lock"
   },
   "devDependencies": {
     "eslint": "3.19.0",
@@ -26,7 +26,16 @@
       "prettier --trailing-comma es5 --single-quote --write",
       "git add"
     ],
-    "yarn.lock": [
+    "packages/babel-preset-react-app/yarn.lock": [
+      "git rm --cached"
+    ],
+    "packages/react-dev-utils/yarn.lock": [
+      "git rm --cached"
+    ],
+    "packages/react-error-overlay/yarn.lock": [
+      "git rm --cached"
+    ],
+    "packages/create-react-app/yarn.lock": [
       "git rm --cached"
     ]
   }
