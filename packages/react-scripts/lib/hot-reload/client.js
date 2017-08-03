@@ -1,17 +1,19 @@
-/* globals browser */
+/* globals __resourceQuery, browser */
 'use strict';
 
-const { hotReloadUrl } = require('./_shared');
-
-module.exports = address => {
+const makeClient = address => {
   const url = require('url');
   const stripAnsi = require('strip-ansi');
-  var formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
+  const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 
   let _connectionFailureReported = false;
   const loadedHashes = new Set();
 
-  const connection = new window.EventSource(url.resolve(address, hotReloadUrl));
+  // HARDCODED in hotReloadServer.js
+  const hotReloadPath = '/__web_ext_hot_reload';
+  const connection = new window.EventSource(
+    url.resolve(address, hotReloadPath)
+  );
 
   connection.onmessage = e => {
     // This is heart emoji... wish it was action === 'heartbeat'.
@@ -28,7 +30,9 @@ module.exports = address => {
       case 'built':
         handleBuilt(message);
         break;
-      default:
+      case 'force':
+        browser.runtime.reload();
+        break;
     }
   };
 
@@ -79,3 +83,10 @@ module.exports = address => {
 
   return connection;
 };
+
+const isBackgroundOrOptionsScript = !!browser.runtime.getBackgroundPage;
+if (isBackgroundOrOptionsScript) {
+  const querystring = require('querystring');
+  const serverUrl = querystring.parse(__resourceQuery.slice(1)).server_url;
+  makeClient(serverUrl);
+}

@@ -2,6 +2,8 @@
 
 import { hello } from './other';
 
+const thing = require('./donut2.svg');
+
 console.log(hello, 'and thisx');
 
 browser.browserAction.onClicked.addListener(e => {

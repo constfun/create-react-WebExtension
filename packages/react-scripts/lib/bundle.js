@@ -29,7 +29,6 @@ const loadBundles = app => {
 const loadOneBundle = (app, bundleFile) => {
   const bundlePath = path.dirname(bundleFile);
   const bundleName = path.basename(bundlePath);
-  const publicPath = path.join(bundlePath, 'public');
 
   const bundle = {
     bundlePath,
@@ -37,10 +36,8 @@ const loadOneBundle = (app, bundleFile) => {
     servedPath: path.join(app.servedPath, 'bundles', bundleName) + '/',
     // Bundles are built into a flat namespace under {app.buildPath}/bundles/.
     buildPath: path.join(app.buildPath, 'bundles', bundleName),
-    // Bundles may have their own public directory,
-    publicPath: existsOrNull(publicPath),
-    // which may contain an index.html template.
-    indexHtml: existsOrNull(path.join(publicPath, 'index.html')),
+    // Bundles may contain an index.html template.
+    indexHtml: existsOrNull(path.join(bundlePath, 'index.html')),
     // Entry points can be written in a number of languages.
     indexJs: selectIndexFile(bundlePath),
   };
@@ -59,7 +56,6 @@ const loadApp = appPaths => {
     bundlePath: path.dirname(appPaths.dotenv),
     servedPath: appPaths.servedPath,
     buildPath: appPaths.appBuild,
-    publicPath: appPaths.appPublic,
     // May have an index html. This is a deviation from CRA where it is required.
     // Bundles can be just JavaScript, no reason to put limits on the app.
     indexHtml: existsOrNull(appPaths.appHtml),

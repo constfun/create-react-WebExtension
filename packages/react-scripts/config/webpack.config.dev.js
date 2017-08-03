@@ -16,22 +16,13 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
-const WriteFilePlugin = require('write-file-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
 
-const PORT = parseInt(process.env.PORT, 10) || 3000;
-const HOST = process.env.HOST || '0.0.0.0';
-const PROTOCOL = process.env.HTTPS === 'true' ? 'https' : 'http';
-// We need to know the absolute url since we can't use window.location to infer
-// it on the client. On the client is running in an extension content script.
-// And, the location will be something like moz-extension://123-123-123/rel/path.html
-const URL = `${PROTOCOL}://${HOST}:${PORT}`;
-
-const makeDevConfig = bundle => {
+module.exports = (bundle, hotReloadServerUrl) => {
   const { servedPath, buildPath, indexJs } = bundle;
   // These paths are global to the project and do not vary between bundles.
   const { appTsConfig, appSrc, appNodeModules } = require('./paths');
@@ -45,7 +36,7 @@ const makeDevConfig = bundle => {
   // For these, "homepage" can be set to "." to enable relative asset paths.
   const shouldUseRelativeAssetPaths = servedPath === './';
   // Note: defined here because it will be used more than once.
-  const cssFilename = 'css/[name].css';
+  const cssFilename = 'static/css/[name].css';
   // ExtractTextPlugin expects the build output to be flat.
   // (See https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/27)
   // However, our output is structured with css, js and media folders.
@@ -84,16 +75,12 @@ const makeDevConfig = bundle => {
     entry: [
       // Include an alternative client for WebpackDevServer. A client's job is to
       // connect to WebpackDevServer by a socket and get notified about changes.
-      // When you save a file, the client will either apply hot updates (in case
-      // of CSS changes), or refresh the page (in case of JS changes). When you
-      // make a syntax error, this client will display a syntax error overlay.
-      // Note: instead of the default WebpackDevServer client, we use a custom one
-      // to bring better experience for Create React App users. You can replace
-      // the line below with these two lines if you prefer the stock client:
-      // require.resolve('webpack-dev-server/client') + '?/',
-      // require.resolve('webpack/hot/dev-server'),
-      require.resolve('../scripts/utils/hot-reload/runtime') +
-        `?server_url=${encodeURIComponent(URL)}`,
+      // When you save a file, the client will reload the extension.
+      // We need to know the absolute url since we can't use window.location to infer
+      // it, since the client is running as an extension content or background script
+      // window.location will be something like moz-extension://a2c1a3gf4a2c1a3gf4/rel/index.html
+      require.resolve('../lib/hot-reload/client') +
+        `?server_url=${encodeURIComponent(hotReloadServerUrl)}`,
       // We ship a few polyfills by default:
       require.resolve('./polyfills'),
       // Errors should be considered fatal in development
@@ -112,9 +99,9 @@ const makeDevConfig = bundle => {
       // This does not produce a real file. It's just the virtual path that is
       // served by WebpackDevServer in development. This is the JS bundle
       // containing code from all our entry points, and the Webpack runtime.
-      filename: 'js/[name].js',
+      filename: 'static/js/[name].js',
       // There are also additional JS chunk files if you use code splitting.
-      chunkFilename: 'js/[name].chunk.js',
+      chunkFilename: 'static/js/[name].chunk.js',
       // This is the URL that app is served from.
       publicPath: servedPath,
       // Point sourcemap entries to original disk location (format as URL on Windows)
@@ -126,8 +113,7 @@ const makeDevConfig = bundle => {
       // We placed these paths second because we want `node_modules` to "win"
       // if there are any conflicts. This matches Node resolution mechanism.
       // https://github.com/facebookincubator/create-react-app/issues/253
-      // NOTE: NODE_PATH is not used by TypeScript, so not sure if this code does anything.
-      //       It's left here from create-react-app, for some form of compatibility.
+      // NOTE: NODE_PATH is not used by TypeScript.
       modules: ['node_modules', appNodeModules].concat(
         // It is guaranteed to exist because we tweak it in `env.js`
         process.env.NODE_PATH.split(path.delimiter).filter(Boolean)
@@ -220,7 +206,7 @@ const makeDevConfig = bundle => {
           ],
           loader: require.resolve('file-loader'),
           options: {
-            name: 'media/[name].[hash:8].[ext]',
+            name: 'static/media/[name].[hash:8].[ext]',
           },
         },
         // "url" loader works like "file" loader except that it embeds assets
@@ -231,7 +217,7 @@ const makeDevConfig = bundle => {
           loader: require.resolve('url-loader'),
           options: {
             limit: 10000,
-            name: 'media/[name].[hash:8].[ext]',
+            name: 'static/media/[name].[hash:8].[ext]',
           },
         },
         // Process JS with Babel.
@@ -332,10 +318,6 @@ const makeDevConfig = bundle => {
       // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
       // You can remove this if you don't use Moment.js:
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-      // WebpackDevServer will not write files to disk by default.
-      // For WebExtensions files on disk are required otherwise you won't be able
-      // to load the temporary extension in your browser.
-      new WriteFilePlugin(),
     ]),
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.
@@ -352,12 +334,4 @@ const makeDevConfig = bundle => {
       hints: false,
     },
   };
-};
-
-module.exports = {
-  makeDevConfig,
-  PORT,
-  HOST,
-  PROTOCOL,
-  URL,
 };
