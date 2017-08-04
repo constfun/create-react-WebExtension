@@ -31,6 +31,7 @@ const loadOneBundle = (app, bundleFile) => {
   const bundleName = path.basename(bundlePath);
 
   const bundle = {
+    bundleName,
     bundlePath,
     // Bundles are always served from '{app.servedPath}/bundles/{bundleName}/'.
     servedPath: path.join(app.servedPath, 'bundles', bundleName) + '/',
@@ -52,6 +53,7 @@ const loadOneBundle = (app, bundleFile) => {
 
 const loadApp = appPaths => {
   const bundle = {
+    bundleName: '',
     // The app is treated just like any other bundle.
     bundlePath: path.dirname(appPaths.dotenv),
     servedPath: appPaths.servedPath,

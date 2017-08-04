@@ -56,9 +56,11 @@ choosePort(HOST, DEFAULT_PORT)
     const hotReloadServerUrl = `${protocol}://${HOST}:${port}`;
 
     // This is webpack mutli-compiler config, one for the app itself and one per bundle.
-    const config = setupBuild(hotReloadServerUrl).map(bundle =>
-      makeDevConfig(bundle, hotReloadServerUrl)
+    const config = makeDevConfig(
+      setupBuild(hotReloadServerUrl),
+      hotReloadServerUrl
     );
+
     // We use compiler watch instead of webpack-dev-server,
     // since extensions needs files written to disk,
     // and don't need files served via http.

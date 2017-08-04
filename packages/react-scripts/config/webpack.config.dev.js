@@ -22,14 +22,16 @@ const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeM
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
+var FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 
-module.exports = (bundle, hotReloadServerUrl) => {
-  const { servedPath, buildPath, indexJs } = bundle;
+module.exports = (bundles, hotReloadServerUrl) => {
+  // const { servedPath, buildPath, indexJs } = bundle;
   // These paths are global to the project and do not vary between bundles.
-  const { appTsConfig, appSrc, appNodeModules } = require('./paths');
+  const { appBuild, appTsConfig, appSrc, appNodeModules } = require('./paths');
   // `publicUrl` is just like `publicPath`, but we will provide it to our app
   // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
   // Omit trailing slash as %PUBLIC_PATH%/xyz looks better than %PUBLIC_PATH%xyz.
+  const servedPath = '/';
   const publicUrl = servedPath.slice(0, -1);
   // Env variables that will be injected into the app.
   const clientEnv = getClientEnvironment(publicUrl);
@@ -47,62 +49,74 @@ module.exports = (bundle, hotReloadServerUrl) => {
       { publicPath: Array(cssFilename.split('/').length).join('../') }
     : {};
 
-  let plugins =
-    bundle.indexHtml !== null
-      ? [
-          // Makes some environment variables available in index.html.
-          // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
-          // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-          // In development, this will be an empty string.
-          new InterpolateHtmlPlugin(clientEnv.raw),
-          // Generates an `index.html` file with the <script> injected.
-          new HtmlWebpackPlugin({
-            inject: true,
-            template: bundle.indexHtml,
-          }),
-        ]
-      : [];
+  // const entries = {};
+  // for (let b of bundle) {
+  //   entries[
+  // }
+
+  const entry = {};
+  bundles.forEach(
+    b =>
+      (entry[path.join('js', b.bundleName)] = [
+        // Include an alternative client for WebpackDevServer. A client's job is to
+        // connect to WebpackDevServer by a socket and get notified about changes.
+        // When you save a file, the client will reload the extension.
+        // We need to know the absolute url since we can't use window.location to infer
+        // it, since the client is running as an extension content or background script
+        // window.location will be something like moz-extension://a2c1a3gf4a2c1a3gf4/rel/index.html
+        require.resolve('../lib/hot-reload/client') +
+          `?server_url=${encodeURIComponent(hotReloadServerUrl)}`,
+        // We ship a few polyfills by default:
+        require.resolve('./polyfills'),
+        // Errors should be considered fatal in development
+        require.resolve('react-error-overlay'),
+        // Finally, this is your app's code:
+        b.indexJs,
+        // We include the app code last so that if there is a runtime error during
+        // initialization, it doesn't blow up the WebpackDevServer client, and
+        // changing JS code would still trigger a refresh.
+      ])
+  );
+
+  let plugins = [];
+  // bundle.indexHtml !== null
+  //   ? [
+  //       // Makes some environment variables available in index.html.
+  //       // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
+  //       // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+  //       // In development, this will be an empty string.
+  //       new InterpolateHtmlPlugin(clientEnv.raw),
+  //       // Generates an `index.html` file with the <script> injected.
+  //       new HtmlWebpackPlugin({
+  //         inject: true,
+  //         template: bundle.indexHtml,
+  //       }),
+  //     ]
+  //   : [];
 
   // This is the development configuration.
   // It is focused on developer experience and fast rebuilds.
   // The production configuration is different and lives in a separate file.
   return {
+    // name: 'one' + Math.random(),
     // You may want 'eval' instead if you prefer to see the compiled output in DevTools.
     // See the discussion in https://github.com/facebookincubator/create-react-app/issues/343.
     devtool: 'cheap-module-source-map',
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
     // The first two entry points enable "hot" CSS and auto-refreshes for JS.
-    entry: [
-      // Include an alternative client for WebpackDevServer. A client's job is to
-      // connect to WebpackDevServer by a socket and get notified about changes.
-      // When you save a file, the client will reload the extension.
-      // We need to know the absolute url since we can't use window.location to infer
-      // it, since the client is running as an extension content or background script
-      // window.location will be something like moz-extension://a2c1a3gf4a2c1a3gf4/rel/index.html
-      require.resolve('../lib/hot-reload/client') +
-        `?server_url=${encodeURIComponent(hotReloadServerUrl)}`,
-      // We ship a few polyfills by default:
-      require.resolve('./polyfills'),
-      // Errors should be considered fatal in development
-      require.resolve('react-error-overlay'),
-      // Finally, this is your app's code:
-      indexJs,
-      // We include the app code last so that if there is a runtime error during
-      // initialization, it doesn't blow up the WebpackDevServer client, and
-      // changing JS code would still trigger a refresh.
-    ],
+    entry,
     output: {
       // Next line is not used in dev but WebpackDevServer crashes without it:
-      path: buildPath,
+      path: appBuild,
       // Add /* filename */ comments to generated require()s in the output.
       pathinfo: true,
       // This does not produce a real file. It's just the virtual path that is
       // served by WebpackDevServer in development. This is the JS bundle
       // containing code from all our entry points, and the Webpack runtime.
-      filename: 'js/[name].js',
+      filename: '[name]/index.js',
       // There are also additional JS chunk files if you use code splitting.
-      chunkFilename: 'js/[name].chunk.js',
+      chunkFilename: '[name]/index.[chunkhash].js',
       // This is the URL that app is served from.
       publicPath: servedPath,
       // Point sourcemap entries to original disk location (format as URL on Windows)
@@ -241,12 +255,13 @@ module.exports = (bundle, hotReloadServerUrl) => {
         {
           test: /\.(ts|tsx)$/,
           include: appSrc,
-          loader: require.resolve('awesome-typescript-loader'),
-          options: {
-            // transpileOnly: true,
-            //silent: true,
-            configFileName: appTsConfig,
-          },
+          // loader: require.resolve('awesome-typescript-loader'),
+          loader: require.resolve('ts-loader'),
+          // options: {
+          //   // transpileOnly: true,
+          //   //silent: true,
+          //   configFileName: appTsConfig,
+          // },
         },
         // "postcss" loader applies autoprefixer to our CSS.
         // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -297,10 +312,11 @@ module.exports = (bundle, hotReloadServerUrl) => {
       ],
     },
     plugins: plugins.concat([
-      new ForkTsCheckerWebpackPlugin({
-        tsconfig: appTsConfig,
-        silent: true,
-      }),
+      // new FriendlyErrorsWebpackPlugin(),
+      // new ForkTsCheckerWebpackPlugin({
+      //   tsconfig: appTsConfig,
+      //   silent: true,
+      // }),
       // Add module names to factory functions so they appear in browser profiler.
       new webpack.NamedModulesPlugin(),
       // Makes some environment variables available to the JS code, for example:
