@@ -16,6 +16,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
@@ -145,7 +146,8 @@ module.exports = (bundle, hotReloadServerUrl) => {
         // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
         // please link the files into your node_modules/ and let module-resolution kick in.
         // Make sure your source files are compiled, as they will not be processed in any way.
-        new ModuleScopePlugin(appSrc),
+        // DISABLING for now due to
+        // new ModuleScopePlugin(appSrc),
       ],
     },
     module: {
@@ -241,6 +243,7 @@ module.exports = (bundle, hotReloadServerUrl) => {
           include: appSrc,
           loader: require.resolve('awesome-typescript-loader'),
           options: {
+            // transpileOnly: true,
             //silent: true,
             configFileName: appTsConfig,
           },
@@ -294,6 +297,10 @@ module.exports = (bundle, hotReloadServerUrl) => {
       ],
     },
     plugins: plugins.concat([
+      new ForkTsCheckerWebpackPlugin({
+        tsconfig: appTsConfig,
+        silent: true,
+      }),
       // Add module names to factory functions so they appear in browser profiler.
       new webpack.NamedModulesPlugin(),
       // Makes some environment variables available to the JS code, for example:

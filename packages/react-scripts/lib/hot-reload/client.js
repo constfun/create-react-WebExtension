@@ -1,4 +1,4 @@
-/* globals __resourceQuery, browser */
+/* globals __resourceQuery  */
 'use strict';
 
 const makeClient = address => {
@@ -84,6 +84,7 @@ const makeClient = address => {
   return connection;
 };
 
+const browser = window.browser !== undefined ? window.browser : window.chrome;
 const isBackgroundOrOptionsScript = !!browser.runtime.getBackgroundPage;
 if (isBackgroundOrOptionsScript) {
   const querystring = require('querystring');

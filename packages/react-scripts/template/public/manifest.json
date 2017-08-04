@@ -3,17 +3,20 @@
   "name": "Donut",
   "version": "1.0",
   "icons": {
-    "48": "icon.svg"
+    "16": "icon-16.png",
+    "48": "icon-48.png",
+    "96": "icon-96.png",
+    "128": "icon-128.png"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["bundles/content/js/main.js"],
+      "js": ["browser-polyfill.js", "bundles/content/js/main.js"],
       "css": ["bundles/content/css/main.css"]
     }
   ],
   "background": {
-      "scripts": ["js/main.js"],
+      "scripts": ["browser-polyfill.js", "js/main.js"],
       "persistent": false
   },
   "web_accessible_resources": ["bundles/content/media/*"],
@@ -21,7 +24,7 @@
       "activeTab"
   ],
   "browser_action": {
-    "default_icon": "icon.svg",
+    "default_icon": "icon-16.png",
     "default_title": "Create React WebExtension"
   }
 }

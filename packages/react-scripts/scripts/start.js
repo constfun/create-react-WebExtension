@@ -28,14 +28,11 @@ const fs = require('fs');
 const chokidar = require('chokidar');
 const chalk = require('chalk');
 const webpack = require('webpack');
-const {
-  choosePort,
-  prepareUrls,
-} = require('react-dev-utils/WebpackDevServerUtils');
+const { choosePort } = require('react-dev-utils/WebpackDevServerUtils');
 const appPaths = require('../config/paths');
 const makeDevConfig = require('../config/webpack.config.dev');
 const hotReloadServer = require('../lib/hot-reload/server');
-const { setupBuild, copyPublicFolder } = require('../lib/setup');
+const { setupBuild, processPublicFolder } = require('../lib/setup');
 const { printCompilationStats } = require('../lib/format');
 
 const useYarn = fs.existsSync(appPaths.yarnLockFile);
@@ -59,7 +56,7 @@ choosePort(HOST, DEFAULT_PORT)
     const hotReloadServerUrl = `${protocol}://${HOST}:${port}`;
 
     // This is webpack mutli-compiler config, one for the app itself and one per bundle.
-    const config = setupBuild().map(bundle =>
+    const config = setupBuild(hotReloadServerUrl).map(bundle =>
       makeDevConfig(bundle, hotReloadServerUrl)
     );
     // We use compiler watch instead of webpack-dev-server,
@@ -104,8 +101,8 @@ choosePort(HOST, DEFAULT_PORT)
         ignoreInitial: true,
       })
       .on('all', () => {
-        console.log('Coppying public folder...');
-        copyPublicFolder(appPaths);
+        console.log('Copying pubic files...');
+        processPublicFolder(appPaths, hotReloadServerUrl);
         hotReload.force();
         console.log('Done.');
       });
