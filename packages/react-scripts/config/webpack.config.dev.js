@@ -56,8 +56,8 @@ module.exports = (bundles, hotReloadServerUrl) => {
 
   const entry = {};
   bundles.forEach(
-    b =>
-      (entry[path.join('js', b.bundleName)] = [
+    bun =>
+      (entry[bun.bundleName] = [
         // Include an alternative client for WebpackDevServer. A client's job is to
         // connect to WebpackDevServer by a socket and get notified about changes.
         // When you save a file, the client will reload the extension.
@@ -71,28 +71,26 @@ module.exports = (bundles, hotReloadServerUrl) => {
         // Errors should be considered fatal in development
         require.resolve('react-error-overlay'),
         // Finally, this is your app's code:
-        b.indexJs,
+        bun.indexJs,
         // We include the app code last so that if there is a runtime error during
         // initialization, it doesn't blow up the WebpackDevServer client, and
         // changing JS code would still trigger a refresh.
       ])
   );
 
-  let plugins = [];
-  // bundle.indexHtml !== null
-  //   ? [
-  //       // Makes some environment variables available in index.html.
-  //       // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
-  //       // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-  //       // In development, this will be an empty string.
-  //       new InterpolateHtmlPlugin(clientEnv.raw),
-  //       // Generates an `index.html` file with the <script> injected.
-  //       new HtmlWebpackPlugin({
-  //         inject: true,
-  //         template: bundle.indexHtml,
-  //       }),
-  //     ]
-  //   : [];
+  let plugins = bundles.reduce((plugs, bun) => {
+    if (bun.indexHtml === null) {
+      return plugs;
+    }
+    plugs.push(
+      new HtmlWebpackPlugin({
+        filename: bun.bundleName + '.html',
+        inject: true,
+        template: bun.indexHtml,
+      })
+    );
+    return plugs;
+  }, []);
 
   // This is the development configuration.
   // It is focused on developer experience and fast rebuilds.
@@ -114,9 +112,9 @@ module.exports = (bundles, hotReloadServerUrl) => {
       // This does not produce a real file. It's just the virtual path that is
       // served by WebpackDevServer in development. This is the JS bundle
       // containing code from all our entry points, and the Webpack runtime.
-      filename: '[name]/index.js',
+      filename: 'js/[name].js',
       // There are also additional JS chunk files if you use code splitting.
-      chunkFilename: '[name]/index.[chunkhash].js',
+      chunkFilename: 'js/[name].[chunkhash].js',
       // This is the URL that app is served from.
       publicPath: servedPath,
       // Point sourcemap entries to original disk location (format as URL on Windows)
@@ -312,6 +310,11 @@ module.exports = (bundles, hotReloadServerUrl) => {
       ],
     },
     plugins: plugins.concat([
+      // Makes some environment variables available in index.html.
+      // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
+      // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+      // In development, this will be an empty string.
+      new InterpolateHtmlPlugin(clientEnv.raw),
       // new FriendlyErrorsWebpackPlugin(),
       // new ForkTsCheckerWebpackPlugin({
       //   tsconfig: appTsConfig,

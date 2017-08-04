@@ -53,7 +53,7 @@ const loadOneBundle = (app, bundleFile) => {
 
 const loadApp = appPaths => {
   const bundle = {
-    bundleName: '',
+    bundleName: 'index',
     // The app is treated just like any other bundle.
     bundlePath: path.dirname(appPaths.dotenv),
     servedPath: appPaths.servedPath,
