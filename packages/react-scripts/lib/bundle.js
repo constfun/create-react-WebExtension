@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const find = require('find');
+const chalk = require('chalk');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 
 const existsOrNull = path => (fs.existsSync(path) ? path : null);
@@ -48,6 +49,18 @@ const loadOneChildBundle = (app, bundleFile) => {
 };
 
 const loadAppBundle = appPaths => {
+  // We place the app's index.html file under src for consistency with bundles.
+  // Bundles have their index.html file right in the bundle folder in src,
+  // so it would be odd for this one html file to exist outside of src.
+  // However, this may catch CRA users off guard. So tell and fail.
+  const craHtml = path.join(appPaths.appPublic, 'index.html');
+  if (fs.existsSync(craHtml)) {
+    console.log(
+      chalk.red('Please move public/index.html file to src/index.html')
+    );
+    process.exit(1);
+  }
+
   const bundle = {
     bundleName: 'index',
     // The app is treated just like any other bundle.
