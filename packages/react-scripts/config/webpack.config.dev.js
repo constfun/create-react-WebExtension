@@ -81,6 +81,8 @@ module.exports = (bundles, hotReloadServerUrl) => {
       new HtmlWebpackPlugin({
         // We use the bundle name as the name of the html file.
         filename: bun.bundleName + '.html',
+        // Also limit what assets we inject to only what is in the bundle.
+        chunks: [bun.bundleName],
         inject: true,
         template: bun.indexHtml,
       })
