@@ -10,4 +10,9 @@ lerna-debug.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+yarn.lock
+packages/babel-preset-react-app/yarn.lock
+packages/create-react-app/yarn.lock
+packages/react-dev-utils/yarn.lock
+packages/react-error-overlay/yarn.lock
 /.changelog
