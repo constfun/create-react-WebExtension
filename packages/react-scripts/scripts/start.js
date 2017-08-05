@@ -36,7 +36,7 @@ const clearConsole = require('react-dev-utils/clearConsole');
 const appPaths = require('../config/paths');
 const makeDevConfig = require('../config/webpack.config.dev');
 const hotReloadServer = require('../lib/hot-reload/server');
-const { setupBuild, processPublicFolder } = require('../lib/setup');
+const { setupBuild, copyPublicFolder } = require('../lib/setup');
 
 const useYarn = fs.existsSync(appPaths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;
@@ -94,7 +94,7 @@ choosePort(HOST, DEFAULT_PORT)
       })
       .on('all', () => {
         console.log('Copying public folder...');
-        processPublicFolder(appPaths, hotReloadServerUrl);
+        copyPublicFolder(appPaths, hotReloadServerUrl);
         hotReload.force();
         console.log('Done.');
       });

@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const find = require('find');
+const chalk = require('chalk');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 
 const existsOrNull = path => (fs.existsSync(path) ? path : null);
@@ -48,15 +49,28 @@ const loadOneChildBundle = (app, bundleFile) => {
 };
 
 const loadAppBundle = appPaths => {
+  // We support an index.html file in the public dir.
+  // But for consistency with bundles, we also support placing it at src/index.html.
+  // And again for consistency, we support not having it at all.
+  const craHtml = existsOrNull(appPaths.appHtml);
+  const srcHtml = existsOrNull(path.join(appPaths.appSrc, 'index.html'));
+  // Do fail if both exist.
+  if (craHtml && srcHtml) {
+    console.log(
+      chalk.red(
+        'Both public/index.html and src/index.html exist.\n' +
+          'They would overwrite each other in the build directory.'
+      )
+    );
+    process.exit(1);
+  }
+
   const bundle = {
     bundleName: 'index',
     // The app is treated just like any other bundle.
     bundlePath: path.dirname(appPaths.dotenv),
     // May have an index html. This is a deviation from CRA where it is required.
-    // We lift this restriction for consistency with "bundles" that can be just JavaScript.
-    // Similarly we expect the index.html file to be in src root (this is change in paths.js),
-    // again for consistency with bundles, which will have their html files somewhere under src.
-    indexHtml: existsOrNull(appPaths.appHtml),
+    indexHtml: srcHtml || craHtml,
     // Pick from
     indexJs: selectIndexFile(appPaths.appSrc),
   };
