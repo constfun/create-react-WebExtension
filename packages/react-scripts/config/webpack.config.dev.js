@@ -16,18 +16,16 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
-var FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 
 module.exports = (bundles, hotReloadServerUrl) => {
   // const { servedPath, buildPath, indexJs } = bundle;
   // These paths are global to the project and do not vary between bundles.
-  const { appBuild, appTsConfig, appSrc, appNodeModules } = require('./paths');
+  const { appBuild, appSrc, appNodeModules } = require('./paths');
   // `publicUrl` is just like `publicPath`, but we will provide it to our app
   // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
   // Omit trailing slash as %PUBLIC_PATH%/xyz looks better than %PUBLIC_PATH%xyz.
@@ -49,11 +47,7 @@ module.exports = (bundles, hotReloadServerUrl) => {
       { publicPath: Array(cssFilename.split('/').length).join('../') }
     : {};
 
-  // const entries = {};
-  // for (let b of bundle) {
-  //   entries[
-  // }
-
+  // We use an entry point per bundle to produce separate js files.
   const entry = {};
   bundles.forEach(
     bun =>
@@ -78,12 +72,14 @@ module.exports = (bundles, hotReloadServerUrl) => {
       ])
   );
 
+  // We add an instance of HtmlWebpackPlugin per bundle to compile an index.html, if it exists.
   let plugins = bundles.reduce((plugs, bun) => {
     if (bun.indexHtml === null) {
       return plugs;
     }
     plugs.push(
       new HtmlWebpackPlugin({
+        // We use the bundle name as the name of the html file.
         filename: bun.bundleName + '.html',
         inject: true,
         template: bun.indexHtml,
@@ -96,7 +92,6 @@ module.exports = (bundles, hotReloadServerUrl) => {
   // It is focused on developer experience and fast rebuilds.
   // The production configuration is different and lives in a separate file.
   return {
-    // name: 'one' + Math.random(),
     // You may want 'eval' instead if you prefer to see the compiled output in DevTools.
     // See the discussion in https://github.com/facebookincubator/create-react-app/issues/343.
     devtool: 'cheap-module-source-map',
@@ -158,8 +153,7 @@ module.exports = (bundles, hotReloadServerUrl) => {
         // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
         // please link the files into your node_modules/ and let module-resolution kick in.
         // Make sure your source files are compiled, as they will not be processed in any way.
-        // DISABLING for now due to
-        // new ModuleScopePlugin(appSrc),
+        new ModuleScopePlugin(appSrc),
       ],
     },
     module: {
@@ -253,13 +247,7 @@ module.exports = (bundles, hotReloadServerUrl) => {
         {
           test: /\.(ts|tsx)$/,
           include: appSrc,
-          // loader: require.resolve('awesome-typescript-loader'),
           loader: require.resolve('ts-loader'),
-          // options: {
-          //   // transpileOnly: true,
-          //   //silent: true,
-          //   configFileName: appTsConfig,
-          // },
         },
         // "postcss" loader applies autoprefixer to our CSS.
         // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -315,11 +303,6 @@ module.exports = (bundles, hotReloadServerUrl) => {
       // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
       // In development, this will be an empty string.
       new InterpolateHtmlPlugin(clientEnv.raw),
-      // new FriendlyErrorsWebpackPlugin(),
-      // new ForkTsCheckerWebpackPlugin({
-      //   tsconfig: appTsConfig,
-      //   silent: true,
-      // }),
       // Add module names to factory functions so they appear in browser profiler.
       new webpack.NamedModulesPlugin(),
       // Makes some environment variables available to the JS code, for example:

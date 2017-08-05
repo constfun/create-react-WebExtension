@@ -10,7 +10,7 @@ module.exports = (compiler, hotMiddlewareOpts = {}) => {
     compiler,
     Object.assign(
       {
-        // HARDCODED in hotReloadClient.js
+        // HARDCODED in client.js
         path: '/__web_ext_hot_reload',
         heartbeat: 10e3,
       },

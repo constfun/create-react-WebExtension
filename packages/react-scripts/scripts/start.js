@@ -28,12 +28,15 @@ const fs = require('fs');
 const chokidar = require('chokidar');
 const chalk = require('chalk');
 const webpack = require('webpack');
-const { choosePort } = require('react-dev-utils/WebpackDevServerUtils');
+const {
+  choosePort,
+  createCompiler,
+} = require('react-dev-utils/WebpackDevServerUtils');
+const clearConsole = require('react-dev-utils/clearConsole');
 const appPaths = require('../config/paths');
 const makeDevConfig = require('../config/webpack.config.dev');
 const hotReloadServer = require('../lib/hot-reload/server');
 const { setupBuild, processPublicFolder } = require('../lib/setup');
-const { printCompilationStats } = require('../lib/format');
 
 const useYarn = fs.existsSync(appPaths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;
@@ -61,25 +64,12 @@ choosePort(HOST, DEFAULT_PORT)
       hotReloadServerUrl
     );
 
+    const compiler = createCompiler(webpack, config, '', {}, true);
+    // Instructions printed by CRA are not relevant, so we replace them on success.
+    patchInstructions(compiler);
     // We use compiler watch instead of webpack-dev-server,
-    // since extensions needs files written to disk,
-    // and don't need files served via http.
-    let isFirstCompilation = true;
-    const compiler = webpack(config);
-    const compilerWatch = compiler.watch({}, (err, stats) => {
-      if (err) {
-        console.log(err, chalk.red('\nCompiler watch failed'));
-        process.exit(1);
-      }
-
-      printCompilationStats({
-        stats,
-        isFirstCompilation,
-        isInteractive,
-        useYarn,
-      });
-      isFirstCompilation = false;
-    });
+    // since extensions need files written to disk, but not served over http.
+    const compilerWatch = compiler.watch({}, () => {});
 
     // Loading proxy config is not implemented yet, check and fail.
     const proxySetting = require(appPaths.appPackageJson).proxy;
@@ -103,7 +93,7 @@ choosePort(HOST, DEFAULT_PORT)
         ignoreInitial: true,
       })
       .on('all', () => {
-        console.log('Copying pubic files...');
+        console.log('Copying public folder...');
         processPublicFolder(appPaths, hotReloadServerUrl);
         hotReload.force();
         console.log('Done.');
@@ -124,3 +114,34 @@ choosePort(HOST, DEFAULT_PORT)
     }
     process.exit(1);
   });
+
+const patchInstructions = compiler => {
+  let isFirstCompile = true;
+  compiler.plugin('done', stats => {
+    const isSuccessful = !stats.hasErrors() && !stats.hasWarnings();
+    if (isSuccessful && (isInteractive || isFirstCompile)) {
+      clearConsole();
+      console.log(chalk.green('Compiled successfully!'));
+      printInstructions();
+    }
+    isFirstCompile = false;
+  });
+};
+
+const printInstructions = () => {
+  console.log();
+  console.log(
+    chalk.green(
+      `You can now load the ${chalk.bold(
+        'build'
+      )} directory as a temporary extension.`
+    )
+  );
+  console.log();
+  console.log('Note that the development build is not optimized.');
+  console.log(
+    `To create a production build, use ` +
+      `${chalk.cyan(`${useYarn ? 'yarn' : 'npm run'} build`)}.`
+  );
+  console.log();
+};

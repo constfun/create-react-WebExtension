@@ -18,25 +18,21 @@ const selectIndexFile = bundlePath => {
 
 // Any directory that has an empty _bundle file in it will be compiled to
 // a main.js, and an optional index.html and main.css.
-const loadBundles = app => {
-  const searchPath = path.join(app.bundlePath, 'src');
+const loadChildBundles = appBundle => {
+  const searchPath = path.join(appBundle.bundlePath, 'src');
   return find
     .fileSync(/\/_bundle$/, searchPath)
     .filter(file => path.dirname(file) !== searchPath)
-    .map(bundleFile => loadOneBundle(app, bundleFile));
+    .map(bundleFile => loadOneChildBundle(appBundle, bundleFile));
 };
 
-const loadOneBundle = (app, bundleFile) => {
+const loadOneChildBundle = (app, bundleFile) => {
   const bundlePath = path.dirname(bundleFile);
   const bundleName = path.basename(bundlePath);
 
   const bundle = {
     bundleName,
     bundlePath,
-    // Bundles are always served from '{app.servedPath}/bundles/{bundleName}/'.
-    servedPath: path.join(app.servedPath, 'bundles', bundleName) + '/',
-    // Bundles are built into a flat namespace under {app.buildPath}/bundles/.
-    buildPath: path.join(app.buildPath, 'bundles', bundleName),
     // Bundles may contain an index.html template.
     indexHtml: existsOrNull(path.join(bundlePath, 'index.html')),
     // Entry points can be written in a number of languages.
@@ -51,15 +47,15 @@ const loadOneBundle = (app, bundleFile) => {
   return Object.freeze(bundle);
 };
 
-const loadApp = appPaths => {
+const loadAppBundle = appPaths => {
   const bundle = {
     bundleName: 'index',
     // The app is treated just like any other bundle.
     bundlePath: path.dirname(appPaths.dotenv),
-    servedPath: appPaths.servedPath,
-    buildPath: appPaths.appBuild,
     // May have an index html. This is a deviation from CRA where it is required.
-    // Bundles can be just JavaScript, no reason to put limits on the app.
+    // We lift this restriction for consistency with "bundles" that can be just JavaScript.
+    // Similarly we expect the index.html file to be in src root (this is change in paths.js),
+    // again for consistency with bundles, which will have their html files somewhere under src.
     indexHtml: existsOrNull(appPaths.appHtml),
     // Pick from
     indexJs: selectIndexFile(appPaths.appSrc),
@@ -68,7 +64,13 @@ const loadApp = appPaths => {
   return Object.freeze(bundle);
 };
 
+const loadBundles = appPaths => {
+  const appBundle = loadAppBundle(appPaths);
+  return [].concat(appBundle, loadChildBundles(appBundle));
+};
+
 module.exports = {
+  loadChildBundles,
+  loadAppBundle,
   loadBundles,
-  loadApp,
 };

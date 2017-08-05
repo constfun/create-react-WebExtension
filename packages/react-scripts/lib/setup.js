@@ -2,7 +2,7 @@
 
 const fs = require('fs-extra');
 const path = require('path');
-const { loadApp, loadBundles } = require('./bundle');
+const { loadBundles } = require('./bundle');
 
 const processPublicFolder = (appPaths, hotReloadUrl) => {
   copyUnprocessedPublicFiles(appPaths);
@@ -51,9 +51,7 @@ const setupBuild = hotReloadUrl => {
   fs.emptyDirSync(appPaths.appBuild);
   processPublicFolder(appPaths, hotReloadUrl);
 
-  const app = loadApp(appPaths);
-  const bundles = [].concat(app, loadBundles(app));
-  return bundles.filter(p => p.indexJs);
+  return loadBundles(appPaths);
 };
 
 module.exports = {

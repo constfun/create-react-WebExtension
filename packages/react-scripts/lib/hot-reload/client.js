@@ -9,7 +9,7 @@ const makeClient = address => {
   let _connectionFailureReported = false;
   const loadedHashes = new Set();
 
-  // HARDCODED in hotReloadServer.js
+  // HARDCODED in server.js
   const hotReloadPath = '/__web_ext_hot_reload';
   const connection = new window.EventSource(
     url.resolve(address, hotReloadPath)
