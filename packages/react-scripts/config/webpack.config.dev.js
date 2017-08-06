@@ -14,7 +14,6 @@ const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const WriteFilePlugin = require('write-file-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
@@ -34,20 +33,6 @@ module.exports = (bundles, hotReloadServerUrl) => {
   const publicUrl = '';
   // Get environment variables to inject into our app.
   const env = getClientEnvironment(publicUrl);
-
-  // Some apps do not use client-side routing with pushState.
-  // For these, "homepage" can be set to "." to enable relative asset paths.
-  const shouldUseRelativeAssetPaths = publicPath === './';
-  // Note: defined here because it will be used more than once.
-  const cssFilename = 'css/[name].css';
-  // ExtractTextPlugin expects the build output to be flat.
-  // (See https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/27)
-  // However, our output is structured with css, js and media folders.
-  // To have this structure working with relative paths, we have to use custom options.
-  const extractTextPluginOptions = shouldUseRelativeAssetPaths
-    ? // Making sure that the publicPath goes back to to build folder.
-      { publicPath: Array(cssFilename.split('/').length).join('../') }
-    : {};
 
   // We use an entry point per bundle to produce separate js files.
   const entry = {};
@@ -269,42 +254,35 @@ module.exports = (bundles, hotReloadServerUrl) => {
         // in development "style" loader enables hot editing of CSS.
         {
           test: /\.css$/,
-          loader: ExtractTextPlugin.extract(
-            Object.assign(
-              {
-                fallback: require.resolve('style-loader'),
-                use: [
-                  {
-                    loader: require.resolve('css-loader'),
-                    options: {
-                      importLoaders: 1,
-                    },
-                  },
-                  {
-                    loader: require.resolve('postcss-loader'),
-                    options: {
-                      // Necessary for external CSS imports to work
-                      // https://github.com/facebookincubator/create-react-app/issues/2677
-                      ident: 'postcss',
-                      plugins: () => [
-                        require('postcss-flexbugs-fixes'),
-                        autoprefixer({
-                          browsers: [
-                            '>1%',
-                            'last 4 versions',
-                            'Firefox ESR',
-                            'not ie < 9', // React doesn't support IE8 anyway
-                          ],
-                          flexbox: 'no-2009',
-                        }),
-                      ],
-                    },
-                  },
+          use: [
+            require.resolve('style-loader'),
+            {
+              loader: require.resolve('css-loader'),
+              options: {
+                importLoaders: 1,
+              },
+            },
+            {
+              loader: require.resolve('postcss-loader'),
+              options: {
+                // Necessary for external CSS imports to work
+                // https://github.com/facebookincubator/create-react-app/issues/2677
+                ident: 'postcss',
+                plugins: () => [
+                  require('postcss-flexbugs-fixes'),
+                  autoprefixer({
+                    browsers: [
+                      '>1%',
+                      'last 4 versions',
+                      'Firefox ESR',
+                      'not ie < 9', // React doesn't support IE8 anyway
+                    ],
+                    flexbox: 'no-2009',
+                  }),
                 ],
               },
-              extractTextPluginOptions
-            )
-          ),
+            },
+          ],
         },
         // ** STOP ** Are you adding a new loader?
         // Remember to add the new extension(s) to the "url" loader exclusion list.
@@ -321,10 +299,8 @@ module.exports = (bundles, hotReloadServerUrl) => {
       // Makes some environment variables available to the JS code, for example:
       // if (process.env.NODE_ENV === 'development') { ... }. See `./env.js`.
       new webpack.DefinePlugin(env.stringified),
-      // Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
-      new ExtractTextPlugin({
-        filename: cssFilename,
-      }),
+      // This is necessary to emit hot updates (currently CSS only):
+      new webpack.HotModuleReplacementPlugin(),
       // Watcher doesn't work well if you mistype casing in a path so we use
       // a plugin that prints an error when you attempt to do this.
       // See https://github.com/facebookincubator/create-react-app/issues/240
