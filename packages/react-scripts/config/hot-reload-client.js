@@ -2,6 +2,7 @@
 'use strict';
 
 const makeClient = address => {
+  const SockJS = require('sockjs-client');
   const url = require('url');
   const stripAnsi = require('strip-ansi');
   const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
@@ -9,31 +10,35 @@ const makeClient = address => {
   let _connectionFailureReported = false;
   const loadedHashes = new Set();
 
-  // HARDCODED in server.js
-  const hotReloadPath = '/__web_ext_hot_reload';
-  const connection = new window.EventSource(
-    url.resolve(address, hotReloadPath)
+  const connection = new SockJS(
+    // Hardcoded in WebpackDevServer
+    url.resolve(address, '/sockjs-node')
   );
 
   connection.onmessage = e => {
-    // This is heart emoji... wish it was action === 'heartbeat'.
-    // Crash and burn and sometimes even work, cutely.
-    if (e.data == '\uD83D\uDC93') {
-      return;
-    }
-
-    const message = JSON.parse(e.data);
-    switch (message.action) {
-      case 'sync':
-        loadedHashes.add(message.hash);
-        break;
-      case 'built':
-        handleBuilt(message);
-        break;
-      case 'force':
-        browser.runtime.reload();
-        break;
-    }
+    var message = JSON.parse(e.data);
+    console.log(message);
+    // switch (message.type) {
+    //   case 'hash':
+    //     handleAvailableHash(message.data);
+    //     break;
+    //   case 'still-ok':
+    //   case 'ok':
+    //     handleSuccess();
+    //     break;
+    //   case 'content-changed':
+    //     // Triggered when a file from `contentBase` changed.
+    //     window.location.reload();
+    //     break;
+    //   case 'warnings':
+    //     handleWarnings(message.data);
+    //     break;
+    //   case 'errors':
+    //     handleErrors(message.data);
+    //     break;
+    //   default:
+    //   // Do nothing.
+    // }
   };
 
   connection.onopen = () => {

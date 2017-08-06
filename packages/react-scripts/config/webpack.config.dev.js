@@ -60,7 +60,7 @@ module.exports = (bundles, hotReloadServerUrl) => {
         // We need to know the absolute url since we can't use window.location to infer
         // it, since the client is running as an extension content or background script
         // window.location will be something like moz-extension://a2c1a3gf4a2c1a3gf4/rel/index.html
-        require.resolve('../lib/hot-reload/client') +
+        require.resolve('./hot-reload-client') +
           `?server_url=${encodeURIComponent(hotReloadServerUrl)}`,
         // We ship a few polyfills by default:
         require.resolve('./polyfills'),
