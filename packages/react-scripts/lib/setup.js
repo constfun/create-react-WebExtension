@@ -9,11 +9,11 @@ const copyPublicFolder = appPaths => {
   });
 };
 
-const setupBuild = hotReloadUrl => {
+const setupBuild = () => {
   const appPaths = require('../config/paths');
 
   fs.emptyDirSync(appPaths.appBuild);
-  copyPublicFolder(appPaths, hotReloadUrl);
+  copyPublicFolder(appPaths);
 
   return loadBundles(appPaths);
 };
