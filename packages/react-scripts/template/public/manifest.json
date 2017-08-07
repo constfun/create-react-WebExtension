@@ -11,14 +11,14 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["js/browser-polyfill.js", "js/content.js"],
-      "css": ["css/content.css"]
+      "js": ["js/browser-polyfill.js", "js/content.js"]
     }
   ],
   "background": {
       "scripts": ["js/browser-polyfill.js", "js/index.js"]
   },
   "web_accessible_resources": ["media/*"],
+  "permissions":["<all_urls>"],
   "browser_action": {
     "default_icon": "icon-16.png",
     "default_title": "Create React WebExtension"

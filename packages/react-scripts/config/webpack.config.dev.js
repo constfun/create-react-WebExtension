@@ -20,10 +20,11 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
+const JsonpTemplateReplacePlugin = require('../lib/hot-reload/JsonpTemplateReplacePlugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 
-module.exports = (bundles, hotReloadServerUrl) => {
+module.exports = (bundles, hotUpdateServerUrl) => {
   // Webpack uses `publicPath` to determine where the app is being served from.
   // In development, we always serve from the root. This makes config easier.
   const publicPath = '/';
@@ -41,12 +42,13 @@ module.exports = (bundles, hotReloadServerUrl) => {
       (entry[bun.bundleName] = [
         // Include an alternative client for WebpackDevServer. A client's job is to
         // connect to WebpackDevServer by a socket and get notified about changes.
-        // When you save a file, the client will reload the extension.
-        // We need to know the absolute url since we can't use window.location to infer
-        // it, since the client is running as an extension content or background script
-        // window.location will be something like moz-extension://a2c1a3gf4a2c1a3gf4/rel/index.html
-        require.resolve('./hot-reload-client') +
-          `?server_url=${encodeURIComponent(hotReloadServerUrl)}`,
+        // When you save a file, the client will hot load CSS or reload the extension in case of JS changes.
+        // We need to know the absolute url of the server since we can't use window.location to infer
+        // it. The client is running in a sandboxed script where window.location is random.
+        require.resolve('../lib/hot-reload/webpackHotDevClient') +
+          `?hotUpdateServerUrl=${encodeURIComponent(hotUpdateServerUrl)}`,
+        // require.resolve('./hot-reload-client') +
+        //   `?server_url=${encodeURIComponent(hotReloadServerUrl)}`,
         // We ship a few polyfills by default:
         require.resolve('./polyfills'),
         // Errors should be considered fatal in development
@@ -301,6 +303,7 @@ module.exports = (bundles, hotReloadServerUrl) => {
       new webpack.DefinePlugin(env.stringified),
       // This is necessary to emit hot updates (currently CSS only):
       new webpack.HotModuleReplacementPlugin(),
+      new JsonpTemplateReplacePlugin({ hotUpdateServerUrl }),
       // Watcher doesn't work well if you mistype casing in a path so we use
       // a plugin that prints an error when you attempt to do this.
       // See https://github.com/facebookincubator/create-react-app/issues/240

@@ -1,4 +1,4 @@
-/* globals __resourceQuery, browser */
+/* globals __resourceQuery, browser, __webpack_hash__ */
 'use strict';
 
 const makeClient = address => {
@@ -7,8 +7,18 @@ const makeClient = address => {
   const stripAnsi = require('strip-ansi');
   const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 
+  var isFirstCompilation = true;
+  var mostRecentCompilationHash = null;
   let _connectionFailureReported = false;
   const loadedHashes = new Set();
+
+  // Is there a newer version of this code available?
+  function isUpdateAvailable() {
+    /* globals __webpack_hash__ */
+    // __webpack_hash__ is the hash of the current compilation.
+    // It's a global variable injected by Webpack.
+    return mostRecentCompilationHash !== __webpack_hash__;
+  }
 
   const connection = new SockJS(
     // Hardcoded in WebpackDevServer
@@ -18,27 +28,25 @@ const makeClient = address => {
   connection.onmessage = e => {
     var message = JSON.parse(e.data);
     console.log(message);
-    // switch (message.type) {
-    //   case 'hash':
-    //     handleAvailableHash(message.data);
-    //     break;
-    //   case 'still-ok':
-    //   case 'ok':
-    //     handleSuccess();
-    //     break;
-    //   case 'content-changed':
-    //     // Triggered when a file from `contentBase` changed.
-    //     window.location.reload();
-    //     break;
-    //   case 'warnings':
-    //     handleWarnings(message.data);
-    //     break;
-    //   case 'errors':
-    //     handleErrors(message.data);
-    //     break;
-    //   default:
-    //   // Do nothing.
-    // }
+    switch (message.type) {
+      case 'hash':
+        mostRecentCompilationHash = message.data;
+        break;
+      case 'still-ok':
+      case 'ok':
+        handleSuccess();
+        break;
+      //   case 'content-changed':
+      //     // Triggered when a file from `contentBase` changed.
+      //     window.location.reload();
+      //     break;
+      //   case 'warnings':
+      //     handleWarnings(message.data);
+      //     break;
+      //   case 'errors':
+      //     handleErrors(message.data);
+      //     break;
+    }
   };
 
   connection.onopen = () => {
@@ -92,6 +100,7 @@ const makeClient = address => {
 const isBackgroundOrOptionsScript = !!browser.runtime.getBackgroundPage;
 if (isBackgroundOrOptionsScript) {
   const querystring = require('querystring');
-  const serverUrl = querystring.parse(__resourceQuery.slice(1)).server_url;
+  const serverUrl = querystring.parse(__resourceQuery.slice(1))
+    .hotUpdateServerUrl;
   makeClient(serverUrl);
 }
