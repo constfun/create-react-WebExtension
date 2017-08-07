@@ -13,8 +13,11 @@ module.exports = function() {
   function hotDownloadUpdateChunk(chunkId) {
     // eslint-disable-line no-unused-vars
     // Request hot update from background script, since we can't inject js from content scripts.
-    const crossbrowser = browser || chrome || msBrowser;
-    crossbrowser.runtime.sendMessage({ file: $hotChunkFilename$ });
+    const crossb = browser || chrome || msBrowser;
+    crossb.runtime.sendMessage({
+      action: '__hot-update',
+      file: $hotChunkFilename$,
+    });
   }
 
   function hotDownloadManifest(requestTimeout) {
