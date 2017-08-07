@@ -2,6 +2,7 @@
 
 const fs = require('fs-extra');
 const path = require('path');
+const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const { loadBundles } = require('./bundle');
 
 const processPublicFolder = appPaths => {
@@ -50,6 +51,11 @@ const injectHotUpdateSupportIntoManifest = (manifest, bgScriptRelPath) => {
 };
 
 const setupBuild = appPaths => {
+  // Warn and crash if required files are missing.
+  if (!checkRequiredFiles([appPaths.appManifest])) {
+    process.exit(1);
+  }
+
   fs.emptyDirSync(appPaths.appBuild);
   processPublicFolder(appPaths);
   return loadBundles(appPaths);
