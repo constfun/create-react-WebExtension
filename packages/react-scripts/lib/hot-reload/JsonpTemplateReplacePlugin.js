@@ -82,7 +82,7 @@ module.exports = class JsonpTemplateReplacePlugin {
           .replace(/\$hotUpdateManifestUrl\$/g, currentHotUpdateManifestUrl)
           .replace(/\$hotChunkFilename\$/g, currentHotUpdateChunkFilename)
           .replace(/\$hash\$/g, JSON.stringify(hash));
-        return `${source}
+        return `
 function hotDisposeChunk(chunkId) {
     delete installedChunks[chunkId];
 }

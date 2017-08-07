@@ -293,7 +293,6 @@ function handleAvailableHash(hash) {
 // Handle messages from the server.
 connection.onmessage = function(e) {
   var message = JSON.parse(e.data);
-  console.log(message);
   switch (message.type) {
     case 'hash':
       handleAvailableHash(message.data);

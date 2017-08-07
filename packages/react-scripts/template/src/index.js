@@ -10,4 +10,5 @@ browser.browserAction.onClicked.addListener(e => {
 browser.runtime.onMessage.addListener(({ file }, sender) => {
   // TODO: Check that sender is part of this extension.
   browser.tabs.executeScript(sender.tab.id, { file });
+  return true;
 });
