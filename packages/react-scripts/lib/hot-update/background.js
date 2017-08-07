@@ -1,7 +1,6 @@
-/* global browser chrome msBrowser */
 'use strict';
 
-const crossb = browser || chrome || msBrowser;
+const crossb = window.browser || window.chrome || window.msBrowser;
 
 // Install script, on behalf of the sending content script.
 crossb.runtime.onMessage.addListener((msg, sender) => {

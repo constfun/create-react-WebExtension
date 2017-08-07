@@ -73,6 +73,11 @@ const loadAppBundle = appPaths => {
     indexJs: selectIndexFile(appPaths.appSrc),
   };
 
+  // Warn and crash if required files are missing.
+  if (!checkRequiredFiles([appPaths.appManifest])) {
+    process.exit(1);
+  }
+
   return Object.freeze(bundle);
 };
 

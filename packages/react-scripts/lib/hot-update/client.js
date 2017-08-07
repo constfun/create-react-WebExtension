@@ -379,8 +379,7 @@ function tryApplyUpdates(onHotUpdateSuccess) {
 }
 
 const reloadExtension = () => {
-  /* global browser chrome msBrowser */
-  const crossb = browser || chrome || msBrowser;
+  const crossb = window.browser || window.chrome || window.msBrowser;
   crossb.runtime.sendMessage({ action: '__hot-update-reload' });
   window.location.reload();
 };
