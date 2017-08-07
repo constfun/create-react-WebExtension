@@ -7,13 +7,14 @@ const crossb = browser || chrome || msBrowser;
 crossb.runtime.onMessage.addListener((msg, sender) => {
   // If the message is not from this extension, ignore it.
   if (!msg || sender.id !== crossb.runtime.id) {
-    return;
+    return true;
   }
 
-  if (msg.action !== '__hot-update') {
-    return;
+  if (msg.action === '__hot-update') {
+    crossb.tabs.executeScript(sender.tab.id, { file: msg.file });
+  } else if (msg.action === '__hot-update-reload') {
+    crossb.runtime.reload();
   }
 
-  crossb.tabs.executeScript(sender.tab.id, { file: msg.file });
   return true;
 });

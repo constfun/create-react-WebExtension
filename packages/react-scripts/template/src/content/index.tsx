@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import './index.css';
 
 const donut = browser.extension.getURL(require('./donut.svg'));
-const Donut = () => <img className="donut" src={donut} />;
+const Donut = () => <div style={{ color: 'red' }}>HELLO<img className="donut" src={donut} />WORLD</div>;
 
 browser.runtime.onMessage.addListener(() => {
     const mainEl = document.createElement('div');
@@ -16,4 +16,4 @@ browser.runtime.onMessage.addListener(() => {
     );
 
     return true;
-}); 
+});

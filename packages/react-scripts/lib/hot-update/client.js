@@ -7,7 +7,8 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
-// Based heavily on react-dev-tools/webpackDevClient
+// Pretty much react-dev-tools/webpackDevClient with configurable hot update server url
+// and reloading of the extension in addition to reloading the page.
 
 /* global __resourceQuery */
 'use strict';
@@ -306,7 +307,7 @@ connection.onmessage = function(e) {
       break;
     case 'content-changed':
       // Triggered when a file from `contentBase` changed.
-      window.location.reload();
+      reloadExtension();
       break;
     case 'warnings':
       handleWarnings(message.data);
@@ -336,7 +337,7 @@ function canApplyUpdates() {
 function tryApplyUpdates(onHotUpdateSuccess) {
   if (!module.hot) {
     // HotModuleReplacementPlugin is not in Webpack configuration.
-    window.location.reload();
+    reloadExtension();
     return;
   }
 
@@ -346,8 +347,7 @@ function tryApplyUpdates(onHotUpdateSuccess) {
 
   function handleApplyUpdates(err, updatedModules) {
     if (err || !updatedModules) {
-      console.log(err);
-      // window.location.reload();
+      reloadExtension();
       return;
     }
 
@@ -377,3 +377,10 @@ function tryApplyUpdates(onHotUpdateSuccess) {
     );
   }
 }
+
+const reloadExtension = () => {
+  /* global browser chrome msBrowser */
+  const crossb = browser || chrome || msBrowser;
+  crossb.runtime.sendMessage({ action: '__hot-update-reload' });
+  window.location.reload();
+};
