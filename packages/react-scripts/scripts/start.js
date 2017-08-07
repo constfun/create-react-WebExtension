@@ -39,7 +39,7 @@ const {
 const paths = require('../config/paths');
 const makeDevConfig = require('../config/webpack.config.dev');
 const createDevServerConfig = require('../config/webpackDevServer.config');
-const { setupBuild, copyPublicFolder } = require('../lib/setup');
+const { setupBuild, processPublicFolder } = require('../lib/setup');
 
 const useYarn = fs.existsSync(paths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;
@@ -93,7 +93,7 @@ choosePort(HOST, DEFAULT_PORT)
       })
       .on('all', () => {
         console.log('Copying public folder...');
-        copyPublicFolder(paths);
+        processPublicFolder(paths);
         console.log('Done.');
       });
 

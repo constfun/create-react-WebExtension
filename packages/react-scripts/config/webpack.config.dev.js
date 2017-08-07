@@ -20,7 +20,7 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
-const JsonpTemplateReplacePlugin = require('../lib/hot-reload/JsonpTemplateReplacePlugin');
+const JsonpTemplateReplacePlugin = require('../lib/hot-update/JsonpTemplateReplacePlugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 
@@ -45,10 +45,8 @@ module.exports = (bundles, hotUpdateServerUrl) => {
         // When you save a file, the client will hot load CSS or reload the extension in case of JS changes.
         // We need to know the absolute url of the server since we can't use window.location to infer
         // it. The client is running in a sandboxed script where window.location is random.
-        require.resolve('../lib/hot-reload/webpackHotDevClient') +
+        require.resolve('../lib/hot-update/client') +
           `?hotUpdateServerUrl=${encodeURIComponent(hotUpdateServerUrl)}`,
-        // require.resolve('./hot-reload-client') +
-        //   `?server_url=${encodeURIComponent(hotReloadServerUrl)}`,
         // We ship a few polyfills by default:
         require.resolve('./polyfills'),
         // Errors should be considered fatal in development

@@ -6,6 +6,9 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  */
+
+// Based heavily on react-dev-tools/webpackDevClient
+
 /* global __resourceQuery */
 'use strict';
 
