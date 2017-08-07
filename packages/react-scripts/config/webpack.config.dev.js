@@ -61,19 +61,18 @@ module.exports = (bundles, hotUpdateServerUrl) => {
 
   // We add an instance of HtmlWebpackPlugin per bundle to compile an index.html, if it exists.
   let plugins = bundles.reduce((plugs, bun) => {
-    if (bun.indexHtml === null) {
-      return plugs;
+    if (bun.indexHtml !== null) {
+      plugs.push(
+        new HtmlWebpackPlugin({
+          // We use the bundle name as the name of the html file.
+          filename: bun.bundleName + '.html',
+          // Also limit what assets we inject to only what is in the bundle.
+          chunks: [bun.bundleName],
+          inject: true,
+          template: bun.indexHtml,
+        })
+      );
     }
-    plugs.push(
-      new HtmlWebpackPlugin({
-        // We use the bundle name as the name of the html file.
-        filename: bun.bundleName + '.html',
-        // Also limit what assets we inject to only what is in the bundle.
-        chunks: [bun.bundleName],
-        inject: true,
-        template: bun.indexHtml,
-      })
-    );
     return plugs;
   }, []);
 
@@ -98,7 +97,7 @@ module.exports = (bundles, hotUpdateServerUrl) => {
       // containing code from all our entry points, and the Webpack runtime.
       filename: 'js/[name].js',
       // There are also additional JS chunk files if you use code splitting.
-      chunkFilename: 'js/[name].[chunkhash].js',
+      chunkFilename: 'js/[name].[chunkhash:8].chunk.js',
       // This is the URL that app is served from.
       publicPath: publicPath,
       // Point sourcemap entries to original disk location (format as URL on Windows)
@@ -124,6 +123,7 @@ module.exports = (bundles, hotUpdateServerUrl) => {
       extensions: [
         '.ts',
         '.tsx',
+        '.web.ts',
         '.web.tsx',
         '.web.js',
         '.js',
