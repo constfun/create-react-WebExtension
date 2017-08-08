@@ -20,7 +20,7 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
-const JsonpTemplateReplacePlugin = require('../lib/hot-update/JsonpTemplateReplacePlugin');
+const JsonpTemplateReplacePlugin = require('../libs/hot-update/JsonpTemplateReplacePlugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 
@@ -45,7 +45,7 @@ module.exports = (bundles, hotUpdateServerUrl) => {
         // When you save a file, the client will hot load CSS or reload the extension in case of JS changes.
         // We need to know the absolute url of the server since we can't use window.location to infer
         // it. The client is running in a sandboxed script where window.location is random.
-        require.resolve('../lib/hot-update/client') +
+        require.resolve('../libs/hot-update/client') +
           `?hotUpdateServerUrl=${encodeURIComponent(hotUpdateServerUrl)}`,
         // We ship a few polyfills by default:
         require.resolve('./polyfills'),
@@ -121,6 +121,8 @@ module.exports = (bundles, hotUpdateServerUrl) => {
       // `web` extension prefixes have been added for better support
       // for React Native Web.
       extensions: [
+        '.ml',
+        '.re',
         '.ts',
         '.tsx',
         '.web.ts',
@@ -203,6 +205,7 @@ module.exports = (bundles, hotUpdateServerUrl) => {
             /\.html$/,
             /\.(js|jsx)$/,
             /\.(ts|tsx)$/,
+            /\.(re|ml)$/,
             /\.css$/,
             /\.json$/,
             /\.bmp$/,
@@ -235,6 +238,7 @@ module.exports = (bundles, hotUpdateServerUrl) => {
             // @remove-on-eject-begin
             babelrc: false,
             presets: [require.resolve('babel-preset-react-app')],
+            // plugins: ['babel-plugin-bucklescript'],
             // @remove-on-eject-end
             // This is a feature of `babel-loader` for webpack (not Babel itself).
             // It enables caching results in ./node_modules/.cache/babel-loader/
@@ -242,10 +246,17 @@ module.exports = (bundles, hotUpdateServerUrl) => {
             cacheDirectory: true,
           },
         },
+        // Process TypeScript
         {
           test: /\.(ts|tsx)$/,
           include: paths.appSrc,
           loader: require.resolve('ts-loader'),
+        },
+        // Set up Reason and OCaml files to use the loader
+        {
+          test: /\.(re|ml)$/,
+          use: 'bs-loader',
+          include: paths.appSrc,
         },
         // "postcss" loader applies autoprefixer to our CSS.
         // "css" loader resolves paths in CSS and adds assets as dependencies.

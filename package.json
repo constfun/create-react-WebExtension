@@ -8,7 +8,7 @@
     "e2e:docker": "tasks/local-test.sh",
     "postinstall": "node bootstrap.js && cd packages/react-error-overlay/ && npm run build:prod",
     "publish": "tasks/release.sh",
-    "start": "node packages/react-scripts/scripts/start.js",
+    "start": "cd packages/react-scripts; node scripts/start.js",
     "test": "node packages/react-scripts/scripts/test.js --env=jsdom",
     "format": "prettier --trailing-comma es5 --single-quote --write 'packages/*/*.js' 'packages/*/!(node_modules)/**/*.js'",
     "precommit": "lint-staged"
@@ -26,5 +26,8 @@
       "prettier --trailing-comma es5 --single-quote --write",
       "git add"
     ]
+  },
+  "dependencies": {
+    "bs-loader": "^1.5.8"
   }
 }
