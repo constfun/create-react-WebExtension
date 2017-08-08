@@ -131,7 +131,7 @@ const printInstructions = () => {
     chalk.green(
       `You can now load the ${chalk.bold(
         'build'
-      )} directory as a temporary extension.`
+      )} directory as a temporary extension in your browser.`
     )
   );
   console.log();

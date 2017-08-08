@@ -21,7 +21,7 @@ const path = require('path');
 const execSync = require('child_process').execSync;
 const chalk = require('chalk');
 const paths = require('../config/paths');
-const createJestConfig = require('../lib/createJestConfig');
+const createJestConfig = require('./utils/createJestConfig');
 const inquirer = require('react-dev-utils/inquirer');
 const spawnSync = require('react-dev-utils/crossSpawn').sync;
 
@@ -82,7 +82,13 @@ inquirer
       }
     }
 
-    const folders = ['config', 'config/jest', 'scripts'];
+    const folders = [
+      'config',
+      'config/jest',
+      'scripts',
+      'lib',
+      'lib/hot-update',
+    ];
 
     // Make shallow array of files paths
     const files = folders.reduce((files, folder) => {

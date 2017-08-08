@@ -15,7 +15,7 @@
     "config",
     "scripts",
     "template",
-    "utils"
+    "lib"
   ],
   "bin": {
     "react-scripts-web-ext": "./bin/react-scripts-web-ext.js"
@@ -56,6 +56,7 @@
     "tslint": "5.2.0",
     "tslint-loader": "3.5.3",
     "tslint-react": "3.0.0",
+    "typescript": "2.4.2",
     "url-loader": "0.5.9",
     "webpack": "3.4.1",
     "webpack-dev-server": "2.6.1",
@@ -67,10 +68,8 @@
     "@types/node": "^8.0.19",
     "@types/react": "^16.0.0",
     "@types/react-dom": "^15.5.1",
-    "chokidar": "^1.7.0",
     "react": "^15.5.1",
     "react-dom": "^15.5.1",
-    "typescript": "2.4.2",
     "web-ext-types": "^0.3.1"
   },
   "optionalDependencies": {

@@ -134,8 +134,8 @@ module.exports = function(
     '@types/node',
     '@types/react',
     '@types/react-dom',
-    'web-ext-types',
     '@types/jest',
+    'web-ext-types',
   ];
 
   console.log(`Installing ${types.join(', ')} ${command}...`);
@@ -181,12 +181,14 @@ module.exports = function(
   console.log('Inside that directory, you can run several commands:');
   console.log();
   console.log(chalk.cyan(`  ${displayedCommand} start`));
-  console.log('    Starts the development server.');
+  console.log(
+    '    Starts the development server and creates a temporary WebExtension.'
+  );
   console.log();
   console.log(
     chalk.cyan(`  ${displayedCommand} ${useYarn ? '' : 'run '}build`)
   );
-  console.log('    Bundles the app into static files for production.');
+  console.log('    Builds a production version of the extension.');
   console.log();
   console.log(chalk.cyan(`  ${displayedCommand} test`));
   console.log('    Starts the test runner.');
