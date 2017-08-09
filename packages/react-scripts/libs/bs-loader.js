@@ -33,22 +33,21 @@ const bsbSourceDirs = bsbSources => {
 };
 
 const makeBsbContext = ({ bsconfig, bsbOutputPath }) => {
+  const rootPath = path.dirname(bsconfig);
   const context = bsbOutputPath;
   fs.ensureDirSync(context);
 
   // Symlink node_modules so bs-platform is found.
   const nodeModulesInContext = path.join(context, 'node_modules');
   fs.removeSync(nodeModulesInContext);
-  fs.symlinkSync(
-    path.join(path.dirname(bsconfig), 'node_modules'),
-    nodeModulesInContext
-  );
+  fs.symlinkSync(path.join(rootPath, 'node_modules'), nodeModulesInContext);
 
   // Rsync all the sources.
   const bsbSources = require(bsconfig).sources;
   const pathsToRsync = ['bsconfig.json'].concat(bsbSourceDirs(bsbSources));
   return child_process
     .execFile('rsync', ['-avR', '--delete'].concat(pathsToRsync, [context]), {
+      cwd: rootPath,
       maxBuffer: Infinity,
     })
     .then(() => context);

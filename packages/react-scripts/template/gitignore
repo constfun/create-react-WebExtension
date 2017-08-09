@@ -8,6 +8,7 @@
 
 # production
 /build
+/_bsb
 
 # misc
 .DS_Store

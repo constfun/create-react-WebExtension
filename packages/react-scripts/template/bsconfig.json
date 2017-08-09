@@ -1,7 +1,7 @@
 {
     "name": "hello",
     "sources": {
-        "dir": "template/src/flavor"
+        "dir": "src/flavor"
     },
     "bs-dependencies": [
         "reason-react"
