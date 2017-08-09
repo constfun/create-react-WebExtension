@@ -1,10 +1,12 @@
 'use strict';
 
-const os = require('os');
 const path = require('path');
 const fs = require('fs-extra');
 const child_process = require('child-process-promise');
 const { getOptions } = require('loader-utils');
+
+// We'll make this noop if quiet.
+let log = console.log;
 
 let bsb;
 try {
@@ -30,7 +32,7 @@ const bsbSourceDirs = bsbSources => {
   }
 };
 
-const makeBsbContext = bsbOutputPath => {
+const makeBsbContext = ({ bsconfig, bsbOutputPath }) => {
   const context = bsbOutputPath;
   fs.ensureDirSync(context);
 
@@ -38,12 +40,11 @@ const makeBsbContext = bsbOutputPath => {
   const nodeModulesInContext = path.join(context, 'node_modules');
   fs.removeSync(nodeModulesInContext);
   fs.symlinkSync(
-    path.join(process.cwd(), 'node_modules'),
+    path.join(path.dirname(bsconfig), 'node_modules'),
     nodeModulesInContext
   );
 
   // Rsync all the sources.
-  const bsconfig = path.join(process.cwd(), 'bsconfig.json');
   const bsbSources = require(bsconfig).sources;
   const pathsToRsync = ['bsconfig.json'].concat(bsbSourceDirs(bsbSources));
   return child_process
@@ -58,15 +59,15 @@ const transformSrc = (moduleDir, src) =>
     ? src.replace(es6ReplaceRegex, '$1$3')
     : src.replace(commonJsReplaceRegex, '$1$3');
 
-const runBsb = (compilation, bsbOutputPath) => {
+const runBsb = (compilation, options) => {
   return new Promise(resolve => {
     if (compilation.__BSB_CONTEXT) {
       resolve(compilation.__BSB_CONTEXT);
       return;
     }
 
-    log("Running BuckleScript's bsb in", bsbOutputPath);
-    makeBsbContext(bsbOutputPath)
+    log("Running BuckleScript's bsb in", options.bsbOutputPath);
+    makeBsbContext(options)
       .then(context => {
         compilation.__BSB_CONTEXT = context;
         return child_process.execFile(bsb, ['-make-world'], {
@@ -74,22 +75,30 @@ const runBsb = (compilation, bsbOutputPath) => {
           maxBuffer: Infinity,
         });
       })
-      .then(() => resolve(compilation.__BSB_CONTEXT));
+      .then(() => {
+        const context = compilation.__BSB_CONTEXT;
+        fs.copySync(
+          path.join(context, '.merlin'),
+          path.join(path.dirname(options.bsconfig), '.merlin')
+        );
+        resolve(compilation.__BSB_CONTEXT);
+      });
   });
-};
-
-const getJsFile = (context, moduleDir, resourcePath) => {
-  const mlFileName = resourcePath.replace(process.cwd(), '');
-  const jsFileName = mlFileName.replace(fileNameRegex, '.js');
-  return path.join(context, 'lib', moduleDir, jsFileName);
 };
 
 const getBsbErrorMessages = err => err.match(getErrorRegex);
 
 const getCompiledFile = (compilation, resourcePath, options) => {
   return new Promise((resolve, reject) => {
-    runBsb(compilation, options.bsbOutputPath).then(context => {
-      const jsFile = getJsFile(context, options.module, resourcePath);
+    runBsb(compilation, options).then(context => {
+      const rootPath = path.dirname(options.bsconfig);
+      const mlFile = resourcePath.replace(rootPath, '');
+      const jsFile = path.join(
+        context,
+        'lib',
+        options.module,
+        mlFile.replace(fileNameRegex, '.js')
+      );
       fs.readFile(jsFile, (err, contents) => {
         if (err) {
           reject(err);
@@ -102,13 +111,14 @@ const getCompiledFile = (compilation, resourcePath, options) => {
   });
 };
 
-let log = console.log;
-
 module.exports = function loader() {
   const options = getOptions(this) || {};
   options.module = options.module || 'js';
+  options.bsconfig =
+    options.bsconfig || path.join(process.cwd(), 'bsconfig.json');
   options.bsbOutputPath =
-    options.bsbOutputPath || path.join(os.tmpdir(), 'bs-loader');
+    options.bsbOutputPath || path.join(path.dirname(options.bsconfig), '_bsb');
+
   if (options.quiet) {
     log = () => {};
   }
