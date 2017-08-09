@@ -22,6 +22,12 @@
 // that looks similar to our console output. The error overlay is inspired by:
 // https://github.com/glenjamin/webpack-hot-middleware
 
+const crossb = window.browser || window.chrome || window.msBrowser;
+const IS_BACKGROUND = !!crossb.extension.getBackgroundPage;
+if (IS_BACKGROUND) {
+  require('./background.js');
+}
+
 var SockJS = require('sockjs-client');
 var querystring = require('querystring');
 var stripAnsi = require('strip-ansi');
@@ -380,6 +386,11 @@ function tryApplyUpdates(onHotUpdateSuccess) {
 
 const reloadExtension = () => {
   const crossb = window.browser || window.chrome || window.msBrowser;
-  crossb.runtime.sendMessage({ action: '__hot-update-reload' });
-  window.location.reload();
+  if (IS_BACKGROUND) {
+    console.log('direct reload');
+    crossb.runtime.reload();
+  } else {
+    crossb.runtime.sendMessage({ action: '__hot-update-reload' });
+    window.location.reload();
+  }
 };

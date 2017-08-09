@@ -9,7 +9,7 @@ crossb.runtime.onMessage.addListener((msg, sender) => {
     return true;
   }
 
-  if (msg.action === '__hot-update') {
+  if (msg.action === '__hot-update-apply') {
     crossb.tabs.executeScript(sender.tab.id, { file: msg.file });
   } else if (msg.action === '__hot-update-reload') {
     crossb.runtime.reload();
@@ -17,3 +17,5 @@ crossb.runtime.onMessage.addListener((msg, sender) => {
 
   return true;
 });
+
+console.log("I'm a background script.");

@@ -12,12 +12,17 @@ module.exports = function() {
 
   function hotDownloadUpdateChunk(chunkId) {
     // eslint-disable-line no-unused-vars
-    // Request hot update from background script, since we can't inject js from content scripts.
     const crossb = browser || chrome || msBrowser;
-    crossb.runtime.sendMessage({
-      action: '__hot-update',
-      file: $hotChunkFilename$,
-    });
+    const IS_BACKGROUND = !!crossb.extension.getBackgroundPage;
+    if (IS_BACKGROUND) {
+      crossb.runtime.reload();
+    } else {
+      // Request hot update from background script, since we can't inject js from content scripts.
+      crossb.runtime.sendMessage({
+        action: '__hot-update-apply',
+        file: $hotChunkFilename$,
+      });
+    }
   }
 
   function hotDownloadManifest(requestTimeout) {
