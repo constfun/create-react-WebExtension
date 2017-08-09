@@ -3,6 +3,7 @@
 const path = require('path');
 const fs = require('fs-extra');
 const child_process = require('child-process-promise');
+const ChildProcessError = require('child-process-promise/lib/ChildProcessError');
 const { getOptions } = require('loader-utils');
 
 // We'll make this noop if quiet.
@@ -59,7 +60,7 @@ const transformSrc = (moduleDir, src) =>
     : src.replace(commonJsReplaceRegex, '$1$3');
 
 const runBsb = (compilation, options) => {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     if (compilation.__BSB_CONTEXT) {
       resolve(compilation.__BSB_CONTEXT);
       return;
@@ -69,44 +70,57 @@ const runBsb = (compilation, options) => {
     makeBsbContext(options)
       .then(context => {
         compilation.__BSB_CONTEXT = context;
-        return child_process.execFile(bsb, ['-make-world'], {
-          cwd: context,
-          maxBuffer: Infinity,
-        });
+        return child_process
+          .execFile(bsb, ['-make-world'], {
+            cwd: context,
+            maxBuffer: Infinity,
+          })
+          .then(() => context);
       })
-      .then(() => {
-        const context = compilation.__BSB_CONTEXT;
-        fs.copySync(
-          path.join(context, '.merlin'),
-          path.join(path.dirname(options.bsconfig), '.merlin')
-        );
-        resolve(compilation.__BSB_CONTEXT);
-      });
+      .then(context =>
+        patchAndCopyMerlinFile(context, options).then(() => context)
+      )
+      .then(resolve)
+      .catch(reject);
   });
 };
 
-const getBsbErrorMessages = err => err.match(getErrorRegex);
+const merlinRegex = /B lib\/bs\/src\//;
+const patchAndCopyMerlinFile = (context, options) => {
+  const srcPath = path.join(context, '.merlin');
+  const destPath = path.join(path.dirname(options.bsconfig), '.merlin');
+  return fs.readFile(srcPath).then(buf => {
+    const patchedContent = buf
+      .toString()
+      .replace(merlinRegex, `B ${context}/lib/bs/src/`);
+    return fs.writeFile(destPath, patchedContent);
+  });
+};
+
+const getBsbErrorMessages = text => text.match(getErrorRegex);
 
 const getCompiledFile = (compilation, resourcePath, options) => {
   return new Promise((resolve, reject) => {
-    runBsb(compilation, options).then(context => {
-      const rootPath = path.dirname(options.bsconfig);
-      const mlFile = resourcePath.replace(rootPath, '');
-      const jsFile = path.join(
-        context,
-        'lib',
-        options.module,
-        mlFile.replace(fileNameRegex, '.js')
-      );
-      fs.readFile(jsFile, (err, contents) => {
-        if (err) {
-          reject(err);
-        } else {
-          const src = transformSrc(options.module, contents.toString());
-          resolve(src);
-        }
-      });
-    });
+    runBsb(compilation, options)
+      .then(context => {
+        const rootPath = path.dirname(options.bsconfig);
+        const mlFile = resourcePath.replace(rootPath, '');
+        const jsFile = path.join(
+          context,
+          'lib',
+          options.module,
+          mlFile.replace(fileNameRegex, '.js')
+        );
+        fs.readFile(jsFile, (err, contents) => {
+          if (err) {
+            reject(err);
+          } else {
+            const src = transformSrc(options.module, contents.toString());
+            resolve(src);
+          }
+        });
+      })
+      .catch(reject);
   });
 };
 
@@ -116,7 +130,8 @@ module.exports = function loader() {
   options.bsconfig =
     options.bsconfig || path.join(process.cwd(), 'bsconfig.json');
   options.bsbOutputPath =
-    options.bsbOutputPath || path.join(path.dirname(options.bsconfig), '_bsb');
+    options.bsbOutputPath ||
+    path.join(path.dirname(options.bsconfig), '.tmp/bsb');
 
   if (options.quiet) {
     log = () => {};
@@ -128,19 +143,16 @@ module.exports = function loader() {
   getCompiledFile(this._compilation, this.resourcePath, options)
     .then(src => callback(null, src))
     .catch(err => {
-      if (err instanceof Error) {
-        throw err;
+      if (err instanceof ChildProcessError) {
+        err.message += `\n\nStdout follows:\n${err.stdout}'\n\nStderr follows:${err.stderr}`;
+
+        const errorMessages = getBsbErrorMessages(err.message);
+        if (errorMessages) {
+          callback(new Error(errorMessages.join('\n')), null);
+          return;
+        }
       }
 
-      const errorMessages = getBsbErrorMessages(err);
-      if (!errorMessages) {
-        throw err;
-      }
-
-      for (let i = 0; i < errorMessages.length - 1; ++i) {
-        this.emitError(new Error(errorMessages[i]));
-      }
-
-      callback(new Error(errorMessages[errorMessages.length - 1]), null);
+      throw err;
     });
 };

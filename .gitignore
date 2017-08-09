@@ -1,8 +1,8 @@
 .idea/
-.vscode/
 node_modules/
 build
-_bsb
+.merlin
+.tmp
 .DS_Store
 *.tgz
 my-app*
