@@ -229,6 +229,12 @@ module.exports = (bundles, hotUpdateServerUrl) => {
             name: 'media/[name].[hash:8].[ext]',
           },
         },
+        // Set up Reason and OCaml files to use the loader
+        {
+          test: /\.(re|ml)$/,
+          use: require.resolve('../libs/bs-loader'),
+          include: paths.appSrc,
+        },
         // Process JS with Babel.
         {
           test: /\.(js|jsx)$/,
@@ -251,12 +257,6 @@ module.exports = (bundles, hotUpdateServerUrl) => {
           test: /\.(ts|tsx)$/,
           include: paths.appSrc,
           loader: require.resolve('ts-loader'),
-        },
-        // Set up Reason and OCaml files to use the loader
-        {
-          test: /\.(re|ml)$/,
-          use: 'bs-loader',
-          include: paths.appSrc,
         },
         // "postcss" loader applies autoprefixer to our CSS.
         // "css" loader resolves paths in CSS and adds assets as dependencies.
