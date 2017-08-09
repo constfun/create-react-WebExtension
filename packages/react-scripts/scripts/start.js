@@ -39,7 +39,7 @@ const {
 const paths = require('../config/paths');
 const makeDevConfig = require('../config/webpack.config.dev');
 const createDevServerConfig = require('../config/webpackDevServer.config');
-const { setupBuild, processPublicFolder } = require('../libs/setup');
+const { setupBuild, processPublicFolder } = require('../lib/setup');
 
 const useYarn = fs.existsSync(paths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;

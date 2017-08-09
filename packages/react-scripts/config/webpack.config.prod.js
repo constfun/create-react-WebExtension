@@ -14,7 +14,6 @@ const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ManifestPlugin = require('webpack-manifest-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
@@ -52,6 +51,7 @@ module.exports = bundles => {
   // We add an instance of HtmlWebpackPlugin per bundle to compile an index.html, if it exists.
   let plugins = bundles.reduce((plugs, bun) => {
     if (bun.indexHtml !== null) {
+      console.log(bun.indexHtml);
       plugs.push(
         new HtmlWebpackPlugin({
           // We use the bundle name as the name of the html file.
@@ -120,6 +120,8 @@ module.exports = bundles => {
       // `web` extension prefixes have been added for better support
       // for React Native Web.
       extensions: [
+        '.ml',
+        '.re',
         '.ts',
         '.tsx',
         '.web.ts',
@@ -194,6 +196,7 @@ module.exports = bundles => {
             /\.html$/,
             /\.(js|jsx)$/,
             /\.(ts|tsx)$/,
+            /\.(re|ml)$/,
             /\.css$/,
             /\.json$/,
             /\.bmp$/,
@@ -234,6 +237,15 @@ module.exports = bundles => {
           test: /\.(ts|tsx)$/,
           include: paths.appSrc,
           loader: require.resolve('ts-loader'),
+        },
+        // Process Ocaml and ReasonML
+        {
+          test: /\.(re|ml)$/,
+          include: paths.appSrc,
+          loader: require.resolve('../lib/bs-loader'),
+          options: {
+            bsconfig: paths.appBsconfig,
+          },
         },
         // The notation here is somewhat confusing.
         // "postcss" loader applies autoprefixer to our CSS.
@@ -287,23 +299,6 @@ module.exports = bundles => {
       // In production, it will be an empty string unless you specify "homepage"
       // in `package.json`, in which case it will be the pathname of that URL.
       new InterpolateHtmlPlugin(env.raw),
-      // Generates an `index.html` file with the <script> injected.
-      new HtmlWebpackPlugin({
-        inject: true,
-        template: paths.appHtml,
-        minify: {
-          removeComments: true,
-          collapseWhitespace: true,
-          removeRedundantAttributes: true,
-          useShortDoctype: true,
-          removeEmptyAttributes: true,
-          removeStyleLinkTypeAttributes: true,
-          keepClosingSlash: true,
-          minifyJS: true,
-          minifyCSS: true,
-          minifyURLs: true,
-        },
-      }),
       // Makes some environment variables available to the JS code, for example:
       // if (process.env.NODE_ENV === 'production') { ... }. See `./env.js`.
       // It is absolutely essential that NODE_ENV was set to production here.

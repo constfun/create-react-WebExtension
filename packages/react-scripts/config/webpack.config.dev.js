@@ -20,7 +20,7 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
-const JsonpTemplateReplacePlugin = require('../libs/hot-update/JsonpTemplateReplacePlugin');
+const JsonpTemplateReplacePlugin = require('../lib/hot-update/JsonpTemplateReplacePlugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 
@@ -45,7 +45,7 @@ module.exports = (bundles, hotUpdateServerUrl) => {
         // When you save a file, the client will hot load CSS or reload the extension in case of JS changes.
         // We need to know the absolute url of the server since we can't use window.location to infer
         // it. The client is running in a sandboxed script where window.location is random.
-        require.resolve('../libs/hot-update/client') +
+        require.resolve('../lib/hot-update/client') +
           `?hotUpdateServerUrl=${encodeURIComponent(hotUpdateServerUrl)}`,
         // We ship a few polyfills by default:
         require.resolve('./polyfills'),
@@ -252,11 +252,11 @@ module.exports = (bundles, hotUpdateServerUrl) => {
           include: paths.appSrc,
           loader: require.resolve('ts-loader'),
         },
-        // Set up Reason and OCaml files to use the loader
+        // Process Ocaml and ReasonML
         {
           test: /\.(re|ml)$/,
           include: paths.appSrc,
-          loader: require.resolve('../libs/bs-loader'),
+          loader: require.resolve('../lib/bs-loader'),
           options: {
             bsconfig: paths.appBsconfig,
           },
