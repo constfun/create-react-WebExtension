@@ -2,31 +2,21 @@
 	MIT License http://www.opensource.org/licenses/mit-license.php
 	Author Tobias Koppers @sokra
 */
-/*globals hotAddUpdateChunk parentHotUpdateCallback document XMLHttpRequest $hotChunkFilename$ $hotUpdateManifestUrl$ browser chrome msBrowser */
+/*globals hotAddUpdateChunk parentHotUpdateCallback document XMLHttpRequest $hotChunkFilename$ $hotUpdateManifestUrl$ */
 module.exports = function() {
+  // eslint-disable-next-line no-unused-vars
   function webpackHotUpdateCallback(chunkId, moreModules) {
-    // eslint-disable-line no-unused-vars
     hotAddUpdateChunk(chunkId, moreModules);
     if (parentHotUpdateCallback) parentHotUpdateCallback(chunkId, moreModules);
   } //$semicolon
 
+  // eslint-disable-next-line no-unused-vars
   function hotDownloadUpdateChunk(chunkId) {
-    // eslint-disable-line no-unused-vars
-    const crossb = browser || chrome || msBrowser;
-    const IS_BACKGROUND = !!crossb.extension.getBackgroundPage;
-    if (IS_BACKGROUND) {
-      crossb.runtime.reload();
-    } else {
-      // Request hot update from background script, since we can't inject js from content scripts.
-      crossb.runtime.sendMessage({
-        action: '__hot-update-apply',
-        file: $hotChunkFilename$,
-      });
-    }
+    window.__apply_hot_update($hotChunkFilename$);
   }
 
+  // eslint-disable-next-line no-unused-vars
   function hotDownloadManifest(requestTimeout) {
-    // eslint-disable-line no-unused-vars
     requestTimeout = requestTimeout || 10000;
     return new Promise(function(resolve, reject) {
       if (typeof XMLHttpRequest === 'undefined')

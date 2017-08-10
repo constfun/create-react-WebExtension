@@ -20,9 +20,9 @@ const setupHotReloadSupport = appPaths => {
     throw 'Hot module reload is only supported in development.';
   }
 
-  // Copy over hot reload background script to the build dir.
-  const bgScriptRelPath = 'js/hot-update-background.js';
-  const bgScript = require.resolve('./hot-update/background');
+  // Copy over hot update service script to the build dir.
+  const bgScriptRelPath = 'js/hot-update-runtime.js';
+  const bgScript = require.resolve('./hot-update/background-runtime');
   const bgScriptInBuild = path.join(appPaths.appBuild, bgScriptRelPath);
   fs.copySync(bgScript, bgScriptInBuild);
 
