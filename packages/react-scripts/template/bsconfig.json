@@ -1,7 +1,7 @@
 {
     "name": "hello",
     "sources": {
-        "dir": "src/flavor"
+        "dir": "src/ocaml-flavor"
     },
     "bs-dependencies": [
         "reason-react"

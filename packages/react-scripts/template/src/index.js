@@ -3,7 +3,7 @@
 // https://github.com/mozilla/webextension-polyfill
 browser.browserAction.onClicked.addListener(_ => {
   browser.tabs.executeScript({ file: 'js/browser-polyfill.js' });
-  browser.tabs.executeScript({ file: 'js/content.js' });
+  browser.tabs.executeScript({ file: 'js/help.js' });
 });
 
 // browser.browserAction.setBadgeText({ text: '42' })
