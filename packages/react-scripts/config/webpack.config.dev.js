@@ -174,6 +174,9 @@ module.exports = (bundles, hotUpdateServerUrl) => {
                 formatter: eslintFormatter,
                 // @remove-on-eject-begin
                 baseConfig: {
+                  env: {
+                    webextensions: true,
+                  },
                   extends: [require.resolve('eslint-config-react-app')],
                 },
                 ignore: false,

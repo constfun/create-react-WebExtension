@@ -1,11 +1,9 @@
-/* globals browser */
-const ml = require('./flavor/someml');
-const ts = require('./content/somets');
-
-browser.browserAction.onClicked.addListener(e => {
-  browser.tabs.query({ active: true, currentWindow: true }).then(tabs => {
-    console.log('Some ocaml value:', ml.value());
-    console.log('Some ts value', ts.value());
-    browser.tabs.sendMessage(tabs[0].id, 'make-a-donut');
-  });
+// Programatically inject a script when the user clicks our browserAction button in the toolbar.
+// https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Modify_a_web_page
+// https://github.com/mozilla/webextension-polyfill
+browser.browserAction.onClicked.addListener(_ => {
+  browser.tabs.executeScript({ file: 'js/browser-polyfill.js' });
+  browser.tabs.executeScript({ file: 'js/content.js' });
 });
+
+// browser.browserAction.setBadgeText({ text: '42' })

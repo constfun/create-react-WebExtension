@@ -5,7 +5,6 @@ import './index.css';
 const donut = browser.extension.getURL(require('./donut.svg'));
 const Donut = () => <div style={{ color: 'red' }}>HELLO<img className="donut" src={donut} />WORLD</div>;
 
-browser.runtime.onMessage.addListener(() => {
     const mainEl = document.createElement('div');
     mainEl.className = 'donut-extension-main';
     document.body.appendChild(mainEl);
@@ -14,6 +13,3 @@ browser.runtime.onMessage.addListener(() => {
         <Donut />,
         mainEl
     );
-
-    return true;
-});
