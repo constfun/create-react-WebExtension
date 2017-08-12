@@ -15,10 +15,10 @@ import './index.css';
 // This is a stateless React component implemented as a function.
 const Main = () => {
   const flavors = [
-    { name: 'js-flavor', human: 'a JavaScript' },
-    { name: 'typescript-flavor', human: 'a TypeScript' },
-    { name: 'ocaml-flavor', human: 'an Ocaml' },
-    { name: 'reasonml-flavor', human: 'a ReasonML' },
+    { name: 'js-flavor', human: 'JavaScript' },
+    { name: 'typescript-flavor', human: 'TypeScript' },
+    { name: 'ocaml-flavor', human: 'Ocaml' },
+    { name: 'reasonml-flavor', human: 'ReasonML' },
   ];
   for (let fl of flavors) {
     fl.isAvailable = checkFeature(fl.name);
@@ -26,17 +26,21 @@ const Main = () => {
 
   return (
     <div className="Main">
-      <p>Hey there,</p>
+      <p>Welcome to Create React WebExtension</p>
       <p>
-        This extension is a demo of available features when using Create React
-        WebExtension.<br />
-        You should look through the code for detailed and important comments.
-      </p>
-      <p>
-        To get more code and donuts, give these a try (followed by{' '}
-        <code>git diff</code>)
+        This <code>src/guide/</code> and some examples:
       </p>
       <Dispenser flavors={flavors} />
+      <p>
+        Delete the contents of <code>src/</code> and <code>public/</code> to
+        start from scratch.
+      </p>
+      <p>
+        If lost, and if not, read the <code>README.md</code>.
+      </p>
+      <p>
+        If broken, be kind and <a>please report an issue</a>.
+      </p>
     </div>
   );
 };
