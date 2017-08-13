@@ -3,21 +3,21 @@
 
 const path = require('path');
 const fs = require('fs');
+const chalk = require('chalk');
 const spawnSync = require('react-dev-utils/crossSpawn').sync;
 const paths = require('../../config/paths');
 
 const rsyncFeatureSources = sources => {
-  spawnSync('rsync', ['-avR'].concat(sources, [paths.appPath]), {
+  console.log('Copying files...');
+  spawnSync('rsync', ['-avRq'].concat(sources, [paths.appPath]), {
     cwd: path.join(paths.ownPath, 'template'),
     stdio: 'inherit',
   });
 };
 
 const installFeatureDependencies = deps => {
-  const appPath = paths.appPath;
-  const yarnLockFile = path.join(appPath, 'yarn.lock');
-  const useYarn = fs.existsSync(yarnLockFile);
-  console.log(paths.yarnLockFile);
+  console.log('Installing dependencies...');
+  const useYarn = fs.existsSync(paths.yarnLockFile);
 
   let command, args;
   if (useYarn) {
@@ -33,8 +33,27 @@ const installFeatureDependencies = deps => {
   });
   if (proc.status !== 0) {
     console.error(`\`${command} ${args.join(' ')}\` failed`);
-    return;
+    process.exit(1);
   }
+};
+
+const printSuccessMessage = function() {
+  console.log();
+  console.log(
+    chalk.green(
+      `Success. Run ${chalk.bold('git status')} to see what was added.`
+    )
+  );
+};
+
+const injectFeature = function(feature, onSuccess) {
+  console.log(chalk.green(`Adding ${feature.name} support...`));
+  rsyncFeatureSources(feature.sources);
+  installFeatureDependencies(feature.dependencies);
+  if (onSuccess) {
+    onSuccess();
+  }
+  printSuccessMessage(feature);
 };
 
 module.exports = [
@@ -49,20 +68,29 @@ module.exports = [
       'web-ext-types',
     ],
     inject: function() {
-      rsyncFeatureSources(this.sources);
-      installFeatureDependencies(this.dependencies);
-
-      // Fix relative paths for type roots.
-      // While in packages/react-scripts/template tsconfig.json typeRoots refer to
-      // node_modules in the parent directory. In a new app, they should point to
-      // node_modules in the current directory instead.
-      const appTsconfigPath = path.join(paths.appPath, 'tsconfig.json');
-      const appTsconfig = require(appTsconfigPath);
-      // Turn ../node_modules into ./node_modules
-      appTsconfig.compilerOptions.typeRoots = appTsconfig.compilerOptions.typeRoots.map(
-        path => path.substring(1)
-      );
-      fs.writeFileSync(appTsconfigPath, JSON.stringify(appTsconfig, null, 2));
+      injectFeature(this, () => {
+        // Fix relative paths for type roots.
+        // While in packages/react-scripts/template tsconfig.json typeRoots refer to
+        // node_modules in the parent directory. In a new app, they should point to
+        // node_modules in the current directory instead.
+        const appTsconfigPath = path.join(paths.appPath, 'tsconfig.json');
+        const appTsconfig = require(appTsconfigPath);
+        // Turn ../node_modules into ./node_modules
+        appTsconfig.compilerOptions.typeRoots = appTsconfig.compilerOptions.typeRoots.map(
+          path => path.substring(1)
+        );
+        fs.writeFileSync(appTsconfigPath, JSON.stringify(appTsconfig, null, 2));
+      });
+    },
+  },
+  {
+    name: 'Ocaml',
+    sources: ['bsconfig.json', 'src/ocaml-example'],
+    dependencies: require(path.join(paths.ownPath, 'template/bsconfig.json'))[
+      'bs-dependencies'
+    ],
+    inject: function() {
+      injectFeature(this);
     },
   },
 ];

@@ -12,7 +12,7 @@ const inquirer = require('react-dev-utils/inquirer');
 const ensureGitStatus = require('../lib/git-status');
 const features = require('./utils/features');
 
-// ensureGitStatus();
+ensureGitStatus();
 
 const choices = features.map(feat => ({ name: feat.name, value: feat }));
 

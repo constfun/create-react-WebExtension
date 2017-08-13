@@ -20,7 +20,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const chalk = require('chalk');
 const spawn = require('react-dev-utils/crossSpawn');
-const features = require('../template/features');
+const features = require('./utils/features');
 
 module.exports = function(
   appPath,
@@ -68,11 +68,20 @@ module.exports = function(
     // Skip sources that belong to features that can be enabled later with inject.
     const featureSources = features.reduce(
       (srcs, feat) =>
-        srcs.concat(feat.sources.map(relpath => path.join(ownPath, relpath))),
+        srcs.concat(
+          feat.sources.map(relpath => path.join(ownPath, 'template', relpath))
+        ),
       [path.join(ownPath, 'template/features.js')]
     );
     fs.copySync(templatePath, appPath, {
-      filter: path => featureSources.indexOf(path) === -1,
+      filter: path => {
+        console.log(path, featureSources);
+        // return featureSources.find(s => minimatch(path, s)) === undefined
+        return (
+          featureSources.indexOf(path) === -1 &&
+          featureSources.find(s => path.startsWith(s)) === undefined
+        );
+      },
     });
   } else {
     console.error(

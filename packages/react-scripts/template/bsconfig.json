@@ -1,7 +1,7 @@
 {
     "name": "hello",
     "sources": {
-        "dir": "src/ocaml-flavor"
+        "dir": "src/ocaml-example"
     },
     "bs-dependencies": [
         "reason-react"
