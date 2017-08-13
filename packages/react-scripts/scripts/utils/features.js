@@ -6,13 +6,35 @@ const fs = require('fs');
 const spawnSync = require('react-dev-utils/crossSpawn').sync;
 const paths = require('../../config/paths');
 
-const useYarn = fs.existsSync(paths.yarnLockFile);
-
 const rsyncFeatureSources = sources => {
   spawnSync('rsync', ['-avR'].concat(sources, [paths.appPath]), {
     cwd: path.join(paths.ownPath, 'template'),
     stdio: 'inherit',
   });
+};
+
+const installFeatureDependencies = deps => {
+  const appPath = paths.appPath;
+  const yarnLockFile = path.join(appPath, 'yarn.lock');
+  const useYarn = fs.existsSync(yarnLockFile);
+  console.log(paths.yarnLockFile);
+
+  let command, args;
+  if (useYarn) {
+    command = 'yarnpkg';
+    args = ['add'];
+  } else {
+    command = 'npm';
+    args = ['install', '--save'];
+  }
+
+  const proc = spawnSync(command, args.concat(deps), {
+    stdio: 'inherit',
+  });
+  if (proc.status !== 0) {
+    console.error(`\`${command} ${args.join(' ')}\` failed`);
+    return;
+  }
 };
 
 module.exports = [
@@ -28,6 +50,7 @@ module.exports = [
     ],
     inject: function() {
       rsyncFeatureSources(this.sources);
+      installFeatureDependencies(this.dependencies);
 
       // Fix relative paths for type roots.
       // While in packages/react-scripts/template tsconfig.json typeRoots refer to
