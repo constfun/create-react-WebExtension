@@ -25,6 +25,7 @@ process.on('unhandledRejection', err => {
 require('../config/env');
 
 const fs = require('fs');
+const url = require('url');
 const chalk = require('chalk');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
@@ -42,7 +43,7 @@ const createDevServerConfig = require('../config/webpackDevServer.config');
 const { setupBuild, processPublicFolder } = require('../lib/setup');
 
 const useYarn = fs.existsSync(paths.yarnLockFile);
-const isInteractive = process.stdout.isTTY;
+const isInteractive = false && process.stdout.isTTY;
 
 // Tools like Cloud9 rely on this.
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
@@ -59,8 +60,13 @@ choosePort(HOST, DEFAULT_PORT)
     const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
     const appName = require(paths.appPackageJson).name;
     const urls = prepareUrls(protocol, HOST, port);
+    const hotUpdateServerUrl = urls.localUrlForBrowser;
+    const hotUpdateHost = url.parse(hotUpdateServerUrl).hostname;
     // Create a webpack compiler that is configured with custom messages.
-    const config = makeDevConfig(setupBuild(paths), urls.localUrlForBrowser);
+    const config = makeDevConfig(
+      setupBuild(paths, hotUpdateHost),
+      hotUpdateServerUrl
+    );
     const compiler = createCompiler(webpack, config, appName, urls, useYarn);
     // Instructions printed by CRA are not relevant, so we replace them on success.
     patchInstructions(compiler);
