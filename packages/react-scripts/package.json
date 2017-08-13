@@ -53,6 +53,7 @@
     "promise": "7.1.1",
     "react-dev-utils": "^3.0.2",
     "react-error-overlay": "^1.0.9",
+    "reason-react": "^0.2.3",
     "style-loader": "0.18.2",
     "ts-jest": "20.0.7",
     "ts-loader": "2.3.2",

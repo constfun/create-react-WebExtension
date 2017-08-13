@@ -69,13 +69,15 @@ const runBsb = (compilation, options) => {
     log("Running BuckleScript's bsb in", options.bsbOutputPath);
     makeBsbContext(options)
       .then(context => {
-        compilation.__BSB_CONTEXT = context;
         return child_process
           .execFile(bsb, ['-make-world'], {
             cwd: context,
             maxBuffer: Infinity,
           })
-          .then(() => context);
+          .then(() => {
+            compilation.__BSB_CONTEXT = context;
+            return context;
+          });
       })
       .then(context =>
         patchAndCopyMerlinFile(context, options).then(() => context)
