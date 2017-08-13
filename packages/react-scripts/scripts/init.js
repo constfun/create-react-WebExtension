@@ -20,6 +20,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const chalk = require('chalk');
 const spawn = require('react-dev-utils/crossSpawn');
+const features = require('../template/features');
 
 module.exports = function(
   appPath,
@@ -43,6 +44,7 @@ module.exports = function(
     build: 'react-scripts-web-ext build',
     test: 'react-scripts-web-ext test --env=jsdom',
     eject: 'react-scripts-web-ext eject',
+    inject: 'react-scripts-web-ext inject',
   };
 
   fs.writeFileSync(
@@ -63,25 +65,21 @@ module.exports = function(
     ? path.resolve(originalDirectory, template)
     : path.join(ownPath, 'template');
   if (fs.existsSync(templatePath)) {
-    fs.copySync(templatePath, appPath);
+    // Skip sources that belong to features that can be enabled later with inject.
+    const featureSources = features.reduce(
+      (srcs, feat) =>
+        srcs.concat(feat.sources.map(relpath => path.join(ownPath, relpath))),
+      [path.join(ownPath, 'template/features.js')]
+    );
+    fs.copySync(templatePath, appPath, {
+      filter: path => featureSources.indexOf(path) === -1,
+    });
   } else {
     console.error(
       `Could not locate supplied template: ${chalk.green(templatePath)}`
     );
     return;
   }
-
-  // Fix relative paths for type roots.
-  // While in packages/react-scripts/template tsconfig.json typeRoots refer to
-  // node_modules in the parent directory. In a new app, they should point to
-  // node_modules in the current directory instead.
-  const appTsconfigPath = path.join(appPath, 'tsconfig.json');
-  const appTsconfig = require(appTsconfigPath);
-  // Turn ../node_modules into ./node_modules
-  appTsconfig.compilerOptions.typeRoots = appTsconfig.compilerOptions.typeRoots.map(
-    path => path.substring(1)
-  );
-  fs.writeFileSync(appTsconfigPath, JSON.stringify(appTsconfig, null, 2));
 
   // Rename gitignore after the fact to prevent npm from renaming it to .npmignore
   // See: https://github.com/npm/npm/issues/1862
@@ -130,20 +128,9 @@ module.exports = function(
     fs.unlinkSync(templateDependenciesPath);
   }
 
-  const types = [
-    '@types/node',
-    '@types/react',
-    '@types/react-dom',
-    '@types/jest',
-    'web-ext-types',
-  ];
-
-  console.log(`Installing ${types.join(', ')} ${command}...`);
-  console.log();
-
-  const proc = spawn.sync(command, args.concat(types), { stdio: 'inherit' });
+  const proc = spawn.sync(command, args, { stdio: 'inherit' });
   if (proc.status !== 0) {
-    console.error(`\`${command} ${args.concat(types).join(' ')}\` failed`);
+    console.error(`\`${command} ${args.join(' ')}\` failed`);
     return;
   }
 

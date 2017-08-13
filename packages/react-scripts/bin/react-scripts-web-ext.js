@@ -17,6 +17,7 @@ const args = process.argv.slice(3);
 switch (script) {
   case 'build':
   case 'eject':
+  case 'inject':
   case 'start':
   case 'test': {
     const result = spawn.sync(
