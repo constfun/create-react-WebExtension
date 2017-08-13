@@ -2,13 +2,10 @@
 
 const crossb = window.browser || window.chrome || window.msBrowser;
 
-const openPorts = [];
 crossb.runtime.onConnect.addListener(port => {
   if (port.name !== '__hot-update') {
     return;
   }
-
-  openPorts.push(port);
   port.onMessage.addListener(handleMessage);
 });
 
@@ -28,9 +25,5 @@ const handleMessage = (msg, { sender }) => {
   return true;
 };
 
-window.__reload_extension = () => {
-  crossb.runtime.reload();
-  openPorts.map(port => port.postMessage({ action: 'reload-page' }));
-};
-
+window.__reload_extension = crossb.runtime.reload;
 window.__apply_hot_update = window.__reload_extension;
