@@ -92,7 +92,10 @@ module.exports = {
 };
 
 const ownPackageJson = require('../package.json');
-const reactScriptsPath = resolveApp(`node_modules/${ownPackageJson.name}`);
+const reactScriptsPath = path.join(
+  appDirectory,
+  `node_modules/${ownPackageJson.name}`
+);
 const reactScriptsLinked =
   fs.existsSync(reactScriptsPath) &&
   fs.lstatSync(reactScriptsPath).isSymbolicLink();
