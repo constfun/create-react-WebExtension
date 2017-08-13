@@ -26,8 +26,5 @@
       "prettier --trailing-comma es5 --single-quote --write",
       "git add"
     ]
-  },
-  "dependencies": {
-    "bs-loader": "^1.5.8"
   }
 }

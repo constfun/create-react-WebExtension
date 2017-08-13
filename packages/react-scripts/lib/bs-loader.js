@@ -154,7 +154,7 @@ module.exports = function loader() {
             new Error(
               '\n\n' +
                 chalk.red(
-                  "bs-loader likely did not find one of the paths listed in bsconfig.json 'sources'\n\n"
+                  "BuckleScript likely did not find one of the paths listed in bsconfig.json 'sources'\n\n"
                 ) +
                 err.message
             )
