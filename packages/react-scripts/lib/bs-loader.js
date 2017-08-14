@@ -29,8 +29,10 @@ const bsbSourceDirs = bsbSources => {
     return bsbSources.reduce((acc, item) =>
       acc.concat(bsbSourceDirs(item), [])
     );
+  } else if (bsbSources === undefined) {
+    return [];
   } else {
-    return [bsbSources.dir];
+    return bsbSources.dir ? [bsbSources.dir] : [];
   }
 };
 
@@ -172,7 +174,7 @@ module.exports = function loader() {
             new Error(
               '\n\n' +
                 chalk.red(
-                  "BuckleScript likely did not find one of the paths listed in bsconfig.json 'sources'\n\n"
+                  "Make sure that the 'sources' listed in bsconfig.json exist.\n\n"
                 ) +
                 err.message
             )
