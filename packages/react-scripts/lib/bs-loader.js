@@ -39,10 +39,21 @@ const makeBsbContext = ({ bsconfig, bsbOutputPath }) => {
   const context = bsbOutputPath;
   fs.ensureDirSync(context);
 
-  // Symlink node_modules so bs-platform is found.
-  const nodeModulesInContext = path.join(context, 'node_modules');
-  fs.removeSync(nodeModulesInContext);
-  fs.symlinkSync(path.join(rootPath, 'node_modules'), nodeModulesInContext);
+  // Symlink node_modules where bs-platform is found.
+  const testModule = 'bs-platform/lib/js/bs';
+  const resolvedPath = require.resolve(testModule);
+  const nodeModulesPath = resolvedPath.substring(
+    0,
+    resolvedPath.indexOf(testModule)
+  );
+  const nodeModulesPathInContext = path.join(context, 'node_modules');
+  if (
+    !fs.existsSync(nodeModulesPathInContext) ||
+    fs.readlinkSync(nodeModulesPathInContext) !== nodeModulesPath
+  ) {
+    fs.removeSync(nodeModulesPathInContext);
+    fs.symlinkSync(nodeModulesPath, nodeModulesPathInContext, 'dir');
+  }
 
   // Rsync all the sources.
   const bsbSources = require(bsconfig).sources;
@@ -134,7 +145,7 @@ module.exports = function loader() {
     options.bsconfig || path.join(process.cwd(), 'bsconfig.json');
   options.bsbOutputPath =
     options.bsbOutputPath ||
-    path.join(path.dirname(options.bsconfig), '.tmp/bsb');
+    path.join(this._compilation.options.output.path, '_bsb');
 
   if (options.quiet) {
     log = () => {};
