@@ -69,7 +69,9 @@ const makeClient = (
       return;
     }
 
-    reloadExtension();
+    if (module.hot.status() === 'idle') {
+      module.hot.check(true).catch(reloadExtension);
+    }
   };
 
   const printErrors = errors => {
@@ -78,7 +80,6 @@ const makeClient = (
       warnings: [],
     });
 
-    // Also log them to the console.
     if (typeof console !== 'undefined' && typeof console.error === 'function') {
       for (var i = 0; i < formatted.errors.length; i++) {
         console.error(stripAnsi(formatted.errors[i]));

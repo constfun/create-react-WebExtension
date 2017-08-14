@@ -19,6 +19,7 @@ module.exports = (compiler, hotMiddlewareOpts = {}) => {
     )
   );
   app.use(middleware);
+  app.use(express.static(compiler.options.output.path));
 
   const server = http.createServer(app);
   server.force = () => middleware.publish({ action: 'force' });

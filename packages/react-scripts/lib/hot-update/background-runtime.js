@@ -25,5 +25,5 @@ const handleMessage = (msg, { sender }) => {
   return true;
 };
 
-window.__reload_extension = crossb.runtime.reload;
+window.__reload_extension = () => crossb.runtime.reload();
 window.__apply_hot_update = window.__reload_extension;
