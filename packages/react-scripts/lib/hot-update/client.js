@@ -54,7 +54,7 @@ const makeClient = (
       return;
     }
     console.info(
-      'Connection to hot reload development list, attempting to reconnect...'
+      'Connection to hot reload development lost, attempting to reconnect...'
     );
     _connectionFailureReported = true;
   };

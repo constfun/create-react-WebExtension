@@ -83,7 +83,8 @@ choosePort(HOST, DEFAULT_PORT)
     }
 
     // We use a custom, small, express server to just serve hot reload notifications.
-    const hotReload = hotReloadServer(compiler).listen(port, HOST, () => {
+    const hotReload = hotReloadServer(compiler, { https: !!process.env.HTTPS });
+    hotReload.listen(port, HOST, () => {
       console.log(chalk.cyan('Starting the development server...\n'));
     });
 

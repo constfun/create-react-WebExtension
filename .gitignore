@@ -6,6 +6,7 @@ build
 .bsb
 .DS_Store
 *.tgz
+*.pem
 my-app*
 template/src/__tests__/__snapshots__/
 lerna-debug.log
