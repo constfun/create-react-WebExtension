@@ -10,6 +10,7 @@
 // @remove-on-eject-end
 'use strict';
 
+const fs = require('fs');
 const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
@@ -253,28 +254,28 @@ module.exports = (bundles, hotUpdateServerUrl) => {
         {
           test: /\.(ts|tsx)$/,
           include: paths.appSrc,
-          loader: require.resolve('ts-loader'),
+          use: [
+            {
+              loader: require.resolve('../lib/filter-loader'),
+              options: {
+                filterFn: () => fs.existsSync(paths.appTsconfig),
+                failMessage: `tsconfig.json was not found in ${paths.appTsconfig}`,
+              },
+            },
+            {
+              loader: require.resolve('ts-loader'),
+            },
+          ],
         },
         // Process Ocaml and ReasonML
         {
           test: /\.(re|ml)$/,
           include: paths.appSrc,
-          use: [
-            {
-              loader: require.resolve('../lib/filter-loader'),
-              options: {
-                filterFn: () => true,
-                failMessage: 'Bye.',
-              },
-            },
-            {
-              loader: require.resolve('../lib/bs-loader'),
-              options: {
-                bsconfig: paths.appBsconfig,
-                bsbOutputPath: paths.bsbOutputPath,
-              },
-            },
-          ],
+          loader: require.resolve('../lib/bs-loader'),
+          options: {
+            bsconfig: paths.appBsconfig,
+            bsbOutputPath: paths.bsbOutputPath,
+          },
         },
         // "postcss" loader applies autoprefixer to our CSS.
         // "css" loader resolves paths in CSS and adds assets as dependencies.
