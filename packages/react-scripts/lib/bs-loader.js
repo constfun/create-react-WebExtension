@@ -148,7 +148,10 @@ module.exports = function loader() {
     path.join(this._compilation.options.output.path, '_bsb');
 
   if (!fs.existsSync(options.bsconfig)) {
-    throw new Error(`bsconfig.json was not found at ${options.bsconfig}`);
+    this.emitError(
+      new Error(`bsconfig.json was not found at ${options.bsconfig}`)
+    );
+    return '';
   }
 
   if (options.quiet) {

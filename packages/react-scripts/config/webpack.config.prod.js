@@ -10,6 +10,7 @@
 // @remove-on-eject-end
 'use strict';
 
+const fs = require('fs');
 const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
@@ -239,7 +240,18 @@ module.exports = bundles => {
         {
           test: /\.(ts|tsx)$/,
           include: paths.appSrc,
-          loader: require.resolve('ts-loader'),
+          use: [
+            {
+              loader: require.resolve('../lib/filter-loader'),
+              options: {
+                filterFn: () => fs.existsSync(paths.appTsconfig),
+                failMessage: `tsconfig.json was not found in ${paths.appTsconfig}`,
+              },
+            },
+            {
+              loader: require.resolve('ts-loader'),
+            },
+          ],
         },
         // Process Ocaml and ReasonML
         {
