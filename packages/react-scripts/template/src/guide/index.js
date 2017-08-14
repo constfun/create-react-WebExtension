@@ -39,7 +39,7 @@ const Main = () => {
         If lost, and if not, read the <code>README.md</code>.
       </p>
       <p>
-        If broken, be kind and <a>please report an issue</a>.
+        If broken, please be kind and <a>report an issue</a>.
       </p>
     </div>
   );
