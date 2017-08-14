@@ -3,7 +3,7 @@
 /*/*/node_modules
 build
 .merlin
-.tmp
+.bsb
 .DS_Store
 *.tgz
 my-app*

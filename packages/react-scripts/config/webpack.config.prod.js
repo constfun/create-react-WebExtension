@@ -166,6 +166,9 @@ module.exports = bundles => {
                 // TODO: consider separate config for production,
                 // e.g. to enable no-console and no-debugger only in production.
                 baseConfig: {
+                  env: {
+                    webextensions: true,
+                  },
                   extends: [require.resolve('eslint-config-react-app')],
                 },
                 ignore: false,
@@ -245,6 +248,7 @@ module.exports = bundles => {
           loader: require.resolve('../lib/bs-loader'),
           options: {
             bsconfig: paths.appBsconfig,
+            bsbOutputPath: paths.bsbOutputPath,
           },
         },
         // The notation here is somewhat confusing.

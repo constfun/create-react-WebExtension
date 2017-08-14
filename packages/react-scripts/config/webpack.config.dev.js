@@ -262,6 +262,7 @@ module.exports = (bundles, hotUpdateServerUrl) => {
           loader: require.resolve('../lib/bs-loader'),
           options: {
             bsconfig: paths.appBsconfig,
+            bsbOutputPath: paths.bsbOutputPath,
           },
         },
         // "postcss" loader applies autoprefixer to our CSS.
