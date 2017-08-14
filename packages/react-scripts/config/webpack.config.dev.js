@@ -259,11 +259,22 @@ module.exports = (bundles, hotUpdateServerUrl) => {
         {
           test: /\.(re|ml)$/,
           include: paths.appSrc,
-          loader: require.resolve('../lib/bs-loader'),
-          options: {
-            bsconfig: paths.appBsconfig,
-            bsbOutputPath: paths.bsbOutputPath,
-          },
+          use: [
+            {
+              loader: require.resolve('../lib/filter-loader'),
+              options: {
+                filterFn: () => true,
+                failMessage: 'Bye.',
+              },
+            },
+            {
+              loader: require.resolve('../lib/bs-loader'),
+              options: {
+                bsconfig: paths.appBsconfig,
+                bsbOutputPath: paths.bsbOutputPath,
+              },
+            },
+          ],
         },
         // "postcss" loader applies autoprefixer to our CSS.
         // "css" loader resolves paths in CSS and adds assets as dependencies.
