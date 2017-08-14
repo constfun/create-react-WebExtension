@@ -36,7 +36,7 @@ const {
 } = require('react-dev-utils/WebpackDevServerUtils');
 const paths = require('../config/paths');
 const makeDevConfig = require('../config/webpack.config.dev');
-const hotReloadServer = require('../lib/hot-update/server');
+const makeHotUpdateServer = require('../lib/hot-update/server');
 const { setupBuild, processPublicFolder } = require('../lib/setup');
 
 const useYarn = fs.existsSync(paths.yarnLockFile);
@@ -57,13 +57,13 @@ choosePort(HOST, DEFAULT_PORT)
     const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
     const appName = require(paths.appPackageJson).name;
     const urls = prepareUrls(protocol, HOST, port);
-    const hotUpdateServerUrl = urls.localUrlForBrowser;
-    const hotUpdateHost = url.parse(hotUpdateServerUrl).hostname;
-    // Create a webpack compiler that is configured with custom messages.
-    const config = makeDevConfig(
-      setupBuild(paths, hotUpdateHost),
-      hotUpdateServerUrl
+    const hotUpdateUrl = url.resolve(
+      urls.localUrlForBrowser,
+      'web_ext_hot_update'
     );
+    // Create a webpack compiler that is configured with custom messages.
+    const bundles = setupBuild(paths, hotUpdateUrl);
+    const config = makeDevConfig(bundles, hotUpdateUrl);
     const compiler = createCompiler(webpack, config, appName, urls, useYarn);
     // Instructions printed by CRA are not relevant, so we replace them on success.
     patchInstructions(compiler);
@@ -83,8 +83,11 @@ choosePort(HOST, DEFAULT_PORT)
     }
 
     // We use a custom, small, express server to just serve hot reload notifications.
-    const hotReload = hotReloadServer(compiler, { https: !!process.env.HTTPS });
-    hotReload.listen(port, HOST, () => {
+    const hotUpdateServer = makeHotUpdateServer(compiler, {
+      url: hotUpdateUrl,
+      https: !!process.env.HTTPS,
+    });
+    hotUpdateServer.listen(port, HOST, () => {
       console.log(chalk.cyan('Starting the development server...\n'));
     });
 
@@ -95,8 +98,8 @@ choosePort(HOST, DEFAULT_PORT)
       })
       .on('all', () => {
         console.log('Copying public folder...');
-        processPublicFolder(paths, hotUpdateHost);
-        hotReload.force();
+        processPublicFolder(paths, hotUpdateUrl);
+        hotUpdateServer.force();
         console.log('Done.');
       });
 
@@ -104,7 +107,7 @@ choosePort(HOST, DEFAULT_PORT)
       process.on(sig, function() {
         compilerWatch.close();
         appPublicWatch.close();
-        hotReload.close();
+        hotUpdateServer.close();
         process.exit();
       });
     });

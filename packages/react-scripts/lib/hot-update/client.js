@@ -1,101 +1,76 @@
-/* globals __resourceQuery */
 'use strict';
 
-const url = require('url');
 const stripAnsi = require('strip-ansi');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
-var querystring = require('querystring');
 
-const makeClient = (
-  hotUpdateServerUrl,
-  reloadExtension = window.__reload_extension
-) => {
-  let _connectionFailureReported = false;
-  const loadedHashes = new Set();
+const crossb = window.chrome || window.browser || window.msBrowser;
+const port = crossb.runtime.connect({ name: 'hot-update-port' });
+const loadedModules = new Set();
 
-  // HARDCddODED in server.js
-  const connection = new window.EventSource(
-    url.resolve(hotUpdateServerUrl, '/__web_ext_hot_reload')
-  );
+// The port disconnects when our extension (our background runtime, to be exact) reloads.
+// When this happens we reload the page to clear any stale content scripts.
+// We only do this if the port connection was ever successfull, otherwise we'll start an infinite reload loop for content scripts that are automatically injected.
+// let shouldReloadOnDisconnect = false;
+// crossb.runtime.onConnect.addListener((connectedPort) => {
+//   debugger
+//   if (connectedPort === port) {
+//     console.log('Connected to hot reload background runtime.');
+//     shouldReloadOnDisconnect = true;
+//   }
+// });
+// port.onDisconnect.addListener(() => {
+//   if (shouldReloadOnDisconnect) {
+//     window.location.reload();
+//   }
+// });
 
-  connection.onmessage = e => {
-    // This is heart emoji... wish it was action === 'heartbeat'.
-    // Crash and burn and sometimes even work, cutely.
-    if (e.data == '\uD83D\uDC93') {
-      return;
-    }
+port.onMessage.addListener(portMessage => {
+  // We only care about messages proxied from webpack-hot-middleware.
+  if (portMessage.action !== 'receive-hot-message') {
+    return true;
+  }
 
-    const message = JSON.parse(e.data);
-    switch (message.action) {
-      case 'sync':
-        loadedHashes.add(message.hash);
-        break;
-      case 'built':
-        handleBuilt(message);
-        break;
-      case 'force':
-        reloadExtension();
-        break;
-    }
-  };
+  const hotMessage = portMessage.hotMessage;
+  switch (hotMessage.action) {
+    case 'sync':
+      loadedModules.add(hotMessage.hash);
+      break;
+    case 'built':
+      handleBuilt(hotMessage);
+      break;
+  }
 
-  connection.onopen = () => {
-    console.info('Connected to hot reload development server.');
-    _connectionFailureReported = false;
-  };
+  return true;
+});
 
-  connection.onclose = () => {
-    console.info('Disconnected from hot reload development server.');
-    _connectionFailureReported = false;
-  };
+const handleBuilt = message => {
+  if (loadedModules.has(message.hash)) {
+    return;
+  }
 
-  connection.onerror = () => {
-    if (_connectionFailureReported) {
-      return;
-    }
-    console.info(
-      'Connection to hot reload development lost, attempting to reconnect...'
-    );
-    _connectionFailureReported = true;
-  };
+  if (message.errors.length) {
+    printErrors(message.errors);
+    return;
+  }
 
-  const handleBuilt = message => {
-    if (loadedHashes.has(message.hash)) {
-      return;
-    }
-
-    if (message.errors.length) {
-      printErrors(message.errors);
-      return;
-    }
-
-    if (module.hot.status() === 'idle') {
-      module.hot.check(true).catch(reloadExtension);
-    }
-  };
-
-  const printErrors = errors => {
-    var formatted = formatWebpackMessages({
-      errors: errors,
-      warnings: [],
-    });
-
-    if (typeof console !== 'undefined' && typeof console.error === 'function') {
-      for (var i = 0; i < formatted.errors.length; i++) {
-        console.error(stripAnsi(formatted.errors[i]));
-      }
-    }
-  };
-
-  return connection;
+  if (module.hot.status() === 'idle') {
+    module.hot.check(true).catch(reloadExtension);
+  }
 };
 
-const crossb = window.browser || window.chrome || window.msBrowser;
-var IS_BACKGROUND = !!crossb.extension.getBackgroundPage;
-if (IS_BACKGROUND) {
-  require('./background-runtime');
-} else {
-  require('./content-runtime');
-}
+const printErrors = errors => {
+  var formatted = formatWebpackMessages({
+    errors: errors,
+    warnings: [],
+  });
 
-makeClient(querystring.parse(__resourceQuery.slice(1)).hotUpdateServerUrl);
+  if (typeof console !== 'undefined' && typeof console.error === 'function') {
+    for (var i = 0; i < formatted.errors.length; i++) {
+      console.error(stripAnsi(formatted.errors[i]));
+    }
+  }
+};
+
+const reloadExtension = () => {
+  crossb.runtime.sendMessage({ action: 'reload-extension' });
+};

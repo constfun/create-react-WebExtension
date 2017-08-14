@@ -24,7 +24,7 @@ const JsonpTemplateReplacePlugin = require('../lib/hot-update/JsonpTemplateRepla
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 
-module.exports = (bundles, hotUpdateServerUrl) => {
+module.exports = (bundles, hotUpdateUrl) => {
   // Webpack uses `publicPath` to determine where the app is being served from.
   // In development, we always serve from the root. This makes config easier.
   const publicPath = '/';
@@ -45,8 +45,7 @@ module.exports = (bundles, hotUpdateServerUrl) => {
         // When you save a file, the client will hot load CSS or reload the extension in case of JS changes.
         // We need to know the absolute url of the server since we can't use window.location to infer
         // it. The client is running in a sandboxed script where window.location is random.
-        require.resolve('../lib/hot-update/client') +
-          `?hotUpdateServerUrl=${encodeURIComponent(hotUpdateServerUrl)}`,
+        require.resolve('../lib/hot-update/client'),
         // We ship a few polyfills by default:
         require.resolve('./polyfills'),
         // Errors should be considered fatal in development
@@ -334,7 +333,7 @@ module.exports = (bundles, hotUpdateServerUrl) => {
       new webpack.DefinePlugin(env.stringified),
       // This is necessary to emit hot updates (currently CSS only):
       new webpack.HotModuleReplacementPlugin(),
-      new JsonpTemplateReplacePlugin({ hotUpdateServerUrl }),
+      new JsonpTemplateReplacePlugin({ hotUpdateUrl }),
       // Watcher doesn't work well if you mistype casing in a path so we use
       // a plugin that prints an error when you attempt to do this.
       // See https://github.com/facebookincubator/create-react-app/issues/240

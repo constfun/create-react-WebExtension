@@ -1,5 +1,6 @@
 'use strict';
 
+const url = require('url');
 const Template = require('webpack/lib/Template');
 
 // Make Webpack's hot reloading work for WebExtensions.
@@ -10,11 +11,11 @@ const Template = require('webpack/lib/Template');
 module.exports = class JsonpTemplateReplacePlugin {
   constructor(options) {
     this.options = options;
-    this.hotUpdateServerUrl = options.hotUpdateServerUrl;
+    this.hotUpdateUrl = options.hotUpdateUrl;
   }
 
   apply(compiler) {
-    const { hotUpdateServerUrl } = this.options;
+    const { hotUpdateUrl } = this.options;
     compiler.plugin('compilation', compilation => {
       compilation.mainTemplate.plugin('hot-bootstrap', function(
         source,
@@ -72,8 +73,10 @@ module.exports = class JsonpTemplateReplacePlugin {
           }
         );
         // The full url, part of the reason why we're doing all this.
+        const { protocol, host } = url.parse(hotUpdateUrl);
+        const hotUpdateRootUrl = `${protocol}//${host}/`;
         const currentHotUpdateManifestUrl =
-          '"' + hotUpdateServerUrl + currentHotUpdateMainFilename.substr(1);
+          '"' + hotUpdateRootUrl + currentHotUpdateMainFilename.substr(1);
         const runtimeSource = Template.getFunctionContent(
           require('./JsonpMainTemplate.runtime.js')
         )

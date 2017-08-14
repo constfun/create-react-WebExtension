@@ -3,13 +3,14 @@
 const fs = require('fs');
 const del = require('del');
 const path = require('path');
+const url = require('url');
 const http = require('http');
 const express = require('express');
 const spdy = require('spdy');
 const selfsigned = require('selfsigned');
 const hotMiddleware = require('webpack-hot-middleware');
 
-module.exports = (compiler, options = {}) => {
+module.exports = (compiler, options) => {
   const app = express();
   options.hotMiddlewareOpts = options.hotMiddlewareOpts || {};
 
@@ -17,8 +18,7 @@ module.exports = (compiler, options = {}) => {
     compiler,
     Object.assign(
       {
-        // HARDCODED in client.js
-        path: '/__web_ext_hot_reload',
+        path: url.parse(options.url).pathname,
         heartbeat: 10e3,
       },
       options.hotMiddlewareOpts
