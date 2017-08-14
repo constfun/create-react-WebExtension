@@ -10,7 +10,7 @@ process.on('unhandledRejection', err => {
 
 const inquirer = require('react-dev-utils/inquirer');
 const ensureGitStatus = require('../lib/git-status');
-const features = require('./utils/features');
+const { features } = require('./utils/features');
 
 ensureGitStatus();
 

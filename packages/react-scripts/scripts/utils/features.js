@@ -4,10 +4,12 @@
 const path = require('path');
 const fs = require('fs');
 const chalk = require('chalk');
+const glob = require('glob');
+const tree = require('tree-from-paths');
 const spawnSync = require('react-dev-utils/crossSpawn').sync;
 const paths = require('../../config/paths');
 
-const rsyncFeatureSources = sources => {
+const rsyncSources = sources => {
   console.log('Copying files...');
   spawnSync('rsync', ['-avRq'].concat(sources, [paths.appPath]), {
     cwd: path.join(paths.ownPath, 'template'),
@@ -15,7 +17,25 @@ const rsyncFeatureSources = sources => {
   });
 };
 
-const installFeatureDependencies = deps => {
+const getSources = (feature, opts) => {
+  return feature.include.reduce(
+    (sources, pattern) =>
+      sources.concat(
+        glob.sync(
+          pattern,
+          Object.assign(
+            {
+              cwd: path.join(paths.ownPath, 'template'),
+            },
+            opts
+          )
+        )
+      ),
+    []
+  );
+};
+
+const installDependencies = deps => {
   console.log('Installing dependencies...');
   const useYarn = fs.existsSync(paths.yarnLockFile);
 
@@ -37,29 +57,30 @@ const installFeatureDependencies = deps => {
   }
 };
 
-const printSuccessMessage = function() {
+const printSuccessMessage = function(installedDeps, copiedFiles) {
   console.log();
-  console.log(
-    chalk.green(
-      `Success. Run ${chalk.bold('git status')} to see what was added.`
-    )
-  );
+  console.log(chalk.green('Added dependencies:\n'));
+  console.log(installedDeps.join('\n'));
+  console.log(chalk.green('\nAdded files:'));
+  console.log(tree.render(copiedFiles, '.', (parent, file) => file));
 };
 
 const injectFeature = function(feature, onSuccess) {
   console.log(chalk.green(`Adding ${feature.name} support...`));
-  rsyncFeatureSources(feature.sources);
-  installFeatureDependencies(feature.dependencies);
+  const sources = getSources(feature);
+  rsyncSources(sources);
+  installDependencies(feature.dependencies);
+
   if (onSuccess) {
     onSuccess();
   }
-  printSuccessMessage(feature);
+  printSuccessMessage(feature.dependencies, sources);
 };
 
-module.exports = [
+const features = [
   {
     name: 'TypeScript',
-    sources: ['tsconfig.json', 'tslint.json', 'src/typescript-example'],
+    include: ['tsconfig.json', 'tslint.json', 'src/typescript-example/*'],
     dependencies: [
       '@types/node',
       '@types/react',
@@ -85,7 +106,7 @@ module.exports = [
   },
   {
     name: 'Ocaml',
-    sources: ['bsconfig.json', 'src/ocaml-example'],
+    include: ['bsconfig.json', 'src/ocaml-example/*'],
     dependencies: require(path.join(paths.ownPath, 'template/bsconfig.json'))[
       'bs-dependencies'
     ],
@@ -94,3 +115,5 @@ module.exports = [
     },
   },
 ];
+
+module.exports = { features, getFeatureSources: getSources };
