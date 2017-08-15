@@ -18,8 +18,8 @@
     "noUnusedLocals": true,
     "allowSyntheticDefaultImports": true,
     "typeRoots": [
-      "../node_modules/@types",
-      "../node_modules/web-ext-types"
+      "../../../node_modules/@types",
+      "../../../node_modules/web-ext-types"
     ]
   },
   "exclude": [
