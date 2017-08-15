@@ -4,16 +4,10 @@
 const stripAnsi = require('strip-ansi');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 
-const crossb = window.chrome || window.browser || window.msBrowser;
-const IS_BACKGROUND_SCRIPT = !!crossb.extension.getBackgroundPage;
+const browser = window.chrome || window.browser || window.msBrowser;
+const IS_BACKGROUND_SCRIPT = !!browser.extension.getBackgroundPage;
 
-const currentHash = __webpack_require__.h;
-
-let lastHash;
-function upToDate(hash) {
-  if (hash) lastHash = hash;
-  return lastHash == currentHash();
-}
+const currentCompilationHash = __webpack_require__.h;
 
 const handleMessage = (message, reloadExtension) => {
   switch (message.action) {
@@ -24,22 +18,13 @@ const handleMessage = (message, reloadExtension) => {
         return;
       }
 
-      if (!upToDate(message.hash) && module.hot.status() === 'idle') {
+      if (
+        message.hash !== currentCompilationHash() &&
+        module.hot.status() === 'idle'
+      ) {
         module.hot
           .check(true)
-          .then(res => console.log(res))
           .catch(reloadExtension);
-        // .then(
-        //   res => console.log('up', res),
-        //   res => console.log(res)
-        // );
-        // .then(res => {
-        //   console.log('check ok', res);
-        // },
-        // (err) => {
-        //   console.log('check err', err);
-        // }
-        // )
       }
       break;
   }
@@ -59,14 +44,11 @@ const printErrors = errors => {
 };
 
 if (IS_BACKGROUND_SCRIPT) {
-  window.addEventListener(
-    'hot-update',
-    e => {
-      handleMessage(e.detail, () => crossb.runtime.reload());
-    },
-    false
-  );
-} else {
+  window.addEventListener('hot-update-message', e => {
+    handleMessage(e.detail, () => browser.runtime.reload());
+  }, false);
+}
+else {
   const handleDisconnect = () => {
     // The port disconnects when our extension reloads.
     // When this happens we reload the page to clear any stale content scripts.
@@ -75,12 +57,12 @@ if (IS_BACKGROUND_SCRIPT) {
   };
 
   const reloadExtension = () => {
-    crossb.runtime.sendMessage({ action: 'reload-extension' });
+    browser.runtime.sendMessage({ action: 'reload-extension' });
   };
 
-  const port = crossb.runtime.connect({ name: 'hot-update-port' });
+  const port = browser.runtime.connect({ name: 'hot-update-port' });
+  port.onDisconnect.addListener(handleDisconnect);
   port.onMessage.addListener(message => {
     handleMessage(message, reloadExtension);
   });
-  port.onDisconnect.addListener(handleDisconnect);
 }

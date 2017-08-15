@@ -21,24 +21,14 @@ const setupHotUpdateSupport = (appPaths, hotUpdateUrl) => {
     throw 'Hot module reload is only supported in development.';
   }
 
-  // Inject the hot update server url and copy the runtime into the build dir.
-  const relRuntimePathInBuild = 'js/hot-update-background-runtime.js';
-  // const runtimePathInBuild = path.join(
-  //   appPaths.appBuild,
-  //   relRuntimePathInBuild
-  // );
-  // const runtimePath = require.resolve('./hot-update/background-runtime');
-  // const runtime =
-  //   `const hotUpdateUrl = '${hotUpdateUrl}';\n\n` +
-  //   fs.readFileSync(runtimePath);
-  // fs.writeFileSync(runtimePathInBuild, runtime);
-
-  // Add hot reload scripts to the manifest file.
+  // Add hot update background scripts to the manifest file.
+  const bgScriptRelPath = 'js/hot-update-background-script.js';
   const manifestInBuild = path.join(appPaths.appBuild, 'manifest.json');
-  // We're requiring a json file, so make sure we don't get a cached version.
+  // We're requiring a json file that might have changed while we were "watching",
+  // make sure we don't get a cached version.
   delete require.cache[require.resolve(appPaths.appManifest)];
   let manifest = require(appPaths.appManifest);
-  manifest = injectBackgroundScript(manifest, relRuntimePathInBuild);
+  manifest = injectBackgroundScript(manifest, bgScriptRelPath);
   manifest = injectHotUpdateHostPermission(manifest, hotUpdateUrl);
   fs.writeFileSync(manifestInBuild, JSON.stringify(manifest, null, 2));
 };
@@ -46,7 +36,9 @@ const setupHotUpdateSupport = (appPaths, hotUpdateUrl) => {
 const injectBackgroundScript = (manifest, bgScriptRelPath) => {
   manifest.background = manifest.background || {};
   manifest.background.scripts = manifest.background.scripts || [];
-  manifest.background.scripts.push(bgScriptRelPath);
+  if (!manifest.background.scripts.includes(bgScriptRelPath)) {
+    manifest.background.scripts.push(bgScriptRelPath);
+  }
   return manifest;
 };
 

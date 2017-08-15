@@ -37,8 +37,8 @@ module.exports = (bundles, hotUpdateUrl) => {
 
   // We use an entry point per bundle to produce separate js files.
   const entry = {
-    'hot-update-background-runtime': [
-      require.resolve('../lib/hot-update/background-runtime'),
+    'hot-update-background-script': [
+      require.resolve('../lib/hot-update/background-script'),
     ],
   };
   bundles.forEach(
