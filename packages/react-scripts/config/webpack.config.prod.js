@@ -10,6 +10,7 @@
 // @remove-on-eject-end
 'use strict';
 
+const fs = require('fs');
 const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
@@ -166,6 +167,9 @@ module.exports = bundles => {
                 // TODO: consider separate config for production,
                 // e.g. to enable no-console and no-debugger only in production.
                 baseConfig: {
+                  env: {
+                    webextensions: true,
+                  },
                   extends: [require.resolve('eslint-config-react-app')],
                 },
                 ignore: false,
@@ -236,7 +240,18 @@ module.exports = bundles => {
         {
           test: /\.(ts|tsx)$/,
           include: paths.appSrc,
-          loader: require.resolve('ts-loader'),
+          use: [
+            {
+              loader: require.resolve('../lib/filter-loader'),
+              options: {
+                filterFn: () => fs.existsSync(paths.appTsconfig),
+                failMessage: `tsconfig.json was not found in ${paths.appTsconfig}`,
+              },
+            },
+            {
+              loader: require.resolve('ts-loader'),
+            },
+          ],
         },
         // Process Ocaml and ReasonML
         {
@@ -245,6 +260,7 @@ module.exports = bundles => {
           loader: require.resolve('../lib/bs-loader'),
           options: {
             bsconfig: paths.appBsconfig,
+            bsbOutputPath: paths.bsbOutputPath,
           },
         },
         // The notation here is somewhat confusing.
@@ -293,6 +309,10 @@ module.exports = bundles => {
       ],
     },
     plugins: plugins.concat([
+      new webpack.SourceMapDevToolPlugin({
+        test: /\.(re|ml)$/,
+        module: false,
+      }),
       // Makes some environment variables available in index.html.
       // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
       // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">

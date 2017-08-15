@@ -3,6 +3,7 @@
 const path = require('path');
 const fs = require('fs-extra');
 const child_process = require('child-process-promise');
+const chalk = require('chalk');
 const ChildProcessError = require('child-process-promise/lib/ChildProcessError');
 const { getOptions } = require('loader-utils');
 
@@ -28,8 +29,10 @@ const bsbSourceDirs = bsbSources => {
     return bsbSources.reduce((acc, item) =>
       acc.concat(bsbSourceDirs(item), [])
     );
+  } else if (bsbSources === undefined) {
+    return [];
   } else {
-    return [bsbSources.dir];
+    return bsbSources.dir ? [bsbSources.dir] : [];
   }
 };
 
@@ -38,10 +41,21 @@ const makeBsbContext = ({ bsconfig, bsbOutputPath }) => {
   const context = bsbOutputPath;
   fs.ensureDirSync(context);
 
-  // Symlink node_modules so bs-platform is found.
-  const nodeModulesInContext = path.join(context, 'node_modules');
-  fs.removeSync(nodeModulesInContext);
-  fs.symlinkSync(path.join(rootPath, 'node_modules'), nodeModulesInContext);
+  // Symlink node_modules where bs-platform is found.
+  const testModule = 'bs-platform/lib/js/bs';
+  const resolvedPath = require.resolve(testModule);
+  const nodeModulesPath = resolvedPath.substring(
+    0,
+    resolvedPath.indexOf(testModule)
+  );
+  const nodeModulesPathInContext = path.join(context, 'node_modules');
+  if (
+    !fs.existsSync(nodeModulesPathInContext) ||
+    fs.readlinkSync(nodeModulesPathInContext) !== nodeModulesPath
+  ) {
+    fs.removeSync(nodeModulesPathInContext);
+    fs.symlinkSync(nodeModulesPath, nodeModulesPathInContext, 'dir');
+  }
 
   // Rsync all the sources.
   const bsbSources = require(bsconfig).sources;
@@ -69,13 +83,15 @@ const runBsb = (compilation, options) => {
     log("Running BuckleScript's bsb in", options.bsbOutputPath);
     makeBsbContext(options)
       .then(context => {
-        compilation.__BSB_CONTEXT = context;
         return child_process
           .execFile(bsb, ['-make-world'], {
             cwd: context,
             maxBuffer: Infinity,
           })
-          .then(() => context);
+          .then(() => {
+            compilation.__BSB_CONTEXT = context;
+            return context;
+          });
       })
       .then(context =>
         patchAndCopyMerlinFile(context, options).then(() => context)
@@ -131,7 +147,14 @@ module.exports = function loader() {
     options.bsconfig || path.join(process.cwd(), 'bsconfig.json');
   options.bsbOutputPath =
     options.bsbOutputPath ||
-    path.join(path.dirname(options.bsconfig), '.tmp/bsb');
+    path.join(this._compilation.options.output.path, '_bsb');
+
+  if (!fs.existsSync(options.bsconfig)) {
+    this.emitError(
+      new Error(`bsconfig.json was not found at ${options.bsconfig}`)
+    );
+    return '';
+  }
 
   if (options.quiet) {
     log = () => {};
@@ -144,7 +167,20 @@ module.exports = function loader() {
     .then(src => callback(null, src))
     .catch(err => {
       if (err instanceof ChildProcessError) {
-        err.message += `\n\nStdout follows:\n${err.stdout}'\n\nStderr follows:${err.stderr}`;
+        err.message += `\n\nStdout follows:\n${err.stdout}'\n\nStderr follows:\n${err.stderr}`;
+
+        if (err.code === 23) {
+          callback(
+            new Error(
+              '\n\n' +
+                chalk.red(
+                  "Make sure that the 'sources' listed in bsconfig.json exist.\n\n"
+                ) +
+                err.message
+            )
+          );
+          return;
+        }
 
         const errorMessages = getBsbErrorMessages(err.message);
         if (errorMessages) {
@@ -153,6 +189,6 @@ module.exports = function loader() {
         }
       }
 
-      throw err;
+      callback(err);
     });
 };

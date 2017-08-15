@@ -10,12 +10,12 @@
 // @remove-on-eject-end
 'use strict';
 
+const fs = require('fs');
 const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
-const WriteFilePlugin = require('write-file-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
@@ -174,6 +174,9 @@ module.exports = (bundles, hotUpdateServerUrl) => {
                 formatter: eslintFormatter,
                 // @remove-on-eject-begin
                 baseConfig: {
+                  env: {
+                    webextensions: true,
+                  },
                   extends: [require.resolve('eslint-config-react-app')],
                 },
                 ignore: false,
@@ -250,7 +253,18 @@ module.exports = (bundles, hotUpdateServerUrl) => {
         {
           test: /\.(ts|tsx)$/,
           include: paths.appSrc,
-          loader: require.resolve('ts-loader'),
+          use: [
+            {
+              loader: require.resolve('../lib/filter-loader'),
+              options: {
+                filterFn: () => fs.existsSync(paths.appTsconfig),
+                failMessage: `tsconfig.json was not found in ${paths.appTsconfig}`,
+              },
+            },
+            {
+              loader: require.resolve('ts-loader'),
+            },
+          ],
         },
         // Process Ocaml and ReasonML
         {
@@ -259,6 +273,7 @@ module.exports = (bundles, hotUpdateServerUrl) => {
           loader: require.resolve('../lib/bs-loader'),
           options: {
             bsconfig: paths.appBsconfig,
+            bsbOutputPath: paths.bsbOutputPath,
           },
         },
         // "postcss" loader applies autoprefixer to our CSS.
@@ -303,6 +318,10 @@ module.exports = (bundles, hotUpdateServerUrl) => {
       ],
     },
     plugins: plugins.concat([
+      new webpack.SourceMapDevToolPlugin({
+        test: /\.(re|ml)$/,
+        module: false,
+      }),
       // Makes some environment variables available in index.html.
       // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
       // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
@@ -331,7 +350,6 @@ module.exports = (bundles, hotUpdateServerUrl) => {
       // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
       // You can remove this if you don't use Moment.js:
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-      new WriteFilePlugin(),
     ]),
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.

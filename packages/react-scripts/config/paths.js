@@ -58,6 +58,8 @@ module.exports = {
   appIndexJs: resolveApp('src/index.js'),
   appPackageJson: resolveApp('package.json'),
   appBsconfig: resolveApp('bsconfig.json'),
+  appTsconfig: resolveApp('tsconfig.json'),
+  bsbOutputPath: resolveApp('.bsb'),
   appSrc: resolveApp('src'),
   yarnLockFile: resolveApp('yarn.lock'),
   testsSetup: resolveApp('src/setupTests.js'),
@@ -80,6 +82,8 @@ module.exports = {
   appIndexJs: resolveApp('src/index.js'),
   appPackageJson: resolveApp('package.json'),
   appBsconfig: resolveApp('bsconfig.json'),
+  appTsconfig: resolveApp('tsconfig.json'),
+  bsbOutputPath: resolveApp('.bsb'),
   appSrc: resolveApp('src'),
   yarnLockFile: resolveApp('yarn.lock'),
   testsSetup: resolveApp('src/setupTests.js'),
@@ -92,7 +96,10 @@ module.exports = {
 };
 
 const ownPackageJson = require('../package.json');
-const reactScriptsPath = resolveApp(`node_modules/${ownPackageJson.name}`);
+const reactScriptsPath = path.join(
+  appDirectory,
+  `node_modules/${ownPackageJson.name}`
+);
 const reactScriptsLinked =
   fs.existsSync(reactScriptsPath) &&
   fs.lstatSync(reactScriptsPath).isSymbolicLink();
@@ -112,6 +119,8 @@ if (
     appIndexJs: resolveOwn('template/src/index.js'),
     appPackageJson: resolveOwn('package.json'),
     appBsconfig: resolveOwn('template/bsconfig.json'),
+    appTsconfig: resolveOwn('template/tsconfig.json'),
+    bsbOutputPath: resolveOwn('.bsb'),
     appSrc: resolveOwn('template/src'),
     yarnLockFile: resolveOwn('template/yarn.lock'),
     testsSetup: resolveOwn('template/src/setupTests.js'),

@@ -5,17 +5,17 @@ const path = require('path');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const { loadBundles } = require('./bundle');
 
-const processPublicFolder = appPaths => {
+const processPublicFolder = (appPaths, devServerHost) => {
   fs.copySync(appPaths.appPublic, appPaths.appBuild, {
     dereference: true,
   });
 
   if (process.env.NODE_ENV === 'development') {
-    setupHotReloadSupport(appPaths);
+    setupHotReloadSupport(appPaths, devServerHost);
   }
 };
 
-const setupHotReloadSupport = appPaths => {
+const setupHotReloadSupport = (appPaths, devServerHost) => {
   if (process.env.NODE_ENV !== 'development') {
     throw 'Hot module reload is only supported in development.';
   }
@@ -30,18 +30,13 @@ const setupHotReloadSupport = appPaths => {
   const manifestInBuild = path.join(appPaths.appBuild, 'manifest.json');
   // We're requiring a json file, so make sure we don't get a cached version.
   delete require.cache[require.resolve(appPaths.appManifest)];
-  const manifest = require(appPaths.appManifest);
-  fs.writeFileSync(
-    manifestInBuild,
-    JSON.stringify(
-      injectHotUpdateSupportIntoManifest(manifest, bgScriptRelPath),
-      null,
-      2
-    )
-  );
+  let manifest = require(appPaths.appManifest);
+  manifest = injectBackgroundScript(manifest, bgScriptRelPath);
+  manifest = injectDevServerHostPermission(manifest, devServerHost);
+  fs.writeFileSync(manifestInBuild, JSON.stringify(manifest, null, 2));
 };
 
-const injectHotUpdateSupportIntoManifest = (manifest, bgScriptRelPath) => {
+const injectBackgroundScript = (manifest, bgScriptRelPath) => {
   // Make sure the 'background' entry exists in the manifest.
   manifest.background = manifest.background || {};
   manifest.background.scripts = manifest.background.scripts || [];
@@ -50,14 +45,23 @@ const injectHotUpdateSupportIntoManifest = (manifest, bgScriptRelPath) => {
   return manifest;
 };
 
-const setupBuild = appPaths => {
+const injectDevServerHostPermission = (manifest, devServerHost) => {
+  const requiredPermission = `*://${devServerHost}/*`;
+  manifest.permissions = manifest.permissions || [];
+  if (!manifest.permissions.includes(requiredPermission)) {
+    manifest.permissions.push(requiredPermission);
+  }
+  return manifest;
+};
+
+const setupBuild = (appPaths, devServerHost) => {
   // Warn and crash if required files are missing.
   if (!checkRequiredFiles([appPaths.appManifest])) {
     process.exit(1);
   }
 
   fs.emptyDirSync(appPaths.appBuild);
-  processPublicFolder(appPaths);
+  processPublicFolder(appPaths, devServerHost);
   return loadBundles(appPaths);
 };
 
