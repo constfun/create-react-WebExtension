@@ -54,9 +54,8 @@ choosePort(HOST, DEFAULT_PORT)
       // We have not found a port.
       return;
     }
-    const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
     const appName = require(paths.appPackageJson).name;
-    const urls = prepareUrls(protocol, HOST, port);
+    const urls = prepareUrls('http', HOST, port);
     const hotUpdateUrl = url.resolve(
       urls.localUrlForBrowser,
       'web_ext_hot_update'
@@ -83,10 +82,7 @@ choosePort(HOST, DEFAULT_PORT)
     }
 
     // We use a custom, small, express server to just serve hot reload notifications.
-    const hotUpdateServer = makeHotUpdateServer(compiler, {
-      url: hotUpdateUrl,
-      https: !!process.env.HTTPS,
-    });
+    const hotUpdateServer = makeHotUpdateServer(compiler, { hotUpdateUrl });
     hotUpdateServer.listen(port, HOST, () => {
       console.log(chalk.cyan('Starting the development server...\n'));
     });

@@ -16,7 +16,6 @@ browser.browserAction.onClicked.addListener(_ => {
   // separate build/js/guide.js bundle should be created from the containing directory. With
   // src/guide/index.[js|ts|ml|re] used as the entry point.
   // See README.md for more details.
-  browser.tabs.executeScript({ file: 'js/test.js' });
   browser.tabs.executeScript({ file: 'js/typescript-example.js' });
   browser.tabs.executeScript({ file: 'js/ocaml-example.js' });
   browser.tabs.executeScript({ file: 'js/guide.js' });
