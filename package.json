@@ -5,7 +5,6 @@
     "create-react-app": "tasks/cra.sh",
     "e2e": "tasks/e2e-simple.sh",
     "e2e:docker": "tasks/local-test.sh",
-    "postinstall": "cd packages/react-error-overlay/ && npm run build:prod",
     "publish": "tasks/release.sh",
     "start": "cd packages/react-scripts && node scripts/start.js",
     "test": "cd packages/react-scripts && node scripts/test.js --env=jsdom"
