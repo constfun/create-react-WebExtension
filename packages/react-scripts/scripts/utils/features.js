@@ -96,9 +96,9 @@ const features = [
         // node_modules in the current directory instead.
         const appTsconfigPath = path.join(paths.appPath, 'tsconfig.json');
         const appTsconfig = require(appTsconfigPath);
-        // Turn ../node_modules into ./node_modules
+        // Turn ../../node_modules into ./node_modules
         appTsconfig.compilerOptions.typeRoots = appTsconfig.compilerOptions.typeRoots.map(
-          path => path.substring(1)
+          path => path.replace(/\.\.\/\.\.\/(node_modules.*)/, '$1')
         );
         fs.writeFileSync(appTsconfigPath, JSON.stringify(appTsconfig, null, 2));
       });
