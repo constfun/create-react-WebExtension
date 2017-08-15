@@ -23,15 +23,15 @@ const setupHotUpdateSupport = (appPaths, hotUpdateUrl) => {
 
   // Inject the hot update server url and copy the runtime into the build dir.
   const relRuntimePathInBuild = 'js/hot-update-background-runtime.js';
-  const runtimePathInBuild = path.join(
-    appPaths.appBuild,
-    relRuntimePathInBuild
-  );
-  const runtimePath = require.resolve('./hot-update/background-runtime');
-  const runtime =
-    `const hotUpdateUrl = '${hotUpdateUrl}';\n\n` +
-    fs.readFileSync(runtimePath);
-  fs.writeFileSync(runtimePathInBuild, runtime);
+  // const runtimePathInBuild = path.join(
+  //   appPaths.appBuild,
+  //   relRuntimePathInBuild
+  // );
+  // const runtimePath = require.resolve('./hot-update/background-runtime');
+  // const runtime =
+  //   `const hotUpdateUrl = '${hotUpdateUrl}';\n\n` +
+  //   fs.readFileSync(runtimePath);
+  // fs.writeFileSync(runtimePathInBuild, runtime);
 
   // Add hot reload scripts to the manifest file.
   const manifestInBuild = path.join(appPaths.appBuild, 'manifest.json');

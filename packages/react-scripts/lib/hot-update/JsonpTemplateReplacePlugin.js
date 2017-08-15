@@ -72,11 +72,11 @@ module.exports = class JsonpTemplateReplacePlugin {
               `" + ${this.renderCurrentHashCode(hash, length)} + "`,
           }
         );
-        // The full url, part of the reason why we're doing all this.
         const { protocol, host } = url.parse(hotUpdateUrl);
         const hotUpdateRootUrl = `${protocol}//${host}/`;
         const currentHotUpdateManifestUrl =
           '"' + hotUpdateRootUrl + currentHotUpdateMainFilename.substr(1);
+        const downloadManifestSource = require('./download-manifest').toString();
         const runtimeSource = Template.getFunctionContent(
           require('./JsonpMainTemplate.runtime.js')
         )
@@ -86,6 +86,7 @@ module.exports = class JsonpTemplateReplacePlugin {
           .replace(/\$hotChunkFilename\$/g, currentHotUpdateChunkFilename)
           .replace(/\$hash\$/g, JSON.stringify(hash));
         return `
+${downloadManifestSource}
 function hotDisposeChunk(chunkId) {
     delete installedChunks[chunkId];
 }

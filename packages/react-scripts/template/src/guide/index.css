@@ -13,7 +13,7 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_variables
     left: var(--margin);
     z-index: 10000000;
     padding: var(--padding);
-    background-color: red;
+    background-color: yellow;
     /*
     You do not have to supply vendor specific prefixes,
     they will be added automatically by autoprefixer.

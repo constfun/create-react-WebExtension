@@ -1,60 +1,47 @@
+/* global __webpack_require__ */
 'use strict';
 
 const stripAnsi = require('strip-ansi');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 
 const crossb = window.chrome || window.browser || window.msBrowser;
-const port = crossb.runtime.connect({ name: 'hot-update-port' });
-const loadedModules = new Set();
+const IS_BACKGROUND_SCRIPT = !!crossb.extension.getBackgroundPage;
 
-// The port disconnects when our extension (our background runtime, to be exact) reloads.
-// When this happens we reload the page to clear any stale content scripts.
-// We only do this if the port connection was ever successfull, otherwise we'll start an infinite reload loop for content scripts that are automatically injected.
-// let shouldReloadOnDisconnect = false;
-// crossb.runtime.onConnect.addListener((connectedPort) => {
-//   debugger
-//   if (connectedPort === port) {
-//     console.log('Connected to hot reload background runtime.');
-//     shouldReloadOnDisconnect = true;
-//   }
-// });
-// port.onDisconnect.addListener(() => {
-//   if (shouldReloadOnDisconnect) {
-//     window.location.reload();
-//   }
-// });
+const currentHash = __webpack_require__.h;
 
-port.onMessage.addListener(portMessage => {
-  // We only care about messages proxied from webpack-hot-middleware.
-  if (portMessage.action !== 'receive-hot-message') {
-    return true;
-  }
+let lastHash;
+function upToDate(hash) {
+  if (hash) lastHash = hash;
+  return lastHash == currentHash();
+}
 
-  const hotMessage = portMessage.hotMessage;
-  switch (hotMessage.action) {
+const handleMessage = (message, reloadExtension) => {
+  switch (message.action) {
     case 'sync':
-      loadedModules.add(hotMessage.hash);
-      break;
     case 'built':
-      handleBuilt(hotMessage);
+      if (message.errors.length) {
+        printErrors(message.errors);
+        return;
+      }
+
+      if (!upToDate(message.hash) && module.hot.status() === 'idle') {
+        module.hot
+          .check(true)
+          .then(res => console.log(res))
+          .catch(reloadExtension);
+        // .then(
+        //   res => console.log('up', res),
+        //   res => console.log(res)
+        // );
+        // .then(res => {
+        //   console.log('check ok', res);
+        // },
+        // (err) => {
+        //   console.log('check err', err);
+        // }
+        // )
+      }
       break;
-  }
-
-  return true;
-});
-
-const handleBuilt = message => {
-  if (loadedModules.has(message.hash)) {
-    return;
-  }
-
-  if (message.errors.length) {
-    printErrors(message.errors);
-    return;
-  }
-
-  if (module.hot.status() === 'idle') {
-    module.hot.check(true).catch(reloadExtension);
   }
 };
 
@@ -71,6 +58,29 @@ const printErrors = errors => {
   }
 };
 
-const reloadExtension = () => {
-  crossb.runtime.sendMessage({ action: 'reload-extension' });
-};
+if (IS_BACKGROUND_SCRIPT) {
+  window.addEventListener(
+    'hot-update',
+    e => {
+      handleMessage(e.detail, () => crossb.runtime.reload());
+    },
+    false
+  );
+} else {
+  const handleDisconnect = () => {
+    // The port disconnects when our extension reloads.
+    // When this happens we reload the page to clear any stale content scripts.
+    console.log('Hot update port closed. Reloading.');
+    window.location.reload();
+  };
+
+  const reloadExtension = () => {
+    crossb.runtime.sendMessage({ action: 'reload-extension' });
+  };
+
+  const port = crossb.runtime.connect({ name: 'hot-update-port' });
+  port.onMessage.addListener(message => {
+    handleMessage(message, reloadExtension);
+  });
+  port.onDisconnect.addListener(handleDisconnect);
+}

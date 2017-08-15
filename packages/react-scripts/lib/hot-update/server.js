@@ -28,7 +28,7 @@ module.exports = (compiler, options) => {
   app.use(express.static(compiler.options.output.path));
 
   const server = createServer(app, options);
-  server.force = () => middleware.publish({ action: 'force' });
+  server.force = () => middleware.publish({ action: 'force-reload' });
 
   return server;
 };

@@ -33,10 +33,14 @@ module.exports = (bundles, hotUpdateUrl) => {
   // Omit trailing slash as %PUBLIC_PATH%/xyz looks better than %PUBLIC_PATH%xyz.
   const publicUrl = '';
   // Get environment variables to inject into our app.
-  const env = getClientEnvironment(publicUrl);
+  const env = getClientEnvironment(publicUrl, hotUpdateUrl);
 
   // We use an entry point per bundle to produce separate js files.
-  const entry = {};
+  const entry = {
+    'hot-update-background-runtime': [
+      require.resolve('../lib/hot-update/background-runtime'),
+    ],
+  };
   bundles.forEach(
     bun =>
       (entry[bun.bundleName] = [
