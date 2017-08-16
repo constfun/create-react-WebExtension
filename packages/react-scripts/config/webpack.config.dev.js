@@ -36,13 +36,15 @@ module.exports = (bundles, hotUpdateUrl) => {
   const env = getClientEnvironment(publicUrl, hotUpdateUrl);
 
   // We use an entry point per bundle to produce separate js files.
+  // We also compile the hot update background script as a separate entry.
   const entry = {
     'hot-update-background-script': [
       require.resolve('../lib/hot-update/background-script'),
     ],
   };
-  bundles.forEach(
-    bun =>
+  bundles
+    .filter(bun => bun.indexJs !== null)
+    .forEach(bun =>
       (entry[bun.bundleName] = [
         // Include an alternative client for WebpackDevServer. A client's job is to
         // connect to WebpackDevServer by a socket and get notified about changes.
@@ -57,27 +59,24 @@ module.exports = (bundles, hotUpdateUrl) => {
         // Finally, this is your app's code:
         bun.indexJs,
         // We include the app code last so that if there is a runtime error during
-        // initialization, it doesn't blow up the WebpackDevServer client, and
+        // initialization, it doesn't blow up the hot update client, and
         // changing JS code would still trigger a refresh.
       ])
-  );
+    );
 
-  // We add an instance of HtmlWebpackPlugin per bundle to compile an index.html, if it exists.
-  let plugins = bundles.reduce((plugs, bun) => {
-    if (bun.indexHtml !== null) {
-      plugs.push(
-        new HtmlWebpackPlugin({
-          // We use the bundle name as the name of the html file.
-          filename: bun.bundleName + '.html',
-          // Also limit what assets we inject to only what is in the bundle.
-          chunks: [bun.bundleName],
-          inject: true,
-          template: bun.indexHtml,
-        })
-      );
-    }
-    return plugs;
-  }, []);
+  // We add an instance of HtmlWebpackPlugin per bundle to compile an index.html, if the file exists.
+  let plugins = bundles
+    .filter(bun => bun.indexHtml !== null)
+    .map(bun =>
+      new HtmlWebpackPlugin({
+        // We use the bundle name as the name of the html file.
+        filename: bun.bundleName + '.html',
+        // Also limit what assets we inject to only what is in the bundle.
+        chunks: [bun.bundleName],
+        inject: true,
+        template: bun.indexHtml,
+      })
+    );
 
   // This is the development configuration.
   // It is focused on developer experience and fast rebuilds.

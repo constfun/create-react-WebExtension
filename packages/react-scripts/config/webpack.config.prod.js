@@ -40,8 +40,9 @@ module.exports = bundles => {
 
   // We use an entry point per bundle to produce separate js files.
   const entry = {};
-  bundles.forEach(
-    bun =>
+  bundles
+    .filter(bun => bun.indexJs !== null)
+    .forEach(bun =>
       (entry[bun.bundleName] = [
         // In production, we only want to load the polyfills and the app code.
         require.resolve('./polyfills'),
@@ -49,35 +50,31 @@ module.exports = bundles => {
       ])
   );
 
-  // We add an instance of HtmlWebpackPlugin per bundle to compile an index.html, if it exists.
-  let plugins = bundles.reduce((plugs, bun) => {
-    if (bun.indexHtml !== null) {
-      console.log(bun.indexHtml);
-      plugs.push(
-        new HtmlWebpackPlugin({
-          // We use the bundle name as the name of the html file.
-          filename: bun.bundleName + '.html',
-          // Also limit what assets we inject to only what is in the bundle.
-          chunks: [bun.bundleName],
-          inject: true,
-          template: bun.indexHtml,
-          minify: {
-            removeComments: true,
-            collapseWhitespace: true,
-            removeRedundantAttributes: true,
-            useShortDoctype: true,
-            removeEmptyAttributes: true,
-            removeStyleLinkTypeAttributes: true,
-            keepClosingSlash: true,
-            minifyJS: true,
-            minifyCSS: true,
-            minifyURLs: true,
-          },
-        })
-      );
-    }
-    return plugs;
-  }, []);
+  // We add an instance of HtmlWebpackPlugin per bundle to compile an index.html, if the file exists.
+  let plugins = bundles
+    .filter(bun => bun.indexHtml !== null)
+    .map(bun =>
+      new HtmlWebpackPlugin({
+        // We use the bundle name as the name of the html file.
+        filename: bun.bundleName + '.html',
+        // Also limit what assets we inject to only what is in the bundle.
+        chunks: [bun.bundleName],
+        inject: true,
+        template: bun.indexHtml,
+        minify: {
+          removeComments: true,
+          collapseWhitespace: true,
+          removeRedundantAttributes: true,
+          useShortDoctype: true,
+          removeEmptyAttributes: true,
+          removeStyleLinkTypeAttributes: true,
+          keepClosingSlash: true,
+          minifyJS: true,
+          minifyCSS: true,
+          minifyURLs: true,
+        },
+      })
+    );
 
   // This is the production configuration.
   // It compiles slowly and is focused on producing a fast and minimal bundle.
