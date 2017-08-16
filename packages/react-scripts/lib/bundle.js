@@ -6,15 +6,26 @@ const find = require('find');
 const chalk = require('chalk');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 
-const existsOrNull = path => (fs.existsSync(path) ? path : null);
+const existsOrNull = path => fs.existsSync(path) ? path : null;
 
-const selectIndexFile = bundlePath => {
+const validIndexExts = ['ml', 'tsx', 'ts', 're', 'jsx', 'js']
+const findIndexFile = bundlePath => {
   return (
     // From best option to only option.
-    ['ml', 'tsx', 'ts', 're', 'jsx', 'js']
+    validIndexExts
       .map(ext => path.join(bundlePath, `index.${ext}`))
       .find(p => fs.existsSync(p)) || null
   );
+};
+const requireIndexFile = bundlePath => {
+  const indexFile = findIndexFile(bundlePath);
+  if (!indexFile) {
+    // Warn and rash.
+    const multiFilename = `index.{${validIndexExts.join(',')}}`;
+    checkRequiredFiles([path.join(bundlePath, multiFilename)]);
+    process.exit(1);
+  }
+  return indexFile;
 };
 
 // Any directory that has an empty _bundle file in it will be compiled to
@@ -36,14 +47,9 @@ const loadOneChildBundle = (app, bundleFile) => {
     bundlePath,
     // Bundles may contain an index.html template.
     indexHtml: existsOrNull(path.join(bundlePath, 'index.html')),
-    // Entry points can be written in a number of languages.
-    indexJs: selectIndexFile(bundlePath),
+    // A bundle must have an entry point.
+    indexJs: requireIndexFile(bundlePath),
   };
-
-  // Warn and crash if required files are missing.
-  if (!checkRequiredFiles([bundle.indexJs])) {
-    process.exit(1);
-  }
 
   return Object.freeze(bundle);
 };
@@ -68,9 +74,9 @@ const loadAppBundle = appPaths => {
     // May have an index html. This is a deviation from CRA where it is required.
     // An extension without any html at all makes sense.
     indexHtml: existsOrNull(appPaths.appHtml),
-    // Entry points can be written in a number of languages.
     // An extension with just bundles and no root app makes sense.
-    indexJs: selectIndexFile(appPaths.appSrc),
+    // Hence, we don't actually require an index file, but we'll build it if its there.
+    indexJs: findIndexFile(appPaths.appSrc),
   };
 
   return Object.freeze(bundle);
