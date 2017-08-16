@@ -46,13 +46,13 @@ eventSource.onmessage = e => {
 };
 
 eventSource.onopen = () => {
-  console.info('Connected to hot reload development server.');
+  console.log('Connected to hot reload development server.');
   devServerRestarted = connectionFailureHasBeenReported;
   connectionFailureHasBeenReported = false;
 };
 
 eventSource.onclose = () => {
-  console.info('Disconnected from hot reload development server.');
+  console.log('Disconnected from hot reload development server.');
   connectionFailureHasBeenReported = false;
 };
 
@@ -60,8 +60,8 @@ eventSource.onerror = () => {
   if (connectionFailureHasBeenReported) {
     return;
   }
-  console.info(
-    'Connection to hot update development server lost.\n' +
+  console.log( 'Connection to hot update development server lost.');
+  console.log(
       'You might see network errors in the console while we are attempting to reconnect.\n' +
       "If these become a nuisance, apply a filter in your browser's console."
   );
