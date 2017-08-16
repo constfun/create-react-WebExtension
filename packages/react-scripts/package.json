@@ -1,14 +1,14 @@
 {
-  "name": "react-scripts-web-ext",
+  "name": "react-scripts-web-extension",
   "version": "1.0.10",
-  "description": "Configuration and scripts for Create React App.",
-  "repository": "zinzout/create-react-web-ext",
+  "description": "Configuration and scripts for Create React WebExtension.",
+  "repository": "constfun/create-react-web-extension",
   "license": "BSD-3-Clause",
   "engines": {
     "node": ">=6"
   },
   "bugs": {
-    "url": "https://github.com/zinzout/create-react-web-ext/issues"
+    "url": "https://github.com/constfun/create-react-web-extension/issues"
   },
   "files": [
     "bin",
@@ -18,7 +18,7 @@
     "lib"
   ],
   "bin": {
-    "react-scripts-web-ext": "./bin/react-scripts-web-ext.js"
+    "react-scripts-web-ext": "./bin/react-scripts-web-extension.js"
   },
   "dependencies": {
     "autoprefixer": "7.1.1",
