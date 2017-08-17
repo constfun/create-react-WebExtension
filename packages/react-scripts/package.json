@@ -1,5 +1,5 @@
 {
-  "name": "react-scripts-web-extension",
+  "name": "react-scripts-webextension",
   "version": "1.0.10",
   "description": "Configuration and scripts for Create React WebExtension.",
   "repository": "constfun/create-react-web-extension",
@@ -8,7 +8,7 @@
     "node": ">=6"
   },
   "bugs": {
-    "url": "https://github.com/constfun/create-react-web-extension/issues"
+    "url": "https://github.com/constfun/create-react-webextension/issues"
   },
   "files": [
     "bin",
@@ -18,7 +18,7 @@
     "lib"
   ],
   "bin": {
-    "react-scripts-web-ext": "./bin/react-scripts-web-extension.js"
+    "react-scripts-web-ext": "./bin/react-scripts-webextension.js"
   },
   "dependencies": {
     "autoprefixer": "7.1.1",
