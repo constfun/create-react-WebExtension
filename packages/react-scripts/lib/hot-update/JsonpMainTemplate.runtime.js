@@ -1,4 +1,4 @@
-/* globals chrome hotAddUpdateChunk parentHotUpdateCallback $hotChunkFilename$ $hotUpdateManifestUrl$ */
+/* globals browser chrome hotAddUpdateChunk parentHotUpdateCallback $hotChunkFilename$ $hotUpdateManifestUrl$ */
 'use strict';
 
 module.exports = function () {
@@ -10,7 +10,6 @@ module.exports = function () {
         }
     } //$semicolon
 
-    const browser = window.chrome || window.browser || window.msBrowser;
     const IS_BACKGROUND_SCRIPT = !!browser.extension.getBackgroundPage;
 
     // Polyfill chrome.runtime.sendMessage to return a promise.
@@ -48,7 +47,16 @@ module.exports = function () {
             browserRuntimeSendMessage({
                 action: 'execute-script',
                 file: $hotChunkFilename$,
-            });
+            })
+                // We are asking to replace ourselves, the port will disconnect
+                // immediately after the message is sent.
+                .catch(err => {
+                    // Regardless, lets make sure that we're silencing the right exception,
+                    // because silently eating exceptions is not cool.
+                    if (err.message !== "The message port closed before a reponse was received.") {
+                        throw err;
+                    }
+                });
         }
     }
 

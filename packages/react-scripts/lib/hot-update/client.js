@@ -1,7 +1,7 @@
 /* global __webpack_require__, browser */
 'use strict';
 
-require('chrome-browser-object-polyfill')
+require('chrome-browser-object-polyfill');
 
 const IS_BACKGROUND_SCRIPT = !!browser.extension.getBackgroundPage;
 const __COMPILATION_HASH__ = __webpack_require__.h();

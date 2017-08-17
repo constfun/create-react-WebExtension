@@ -1,10 +1,11 @@
 // WARNING! In development, this script is automatically added as a "background script" in manifest.json.
+/* global browser */
 'use strict';
 
-const browser = window.chrome || window.browser || window.msBrowser;
+require('chrome-browser-object-polyfill');
+
 let connectionFailureHasBeenReported = false;
 let devServerRestarted = false;
-
 
 // All content scripts connect to this port to receive messages from webpack-hot-middleware.
 // We do this to circumvent the Content Security Policy of the host page.
@@ -27,14 +28,14 @@ eventSource.onmessage = e => {
 
   const message = JSON.parse(e.data);
   if (message.action === 'force-reload') {
-    browser.runtime.reload();
+    reloadExtension();
   }
   else if (
     devServerRestarted &&
     (message.action === 'built' || message.action === 'sync')
   ) {
     console.log('Development server restarted. Reloading extension.');
-    browser.runtime.reload();
+    reloadExtension();
   }
 
   // Broadcast to all connected content scripts.
@@ -84,7 +85,7 @@ browser.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     browser.tabs.executeScript(sender.tab.id, { file: message.file });
   }
   else if (message.action === 'reload-extension') {
-    browser.runtime.reload();
+    reloadExtension();
   }
   else if (message.action === 'fetch-hot-update-manifest') {
     fetch(message.requestPath)
@@ -103,3 +104,10 @@ browser.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     return true; // Signal async response.
   }
 });
+
+const reloadExtension = () =>  {
+  // Manually disconnect all ports before we reload, due to
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=1223425
+  connectedPorts.forEach(port => port.disconnect());
+  browser.runtime.reload();
+}
