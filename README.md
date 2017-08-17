@@ -40,17 +40,47 @@ Create React apps with no build configuration.
 Create React App works on macOS, Windows, and Linux.<br>
 If something doesn’t work please [file an issue](https://github.com/facebookincubator/create-react-app/issues/new).
 
-## Quick Overview
+## Limitations
+
+* Only tested on macOS, Firefox, and Chrome.
+
+## Installation
+
+Install [yarn](https://yarnpkg.com/lang/en/docs/install/), or [npm](https://www.npmjs.com/get-npm).
+
+Install [facebookincubator/create-react-app](https://github.com/facebookincubator/create-react-app) once globally:
 
 ```sh
-npm install -g create-react-app
-
-create-react-app my-app
-cd my-app/
-npm start
+yarn global add create-react-app
 ```
+### Quick Start
 
-Then open [http://localhost:3000/](http://localhost:3000/) to see your app.<br>
+To start working on a new WebExtension, run:
+
+```sh
+create-react-app my-extension --scripts-version react-scripts-webextension
+cd my-extension
+yarn start
+```
+This populates the `my-extension` directory with an example extension.  
+When installed, the example extension opens your browser to the [User Guide].
+
+To install the extension, follow the instructions on the screen:
+
+<img src='https://camo.githubusercontent.com/506a5a0a33aebed2bf0d24d3999af7f582b31808/687474703a2f2f692e696d6775722e636f6d2f616d794e66434e2e706e67' width='600' alt='npm start'>
+
+Changing any JavaScript in the `src/` directory or any file in the `public/` directory, will reload the extension and any open pages that have injected content scripts.
+
+Changing any CSS in the `src/` directory will hot update the extension, without reloading.
+
+You can use, and import modules between, TypeScript, OCaml, ReasonML, and JavaScript.  
+For each language, run `yarn inject` to add the required files, along with a friendly example. Or, consult the [User Guide].
+
+Happy hacking, please report any issues!
+
+﹎,﹎_﹎:cactus:_﹎﹎:camel:﹎
+
+
 When you’re ready to deploy to production, create a minified bundle with `npm run build`.
 
 <img src='https://camo.githubusercontent.com/506a5a0a33aebed2bf0d24d3999af7f582b31808/687474703a2f2f692e696d6775722e636f6d2f616d794e66434e2e706e67' width='600' alt='npm start'>
@@ -64,28 +94,9 @@ Just create a project, and you’re good to go.
 
 ## Getting Started
 
-### Installation
 
-Install it once globally:
 
-```sh
-npm install -g create-react-app
-```
-
-**You’ll need to have Node >= 6 on your machine**. You can use [nvm](https://github.com/creationix/nvm#installation) to easily switch Node versions between different projects.
-
-**This tool doesn’t assume a Node backend**. The Node installation is only required for Create React App itself.
-
-### Creating an App
-
-To create a new app, run:
-
-```sh
-create-react-app my-app
-cd my-app
-```
-
-It will create a directory called `my-app` inside the current folder.<br>
+This will create a directory called `my-app` inside the current folder.<br>
 Inside that directory, it will generate the initial project structure and install the transitive dependencies:
 
 ```
