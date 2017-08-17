@@ -1328,6 +1328,10 @@ chokidar@1.7.0, chokidar@^1.7.0:
   optionalDependencies:
     fsevents "^1.0.0"
 
+chrome-browser-object-polyfill@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/chrome-browser-object-polyfill/-/chrome-browser-object-polyfill-0.2.2.tgz#fd40145dc48d5d155698a2f61e4fdf845b48de8d"
+
 ci-info@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-1.0.0.tgz#dc5285f2b4e251821683681c381c3388f46ec534"

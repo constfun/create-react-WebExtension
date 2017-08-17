@@ -1,13 +1,13 @@
-/* global __webpack_require__ */
+/* global __webpack_require__, browser */
 'use strict';
+
+require('chrome-browser-object-polyfill')
+
+const IS_BACKGROUND_SCRIPT = !!browser.extension.getBackgroundPage;
+const __COMPILATION_HASH__ = __webpack_require__.h();
 
 const stripAnsi = require('strip-ansi');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
-
-const browser = window.chrome || window.browser || window.msBrowser;
-const IS_BACKGROUND_SCRIPT = !!browser.extension.getBackgroundPage;
-
-const currentCompilationHash = __webpack_require__.h;
 
 const handleMessage = (message, reloadExtension) => {
   switch (message.action) {
@@ -19,7 +19,7 @@ const handleMessage = (message, reloadExtension) => {
       }
 
       if (
-        message.hash !== currentCompilationHash() &&
+        message.hash !== __COMPILATION_HASH__ &&
         module.hot.status() === 'idle'
       ) {
         module.hot
