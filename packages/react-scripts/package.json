@@ -2,13 +2,13 @@
   "name": "react-scripts-webextension",
   "version": "1.0.10",
   "description": "Configuration and scripts for Create React WebExtension.",
-  "repository": "constfun/create-react-web-extension",
+  "repository": "constfun/create-react-WebExtension",
   "license": "BSD-3-Clause",
   "engines": {
     "node": ">=6"
   },
   "bugs": {
-    "url": "https://github.com/constfun/create-react-webextension/issues"
+    "url": "https://github.com/constfun/create-react-WebExtension/issues"
   },
   "files": [
     "bin",
