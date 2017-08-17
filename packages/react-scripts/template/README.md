@@ -1,13 +1,3 @@
-```
-  //
-  //   src/help                      # "help" is used as the bundle name.
-  //       |-- _bundle               # Mark current dir as a bundle.
-  //       |-- index.[js|ts|ml|re]   # Must exist and will be used as the entry point for the bundle.
-
-  // The file src/[bundle]/index.js will be used as
-  // js/help.js is bundled from src/help with src/help/index.js used as the entry point.
-```
-
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>
