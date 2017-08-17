@@ -62,16 +62,30 @@ create-react-app my-extension --scripts-version react-scripts-webextension
 cd my-extension
 yarn start
 ```
-This populates the `my-extension` directory with an example extension.  
+This populates the `my-extension/build` directory with an example extension.  
 When installed, the example extension opens your browser to the [User Guide].
 
 To install the extension, follow the instructions on the screen:
 
 <img src='https://camo.githubusercontent.com/506a5a0a33aebed2bf0d24d3999af7f582b31808/687474703a2f2f692e696d6775722e636f6d2f616d794e66434e2e706e67' width='600' alt='npm start'>
 
-Changing any JavaScript in the `src/` directory or any file in the `public/` directory, will reload the extension and any open pages that have injected content scripts.
+The directory structure will look like this:
+```
+.
+|– src
+|  |– index.js      # Entry point for build/js/index.js
+|  |– guide       
+|     |– _bundle    # Build separate js and html files out of this dir.
+|     |– index.js   # Entry point for this bundle.
+|     ...
+|– public
+|  |– manifest.json # The all important manifest file for your extension.
+|– package.json
+```
 
-Changing any CSS in the `src/` directory will hot update the extension, without reloading.
+Changing any JavaScript in the `src/` directory or any file in the `public/` directory will reload the extension and any open pages that have injected content scripts in them.
+
+Changing any CSS in the `src/` directory will live update the extension on the screen, without reloading.
 
 You can use, and import modules between, TypeScript, OCaml, ReasonML, and JavaScript.  
 For each language, run `yarn inject` to add the required files, along with a friendly example. Or, consult the [User Guide].
