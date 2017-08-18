@@ -4,9 +4,10 @@ Develop WebExtensions with no build configuration.<br>
 
 WebExtension API is the widely adopted system for extending and modifying the capability of a browser.<br>
 
-* [Getting Started](#getting-started) – How to create a new extension.
+* [Quick Start](#quick-start) – How to create a new extension.
 * [User Guide](https://github.com/constfun/create-react-WebExtension/blob/master/packages/react-scripts/template/README.md) – How to develop extensions bootstrapped with Create React WebExtension.
 * [WebExtensions on MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions) - API reference and tutorials for developing extensions.
+* [Examples](https://github.com/mdn/webextensions-examples) - Example extensions from MDN.
 
 This project is a **fork of**, and owes a great debt to, **the all around excellent [Create React App (CRA)](https://github.com/facebookincubator/create-react-app).<br>**
 The latest version of Create React WebExtension (CRWX) is in sync with [create-react-app#v1.0.11](https://github.com/facebookincubator/create-react-app/tree/v1.0.11).<br>
@@ -22,9 +23,9 @@ They are preconfigured and hidden so that you can focus on the code.
 
 ## Limitations
 
-* Although based on a mature project, this is a new project that introduces significant changes. You'd be an early adopter.
-* Only tested on macOS with Firefox and Chrome. In principle the extensions themselves and the hot update mechanism should work equally well with Edge. I'm not so sure about Windows. Windows support is high on my list, but for now YMMV.
-* CRWX will create a production build, ready for packaging. However, the packaging process itself varries significantly between browsers and is considered out of scope for this project. This may change in the future.
+- Although based on a mature project, this is a new project that introduces significant changes. You'd be an early adopter.
+- Only tested on macOS with Firefox and Chrome. In principle the extensions themselves and the hot update mechanism should work equally well with Edge. I'm not so sure about Windows. Windows support is high on my list, but for now YMMV.
+- CRWX will create a production build, ready for packaging. However, the packaging process itself varries significantly between browsers and is considered out of scope for this project. This may change in the future.
 
 If something doesn’t work please be kind and [report an issue](https://github.com/constfun/create-react-WebExtension/issues/new).
 
@@ -285,28 +286,6 @@ We are grateful to the authors of existing related projects for their ideas and 
 
 ## Alternatives
 
-If you don’t agree with the choices made in this project, you might want to explore alternatives with different tradeoffs.<br>
-Some of the more popular and actively maintained ones are:
-
-* [insin/nwb](https://github.com/insin/nwb)
-* [mozilla-neutrino/neutrino-dev](https://github.com/mozilla-neutrino/neutrino-dev)
-* [jaredpalmer/razzle](https://github.com/jaredpalmer/razzle)
-* [NYTimes/kyt](https://github.com/NYTimes/kyt)
-* [zeit/next.js](https://github.com/zeit/next.js)
-* [gatsbyjs/gatsby](https://github.com/gatsbyjs/gatsby)
-
-Notable alternatives also include:
-
-* [enclave](https://github.com/eanplatter/enclave)
-* [motion](https://github.com/motion/motion)
-* [quik](https://github.com/satya164/quik)
-* [sagui](https://github.com/saguijs/sagui)
-* [roc](https://github.com/rocjs/roc)
-* [aik](https://github.com/d4rkr00t/aik)
-* [react-app](https://github.com/kriasoft/react-app)
-* [dev-toolkit](https://github.com/stoikerty/dev-toolkit)
-* [sku](https://github.com/seek-oss/sku)
-* [gluestick](https://github.com/TrueCar/gluestick)
-
-You can also use module bundlers like [webpack](http://webpack.js.org) and [Browserify](http://browserify.org/) directly.<br>
-React documentation includes [a walkthrough](https://facebook.github.io/react/docs/package-management.html) on this topic.
+* [mi-g/weh](https://github.com/mi-g/weh)
+* [mozilla/web-ext](https://github.com/mozilla/web-ext)
+* [flybayer/create-react-webextension](https://github.com/flybayer/create-react-webextension)
