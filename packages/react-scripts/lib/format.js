@@ -22,12 +22,26 @@ const printInstructions = useYarn => {
   console.log();
 };
 
+const withInstructions = (compiler, useYarn) => {
+  let isFirstCompile = true;
+  compiler.plugin('done', stats => {
+    const isSuccessful = !stats.hasErrors() && !stats.hasWarnings();
+    if (isSuccessful && isFirstCompile) {
+      console.log(chalk.green('Compiled successfully!'));
+      printInstructions(useYarn);
+    }
+    isFirstCompile = false;
+  });
+  return compiler;
+};
+
+
 const printCompilationStats = ({
   stats,
-  isFirstCompile,
+  isFirstCompilation,
   useYarn,
-  isInteractive,
 }) => {
+  const isInteractive = process.stdout.isTTY;
   if (isInteractive) {
     clearConsole();
   }
@@ -68,6 +82,7 @@ const printCompilationStats = ({
 };
 
 module.exports = {
+  withInstructions,
   printInstructions,
   printCompilationStats,
 };

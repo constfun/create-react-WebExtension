@@ -31,16 +31,15 @@ const webpack = require('webpack');
 const chokidar = require('chokidar');
 const {
   choosePort,
-  createCompiler,
   prepareUrls,
 } = require('react-dev-utils/WebpackDevServerUtils');
 const paths = require('../config/paths');
 const makeDevConfig = require('../config/webpack.config.dev');
 const makeHotUpdateServer = require('../lib/hot-update/server');
 const { setupBuild, processPublicFolder } = require('../lib/setup');
+const { withInstructions, printCompilationStats } = require('../lib/format');
 
 const useYarn = fs.existsSync(paths.yarnLockFile);
-const isInteractive = false && process.stdout.isTTY;
 
 // Tools like Cloud9 rely on this.
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
@@ -54,21 +53,30 @@ choosePort(HOST, DEFAULT_PORT)
       // We have not found a port.
       return;
     }
-    const appName = require(paths.appPackageJson).name;
     const urls = prepareUrls('http', HOST, port);
     const hotUpdateUrl = url.resolve(
       urls.localUrlForBrowser,
       'web_ext_hot_update'
     );
-    // Create a webpack compiler that is configured with custom messages.
+    // Process public folder, load all bundles, and create webpack config.
     const bundles = setupBuild(paths, hotUpdateUrl);
     const config = makeDevConfig(bundles, hotUpdateUrl);
-    const compiler = createCompiler(webpack, config, appName, urls, useYarn);
-    // Instructions printed by CRA are not relevant, so we replace them on success.
-    patchInstructions(compiler);
-    // We use compiler watch instead of webpack-dev-server,
-    // since extensions need files written to disk, but not served over http.
-    const compilerWatch = compiler.watch({}, () => {});
+    // Create a webpack compiler that is configured with custom messages.
+    const compiler = withInstructions(webpack(config));
+    let isFirstCompilation = true;
+    const compilerWatch = compiler.watch({}, (err, stats) => {
+      if (err) {
+        console.log(err, chalk.red('\nCompiler watch failed'));
+        process.exit(1);
+      }
+
+      printCompilationStats({
+        stats,
+        isFirstCompilation,
+        useYarn,
+      });
+      isFirstCompilation = false;
+    });
 
     // Loading proxy config is not implemented yet, check and fail.
     const proxySetting = require(paths.appPackageJson).proxy;
@@ -115,32 +123,3 @@ choosePort(HOST, DEFAULT_PORT)
     process.exit(1);
   });
 
-const patchInstructions = compiler => {
-  let isFirstCompile = true;
-  compiler.plugin('done', stats => {
-    const isSuccessful = !stats.hasErrors() && !stats.hasWarnings();
-    if (isSuccessful && (isInteractive || isFirstCompile)) {
-      console.log(chalk.green('Compiled successfully!'));
-      printInstructions();
-    }
-    isFirstCompile = false;
-  });
-};
-
-const printInstructions = () => {
-  console.log();
-  console.log(
-    chalk.green(
-      `You can now load the ${chalk.bold(
-        'build'
-      )} directory as a temporary extension in your browser.`
-    )
-  );
-  console.log();
-  console.log('Note that the development build is not optimized.');
-  console.log(
-    `To create a production build, use ` +
-      `${chalk.cyan(`${useYarn ? 'yarn' : 'npm run'} build`)}.`
-  );
-  console.log();
-};
