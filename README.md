@@ -5,7 +5,7 @@ Develop WebExtensions with no build configuration.<br>
 WebExtension API is the widely adopted system for extending and modifying the capability of a browser.<br>
 
 * [Getting Started](#getting-started) – How to create a new extension.
-* [User Guide](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md) – How to develop extensions bootstrapped with Create React WebExtension.
+* [User Guide](https://github.com/constfun/create-react-WebExtension/blob/master/packages/react-scripts/template/README.md) – How to develop extensions bootstrapped with Create React WebExtension.
 * [WebExtensions on MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions) - API reference and tutorials for developing extensions.
 
 This project is a **fork of**, and owes a great debt to, **the all around excellent [Create React App (CRA)](https://github.com/facebookincubator/create-react-app).<br>**
@@ -54,7 +54,7 @@ Follow the instructions on the screen to install the extension in your browser:
 
 <img src='https://camo.githubusercontent.com/506a5a0a33aebed2bf0d24d3999af7f582b31808/687474703a2f2f692e696d6775722e636f6d2f616d794e66434e2e706e67' width='600' alt='npm start'>
 
-Once installed in your browser, the example extension navigates to the latest version of the [User Guide] and injects itself as a [content script](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Content_scripts) on that page.
+Once installed in your browser, the example extension navigates to the latest version of the [User Guide](https://github.com/constfun/create-react-WebExtension/blob/master/packages/react-scripts/template/README.md) and injects itself as a [content script](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Content_scripts) on that page.
 
 ## Directory Structure
 
