@@ -4,7 +4,7 @@ Develop WebExtensions with no build configuration.<br>
 
 WebExtension API is the widely adopted system for extending and modifying the capability of a browser.<br>
 
-* [Getting Started](#getting-started) – How to create a new extension.
+* [Quick Start](#quick-start) – How to create a new extension.
 * [User Guide](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md) – How to develop extensions bootstrapped with Create React WebExtension.
 * [WebExtensions on MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions) - API reference and tutorials for developing extensions.
 
