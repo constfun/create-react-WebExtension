@@ -62,7 +62,7 @@ choosePort(HOST, DEFAULT_PORT)
     const bundles = setupBuild(paths, hotUpdateUrl);
     const config = makeDevConfig(bundles, hotUpdateUrl);
     // Create a webpack compiler that is configured with custom messages.
-    const compiler = withInstructions(webpack(config));
+    const compiler = withInstructions(webpack(config), useYarn);
     let isFirstCompilation = true;
     const compilerWatch = compiler.watch({}, (err, stats) => {
       if (err) {

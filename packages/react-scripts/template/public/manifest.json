@@ -1,6 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Donut",
+  "author": "Author",
   "version": "1.0",
   "icons": {
     "16": "icon-16.png",
@@ -12,12 +13,14 @@
     "scripts": [
       "js/browser-polyfill.js",
       "js/index.js"
-    ]
+    ],
+    "persistent": true
   },
   "web_accessible_resources": [
     "media/*"
   ],
   "permissions": [
+    "<all_urls>",
     "activeTab"
   ],
   "browser_action": {

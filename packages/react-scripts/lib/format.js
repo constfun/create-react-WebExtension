@@ -14,6 +14,21 @@ const printInstructions = useYarn => {
     )
   );
   console.log();
+  console.log('For Firefox:');
+  console.log('    * Visit about:debugging');
+  console.log('    * Check Enable add-on debugging');
+  console.log('    * Click Load Temporary Add-on');
+  console.log('    * Select the build/manifest.json file');
+  console.log();
+  console.log('For Chrome and Opera:');
+  console.log('    * Visit chrome://extensions or opera://extensions');
+  console.log('    * Enable Developer Mode');
+  console.log('    * Click Load unpacked extension');
+  console.log('    * Select the build/ directory');
+  console.log();
+  console.log('For Edge:');
+  console.log('    https://docs.microsoft.com/en-us/microsoft-edge/extensions/guides/adding-and-removing-extensions');
+  console.log();
   console.log('Note that the development build is not optimized.');
   console.log(
     `To create a production build, use ` +
@@ -23,14 +38,15 @@ const printInstructions = useYarn => {
 };
 
 const withInstructions = (compiler, useYarn) => {
-  let isFirstCompile = true;
+  let isFirstCompilation = true;
   compiler.plugin('done', stats => {
+    console.log('first', isFirstCompilation);
     const isSuccessful = !stats.hasErrors() && !stats.hasWarnings();
-    if (isSuccessful && isFirstCompile) {
+    if (isSuccessful && isFirstCompilation) {
       console.log(chalk.green('Compiled successfully!'));
       printInstructions(useYarn);
     }
-    isFirstCompile = false;
+    isFirstCompilation = false;
   });
   return compiler;
 };
@@ -51,7 +67,7 @@ const printCompilationStats = ({
   if (isSuccessful) {
     console.log(chalk.green('Compiled successfully!'));
   }
-  if (isSuccessful && (isInteractive || isFirstCompile)) {
+  if (isSuccessful && (isInteractive || isFirstCompilation)) {
     printInstructions(useYarn);
   }
 
