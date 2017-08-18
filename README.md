@@ -1,35 +1,34 @@
 # Create React WebExtension [![Build Status](https://travis-ci.org/pacemkr/create-react-web-extension.svg?branch=master)](https://travis-ci.org/facebookincubator/create-react-app)
 
-Create WebExtensions with no build configuration and common sense conveniences.<br>
+Develop WebExtensions with no build configuration.<br>
 
-WebExtension API's is the widely adopted system for extending and modifying the capability of a browser.<br>
+WebExtension API is the widely adopted system for extending and modifying the capability of a browser.<br>
 
 * [Getting Started](#getting-started) – How to create a new extension.
 * [User Guide](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md) – How to develop extensions bootstrapped with Create React WebExtension.
-* [WebExtensions on MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions) - API reference and tutorials for developing WebExtensions.
+* [WebExtensions on MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions) - API reference and tutorials for developing extensions.
 
 This project is a fork of, and owes a great debt to, the all around excellent [Create React App (CRA)](https://github.com/facebookincubator/create-react-app).<br>
 The latest version of Create React WebExtension (CRWX) is in sync with create-react-app#v1.0.12.<br>
-A detailed description of patches and features relative to CRA is included in `packages/react-scripts/README.md`.
+For those familiar with CRA projects, a detailed description of patches and features is included in `packages/react-scripts/README.md`.
 
 ## Highlights
 
-- No configuration or difficult to make decisions to get started.
-- Start from scratch or consult friendly examples.
-- Cross-browser, hot module replacement as you work on your extension.
-- Works seamlessly on HTTPS and Content Security Policy protected pages.
-- Individual modules can be written in TypeScript, Ocaml, ReasonML, or JavaScript. 
-- Includes CSS conveniences such as style-loader and autoprefixer.
+- Get Started Immediately. You **don’t** need to install or configure tools like Webpack or Babel.<br>
+They are preconfigured and hidden so that you can focus on the code.
+- Live reload of JavaScript and CSS as you work on your extension. Works seamlessly in Chrome and Firefox, even on pages protected by HTTPS and Content Security Policy.
+- You can use TypeScript, Ocaml, ReasonML, or JavaScript and import modules between them.
 - At any time, you can "eject" Create React WebExtension from your project to relinquish full control over the webpack configuration.
-
 
 ## Limitations
 
-* Although based based on a mature project, CRWX introduces significant changes. You'd be an early adopter.
-* Tested on macOS, Firefox, and Chrome.
+* Although based on a mature project, CRWX introduces significant changes. You'd be an early adopter.
+* Tested on macOS, Firefox, and Chrome. In principle everything should work equally well with Edge. I'm not so sure about Windows. YMMV.
+* CRWX will create a production build, ready for packaging. However, the packaging process itself varries significantly between browsers and is considered out of scope for this tool. This may change in the future.
 
-If something doesn’t work please be kind and [file an issue](https://github.com/constfun/create-react-WebExtension/issues/new).
-## Getting Started
+If something doesn’t work please be kind and [report an issue](https://github.com/constfun/create-react-WebExtension/issues/new).
+
+## Quick Start
 
 ### Installation
 
@@ -40,106 +39,109 @@ Install [facebookincubator/create-react-app](https://github.com/facebookincubato
 ```sh
 yarn global add create-react-app
 ```
-### Creating a New Extension
+### Create a New Extension
 
-
-To start working on a new WebExtension, run:
+To start working on a new extension, run:
 
 ```sh
 create-react-app my-extension --scripts-version react-scripts-webextension
 cd my-extension
 yarn start
 ```
-Running `yarn start` populates the `my-extension/build` directory with the development version of the example extension.<br>
-Once installed in your browser, the extension navigates to the latest version of the [User Guide] and injects itself as a [content script](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Content_scripts) on that page.
 
-To install the extension in your browser, follow the instructions on the screen:
+Follow the instructions on the screen to install the extension in your browser:
 
 <img src='https://camo.githubusercontent.com/506a5a0a33aebed2bf0d24d3999af7f582b31808/687474703a2f2f692e696d6775722e636f6d2f616d794e66434e2e706e67' width='600' alt='npm start'>
 
-### Get Started Immediately
+Once installed in your browser, the example extension navigates to the latest version of the [User Guide] and injects itself as a [content script](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Content_scripts) on that page.
 
-You **don’t** need to install or configure tools like Webpack or Babel.<br>
-They are preconfigured and hidden so that you can focus on the code.
+## Directory Structure
 
-Changing any JavaScript in the `src/` directory or any file in the `public/` directory will reload the extension and any open pages that have injected content scripts in them. The extension will also be reloaded any time you restart the development server with `yarn start`. In practice this means that you rarely have to reload the extension manually.
-
-Changing any CSS in the `src/` directory will live update the extension on the screen, without reloading.
-
-## Get More Help
-
-### Starting from Scratch
-
-Delete everything from the `src` and `public` directories to start from scratch.<br>
-At the very least you will want to read the section on bundles in the User Guide.
-
-The directory structure of the newly generated example project will look like this:
+The directory structure of a newly generated project looks like this:
 ```
-my-extension
+.
 |– package.json
 |– README.md         # The User Guide.
 |– public            # Contents of this folder are copied as is into the build.
 |  |– manifest.json  # The all important manifest file for your extension.
-|  |– icon.png       # Icon to use for your extension, as specified in the manifest.
+|  |– icon-48.png       
+|  |– js
+|     |– browser-polyfill.js  # Polyfills Chrome with newer APIs, optional.
 |– src
-|  |– index.js       # Entry point for the build/js/index.js bundle.
-|  |– guide              
-|     |– _bundle     # Tells us to build separate js and html files out of this directory.
-|     |– index.js    # The entry point for the resulting build/js/guide.js bundle.
-|     |- index.css   # Imported from and hence bundled with index.js.
-|     ...
-|– build
-|  |– 
-...
+   |– index.js       # Entry point for the build/js/index.js bundle.
+   |– guide              
+      |– _bundle     # Tells us to bundle the code in this directory separately.
+      |– index.js    # The entry point for the resulting build/js/guide.js bundle.
+      |– index.css   # Imported from and hence is bundled with index.js.
+      ...
 ```
 
-Please refer to the user guide
+
+## List of Commands
+
+Create React WebExtension supports five commands:
+
+* `start` - Build and watch the extension in development mode.
+* `test` - Run the test watcher in an interactive mode.
+* `build` - Create a production build.
+* `inject` - Add support files for additional programming languages.
+* `eject` - Remove Create React WebExtension from your project and relinquish control.
+
+Each command is described in more detail bellow.
+
+### `yarn start` (or `npm run start`)
 
 
-You can use, and import modules between, TypeScript, OCaml, ReasonML, and JavaScript.  
-For each language, run `yarn inject` to add the required files, along with a friendly example. Or, consult the [User Guide].
+Running `yarn start` populates the `build/` directory with the development build of the example extension.<br>
+
+
+
+Changing any JavaScript in the `src/` directory or any file in the `public/` directory will reload the extension and any open pages that have injected content scripts in them. The extension will also be reloaded any time that you restart the development server.
+
+Changing any CSS in the `src/` directory will live update the extension on the screen, without reloading.
+
+You will see the build errors and lint warnings in the console.
+
+<img src='https://camo.githubusercontent.com/41678b3254cf583d3186c365528553c7ada53c6e/687474703a2f2f692e696d6775722e636f6d2f466e4c566677362e706e67' width='600' alt='Build errors'>
+
+### `yarn test` (or `npm run test`)
+
+By default, runs tests related to files changed since the last commit.
+
+[Read more about testing.](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md#running-tests)
+
+### `yarn build` (or `npm run build`) - 
+
+When you’re ready to package your extension for distribution, create minified code with `yarn build`.
+
+Since the procedure for packaging extensions varries significantly between browsers and distribution channels, you will have to do this step manually or using additional tools.
+
+### `yarn inject` or `npm run inject`
+
+
+You can use TypeScript, Ocaml, ReasonML, or JavaScript to develop extensions with Create React WebExtension.
+
+Using the command `yarn inject` you can add the required files, along with a friendly example, for each supported language:
+
+<img src='https://camo.githubusercontent.com/506a5a0a33aebed2bf0d24d3999af7f582b31808/687474703a2f2f692e696d6775722e636f6d2f616d794e66434e2e706e67' width='600' alt='npm start'>
+
+
+## Starting an Extension from Scratch
+
+1. Delete everything from the `src` and `public` directories. 
+2. Run `yarn start` and follow the error messages.
 
 Happy hacking!
 
 ﹎,﹎_﹎:cactus:_﹎﹎:camel:﹎
 
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 
-When you’re ready to deploy to production, create a minified bundle with `npm run build`.
-
-<img src='https://camo.githubusercontent.com/506a5a0a33aebed2bf0d24d3999af7f582b31808/687474703a2f2f692e696d6775722e636f6d2f616d794e66434e2e706e67' width='600' alt='npm start'>
-
-### Get Started Immediately
-
-
-Just create a project, and you’re good to go.
-
-## Getting Started
-
-This will create a directory called `my-app` inside the current folder.<br>
-Inside that directory, it will generate the initial project structure and install the transitive dependencies:
-
-```
-my-app
-├── README.md
-├── node_modules
-├── package.json
-├── .gitignore
-├── public
-│   └── favicon.ico
-│   └── index.html
-│   └── manifest.json
-└── src
-    └── App.css
-    └── App.js
-    └── App.test.js
-    └── index.css
-    └── index.js
-    └── logo.svg
-    └── registerServiceWorker.js
-```
-
-No configuration or complicated folder structures, just the files you need to build your app.<br>
-Once the installation is done, you can run some commands inside the project folder:
 
 ### `npm start` or `yarn start`
 
@@ -147,16 +149,7 @@ Runs the app in development mode.<br>
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.<br>
-You will see the build errors and lint warnings in the console.
 
-<img src='https://camo.githubusercontent.com/41678b3254cf583d3186c365528553c7ada53c6e/687474703a2f2f692e696d6775722e636f6d2f466e4c566677362e706e67' width='600' alt='Build errors'>
-
-### `npm test` or `yarn test`
-
-Runs the test watcher in an interactive mode.<br>
-By default, runs tests related to files changed since the last commit.
-
-[Read more about testing.](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md#running-tests)
 
 ### `npm run build` or `yarn build`
 
