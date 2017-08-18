@@ -194,7 +194,6 @@ module.exports = bundles => {
         // When you `import` an asset, you get its filename.
         {
           exclude: [
-            /\.html$/,
             /\.(js|jsx)$/,
             /\.(ts|tsx)$/,
             /\.(re|ml)$/,
