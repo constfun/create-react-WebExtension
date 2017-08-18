@@ -8,13 +8,13 @@ WebExtension API is the widely adopted system for extending and modifying the ca
 * [User Guide](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md) – How to develop extensions bootstrapped with Create React WebExtension.
 * [WebExtensions on MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions) - API reference and tutorials for developing extensions.
 
-This project is a fork of, and owes a great debt to, the all around excellent [Create React App (CRA)](https://github.com/facebookincubator/create-react-app).<br>
-The latest version of Create React WebExtension (CRWX) is in sync with create-react-app#v1.0.12.<br>
+This project is a **fork of**, and owes a great debt to, **the all around excellent [Create React App (CRA)](https://github.com/facebookincubator/create-react-app).<br>**
+The latest version of Create React WebExtension (CRWX) is in sync with [create-react-app#v1.0.11](https://github.com/facebookincubator/create-react-app/tree/v1.0.11).<br>
 For those familiar with CRA projects, a detailed description of patches and features is included in `packages/react-scripts/README.md`.
 
 ## Highlights
 
-- Get Started Immediately. You **don’t** need to install or configure tools like Webpack or Babel.<br>
+- Get started immediately, no need to install or configure tools like Webpack or Babel.<br>
 They are preconfigured and hidden so that you can focus on the code.
 - Live reload of JavaScript and CSS as you work on your extension. Works seamlessly in Chrome and Firefox, even on pages protected by HTTPS and Content Security Policy.
 - You can use TypeScript, Ocaml, ReasonML, or JavaScript and import modules between them.
@@ -22,9 +22,9 @@ They are preconfigured and hidden so that you can focus on the code.
 
 ## Limitations
 
-* Although based on a mature project, CRWX introduces significant changes. You'd be an early adopter.
-* Tested on macOS, Firefox, and Chrome. In principle everything should work equally well with Edge. I'm not so sure about Windows. YMMV.
-* CRWX will create a production build, ready for packaging. However, the packaging process itself varries significantly between browsers and is considered out of scope for this tool. This may change in the future.
+* Although based on a mature project, this is a new project that introduces significant changes. You'd be an early adopter.
+* Only tested on macOS with Firefox and Chrome. In principle the extensions themselves and the hot update mechanism should work equally well with Edge. I'm not so sure about Windows. Windows support is high on my list, but for now YMMV.
+* CRWX will create a production build, ready for packaging. However, the packaging process itself varries significantly between browsers and is considered out of scope for this project. This may change in the future.
 
 If something doesn’t work please be kind and [report an issue](https://github.com/constfun/create-react-WebExtension/issues/new).
 
@@ -39,6 +39,7 @@ Install [facebookincubator/create-react-app](https://github.com/facebookincubato
 ```sh
 yarn global add create-react-app
 ```
+
 ### Create a New Extension
 
 To start working on a new extension, run:
@@ -75,7 +76,6 @@ The directory structure of a newly generated project looks like this:
       |– index.css   # Imported from and hence is bundled with index.js.
       ...
 ```
-
 
 ## List of Commands
 
