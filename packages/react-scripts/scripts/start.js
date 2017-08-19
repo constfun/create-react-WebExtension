@@ -29,6 +29,7 @@ const url = require('url');
 const chalk = require('chalk');
 const webpack = require('webpack');
 const chokidar = require('chokidar');
+const clearConsole = require('react-dev-utils/clearConsole');
 const {
   choosePort,
   prepareUrls,
@@ -39,6 +40,7 @@ const makeHotUpdateServer = require('../lib/hot-update/server');
 const { setupBuild, processPublicFolder } = require('../lib/setup');
 const { withInstructions, printCompilationStats } = require('../lib/format');
 
+const isInteractive = process.stdout.isTTY;
 const useYarn = fs.existsSync(paths.yarnLockFile);
 
 // Tools like Cloud9 rely on this.
@@ -102,9 +104,20 @@ choosePort(HOST, DEFAULT_PORT)
       })
       .on('all', () => {
         console.log('Copying public folder...');
-        processPublicFolder(paths, hotUpdateUrl);
-        hotUpdateServer.force();
-        console.log('Done.');
+        processPublicFolder(paths, hotUpdateUrl)
+          .then(() => {
+            if (isInteractive) {
+              clearConsole();
+            }
+            console.log(chalk.green('Compiled successfully!'));
+          })
+          .catch((err) => {
+            if (isInteractive) {
+              clearConsole();
+            }
+            console.log(chalk.red('Error processing public folder.\n'));
+            console.log(err);
+          });
       });
 
     ['SIGINT', 'SIGTERM'].forEach(function(sig) {

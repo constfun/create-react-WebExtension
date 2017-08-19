@@ -3,6 +3,7 @@
 const url = require('url');
 const fs = require('fs-extra');
 const path = require('path');
+const chalk = require('chalk');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const { loadBundles } = require('./bundle');
 
@@ -12,7 +13,21 @@ const processPublicFolder = (appPaths, hotUpdateUrl) => {
   });
 
   if (process.env.NODE_ENV === 'development') {
-    setupHotUpdateSupport(appPaths, hotUpdateUrl);
+    return new Promise((resolve, reject) => {
+      try {
+        setupHotUpdateSupport(appPaths, hotUpdateUrl);
+        resolve();
+      }
+      // Thrown when there is a syntax error in the manifest file.
+      catch (err) {
+        if (err instanceof SyntaxError) {
+          reject(err.message);
+        }
+      }
+    });
+  }
+  else {
+    return Promise.resolve();
   }
 };
 
@@ -59,7 +74,12 @@ const setupBuild = (appPaths, hotUpdateUrl) => {
   }
 
   fs.emptyDirSync(appPaths.appBuild);
-  processPublicFolder(appPaths, hotUpdateUrl);
+  processPublicFolder(appPaths, hotUpdateUrl)
+    .catch((err) => {
+      console.log(chalk.red('Error processing public folder.\n'));
+      console.log(err);
+      process.exit(1);
+    });
   return loadBundles(appPaths);
 };
 
