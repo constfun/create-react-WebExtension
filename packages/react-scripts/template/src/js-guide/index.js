@@ -1,4 +1,3 @@
-/* global holmes */
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import '../guide/guide.css';
@@ -25,72 +24,99 @@ import '../guide/guide.css';
 //   console.log(sections);
 // };
 
-const wrapSections = () => {
-  // const firstSection = document.querySelector('#readme > article > h2:nth-of-type(2)');
-  const article = document.querySelector('#readme > article');
-  const children = article.children;
-  let tail = children.length;
-  for (let i = children.length - 1; i >= 0; i--) {
-    const node = children[i];
+// const wrapSections = () => {
+//   // const firstSection = document.querySelector('#readme > article > h2:nth-of-type(2)');
+//   const article = document.querySelector('#readme > article');
+//   const children = article.children;
+//   let tail = children.length;
+//   for (let i = children.length - 1; i >= 0; i--) {
+//     const node = children[i];
+//     if (node.tagName === 'H2') {
+//       const section = document.createElement('section');
+//       article.insertBefore(section, node);
+//       const howManyToMove = tail - i;
+//       for (let j = 0; j < howManyToMove; j++) {
+//         section.appendChild(children[i + 1]);
+//       }
+//       tail = i;
+//     }
+//   }
+// }
+
+const searchReadme = (query, callback) => {
+  const firstSection = document.querySelector('#readme > article > h2:nth-of-type(2)')
+  let node = firstSection;
+  let curSection = null;
+  let matches = '';
+  let results = [];
+  while (node) {
     if (node.tagName === 'H2') {
-      const section = document.createElement('section');
-      article.insertBefore(section, node);
-      const howManyToMove = tail - i;
-      for (let j = 0; j < howManyToMove; j++) {
-        section.appendChild(children[i + 1]);
+      if (curSection && matches) {
+        results.push({
+          heading: curSection.textContent,
+          href: curSection.firstChild.id,
+          matches: matches,
+        });
       }
-      tail = i;
+
+      curSection = node;
+      matches = '';
     }
+    else {
+      const text = node.textContent;
+      if (text.indexOf(query) !== -1) {
+        matches += text;
+      }
+    }
+    node = node.nextElementSibling;
   }
-}
+  return results;
+};
 
 class Main extends React.Component {
-  componentWillMount() {
-    wrapSections();
+  constructor() {
+    super();
+    this.state = {
+      query: '',
+      results: [],
+    };
   }
 
-  componentDidMount() {
-    var h = holmes({
-      input: '.Main input[type=search]',
-      find: '#readme > article > section',
-      placeholder: '<h3>— No results, my dear Watson. —</h3>',
-      mark: true,
-      hiddenAttr: false,
-      class: {
-        visible: 'visible',
-        hidden: 'hidden'
-      },
-      // onHidden(el) {
-      //   console.log('hidden', el);
-      // },
-      // onFound(el) {
-      //   console.log('found', el);
-      // },
-      // onInput(el) {
-      //   console.log('input', el);
-      // },
-      // onVisible(el) {
-      //   console.log('visible', el);
-      // },
-      // onEmpty(el) {
-      //   console.log('empty', el);
-      // }
-    });
+  search = (event) => {
+    const query = event.target.value;
+    if (query.length > 2) {
+      this.setState({
+        query,
+        results: searchReadme(query),
+      });
+    }
+    else {
+      this.setState({ query });
+    }
+  }
 
-    h.start();
-
+  displayResults = (results) => {
+    this.setState({ results });
   }
 
   render() {
+    const resultDivs = this.state.results.map(res => {
+      return (
+        <div key={res.href} className="result">
+          <a href={res.href}>{res.heading}</a>
+          <div className="matches">{res.matches}</div>
+        </div>
+      );
+    });
+
     return (
       <div className="Main">
-        <input type="search" />
+        <input type="search" value={this.query} onChange={this.search} />
+        {resultDivs}
       </div>
     );
   }
 }
-
-console.log('Hello World!');
 
 const ourContainer = document.createElement('div');
 const readmeContainer = document.getElementById('readme');
