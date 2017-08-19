@@ -9,6 +9,12 @@
     "96": "icon-96.png",
     "128": "icon-128.png"
   },
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/constfun/create-react-WebExtension*react-scripts/template/README.md"],
+      "js": ["js/holmes.js", "js/js-guide.js"]
+    }
+  ],
   "background": {
     "scripts": [
       "js/browser-polyfill.js",

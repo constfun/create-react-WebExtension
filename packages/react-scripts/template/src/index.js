@@ -11,12 +11,12 @@ browser.browserAction.onClicked.addListener(_ => {
   // The entire public/ directory is coppied into the build/ without modification.
   // If you don't want the polyfill, you can delete the public/js/browser-polyfill.js file.
   // See https://github.com/mozilla/webextension-polyfill for usage instructions.
-  browser.tabs.executeScript({ file: 'js/browser-polyfill.js' });
+  // browser.tabs.executeScript({ file: 'js/browser-polyfill.js' });
   // The presense of an empty src/guide/_bundle file signals Create React WebExtension that
   // separate build/js/guide.js bundle should be created from the containing directory. With
   // src/guide/index.[js|ts|ml|re] used as the entry point.
   // See README.md for more details.
-  browser.tabs.executeScript({ file: 'js/typescript-example.js' });
-  browser.tabs.executeScript({ file: 'js/ocaml-example.js' });
-  browser.tabs.executeScript({ file: 'js/guide.js' });
+  // browser.tabs.executeScript({ file: 'js/typescript-example.js' });
+  // browser.tabs.executeScript({ file: 'js/ocaml-example.js' });
+  // browser.tabs.executeScript({ file: 'js/js-guide.js' });
 });

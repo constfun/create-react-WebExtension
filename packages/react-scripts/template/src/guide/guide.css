@@ -1,0 +1,13 @@
+.Main {
+    height: 20px;
+    width: 100%;
+    background-color: yellow;
+}
+
+.hidden {
+    display: none;
+}
+
+mark {
+    background: #FFA3A3;
+}

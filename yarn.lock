@@ -2789,6 +2789,10 @@ hoek@2.x.x:
   version "2.16.3"
   resolved "https://registry.yarnpkg.com/hoek/-/hoek-2.16.3.tgz#20bb7403d3cea398e91dc4710a8ff1b8274a25ed"
 
+holmes.js@^1.17.2:
+  version "1.17.2"
+  resolved "https://registry.yarnpkg.com/holmes.js/-/holmes.js-1.17.2.tgz#9a0fad8db5dca480f90fd660995ef4119f78c26f"
+
 home-or-tmp@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/home-or-tmp/-/home-or-tmp-2.0.0.tgz#e36c3f2d2cae7d746a857e38d18d5f32a7882db8"

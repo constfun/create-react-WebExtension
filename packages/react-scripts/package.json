@@ -77,7 +77,8 @@
     "react": "^15.5.1",
     "react-dom": "^15.5.1",
     "reason-react": "^0.2.3",
-    "web-ext-types": "^0.3.1"
+    "web-ext-types": "^0.3.1",
+    "holmes.js": "^1.17.2"
   },
   "optionalDependencies": {
     "fsevents": "1.1.2"

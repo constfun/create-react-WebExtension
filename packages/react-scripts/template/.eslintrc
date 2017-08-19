@@ -1,5 +1,13 @@
 {
   "root": true,
   "parser": "babel-eslint",
-  "sourceType": "module"
+  "sourceType": "module",
+  "rules": {
+    "no-console": "off",
+    "strict": [
+      "error",
+      "global"
+    ],
+    "curly": "warn"
+  }
 }
