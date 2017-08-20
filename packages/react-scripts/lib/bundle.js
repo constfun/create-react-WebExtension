@@ -30,17 +30,18 @@ const requireIndexFile = bundlePath => {
 
 // Any directory that has an empty _bundle file in it will be compiled to
 // a main.js, and an optional index.html and main.css.
-const loadChildBundles = appBundle => {
-  const searchPath = path.join(appBundle.bundlePath, 'src');
+const loadChildBundles = searchPath => {
   return find
     .fileSync(/\/_bundle$/, searchPath)
     .filter(file => path.dirname(file) !== searchPath)
-    .map(bundleFile => loadOneChildBundle(appBundle, bundleFile));
+    .map(bundleFile => loadOneChildBundle(searchPath, bundleFile));
 };
 
-const loadOneChildBundle = (app, bundleFile) => {
+const loadOneChildBundle = (searchPath, bundleFile) => {
   const bundlePath = path.dirname(bundleFile);
-  const bundleName = path.basename(bundlePath);
+  const bundleName = bundlePath
+    .substr(searchPath.length + 1)
+    .replace(new RegExp(path.sep, 'g'), '-');
 
   const bundle = {
     bundleName,
@@ -84,7 +85,7 @@ const loadAppBundle = appPaths => {
 
 const loadBundles = appPaths => {
   const appBundle = loadAppBundle(appPaths);
-  return [].concat(appBundle, loadChildBundles(appBundle));
+  return [].concat(appBundle, loadChildBundles(appPaths.appSrc));
 };
 
 module.exports = {
