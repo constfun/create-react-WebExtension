@@ -1,3 +1,5 @@
+'use strict';
+
 (function() {
   var escapeEl = document.createElement('textarea');
 
@@ -12,7 +14,7 @@
   };
 })();
 
-module.exports = searchReadme (queryString, callback) {
+module.exports = function (queryString) {
   const query = new RegExp(`(${queryString})`, 'i');
   const firstSection = document.querySelector('#readme > article > h2:nth-of-type(2)')
   let node = firstSection;
