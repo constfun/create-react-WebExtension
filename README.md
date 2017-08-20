@@ -28,6 +28,7 @@ They are preconfigured and hidden so that you can focus on the code.
 - Likely will not work on Windows. Edge was tested through a virtual machine running on a macOS host. 
 - CRWX will create a production build, ready for packaging. However, the packaging process itself varries significantly between browsers and is considered out of scope for this project.
 - You'll have to restart the server if you add or remove files.
+- In development, `<all_urls>` permission is injected into the manifest to support hot reload.
 
 If something doesn’t work please be kind and [report an issue](https://github.com/constfun/create-react-WebExtension/issues/new).
 

@@ -1,13 +1,12 @@
 'use strict';
 
-const url = require('url');
 const fs = require('fs-extra');
 const path = require('path');
 const chalk = require('chalk');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const { loadBundles } = require('./bundle');
 
-const processPublicFolder = (appPaths, hotUpdateUrl) => {
+const processPublicFolder = (appPaths) => {
   fs.copySync(appPaths.appPublic, appPaths.appBuild, {
     dereference: true,
   });
@@ -15,7 +14,7 @@ const processPublicFolder = (appPaths, hotUpdateUrl) => {
   if (process.env.NODE_ENV === 'development') {
     return new Promise((resolve, reject) => {
       try {
-        setupHotUpdateSupport(appPaths, hotUpdateUrl);
+        setupHotUpdateSupport(appPaths);
         resolve();
       }
       // Thrown when there is a syntax error in the manifest file.
@@ -31,7 +30,7 @@ const processPublicFolder = (appPaths, hotUpdateUrl) => {
   }
 };
 
-const setupHotUpdateSupport = (appPaths, hotUpdateUrl) => {
+const setupHotUpdateSupport = (appPaths) => {
   if (process.env.NODE_ENV !== 'development') {
     throw 'Hot module reload is only supported in development.';
   }
@@ -44,7 +43,7 @@ const setupHotUpdateSupport = (appPaths, hotUpdateUrl) => {
   delete require.cache[require.resolve(appPaths.appManifest)];
   let manifest = require(appPaths.appManifest);
   manifest = injectBackgroundScript(manifest, bgScriptRelPath);
-  manifest = injectHotUpdateHostPermission(manifest, hotUpdateUrl);
+  manifest = injectHotUpdateHostPermission(manifest);
   fs.writeFileSync(manifestInBuild, JSON.stringify(manifest, null, 2));
 };
 
@@ -57,9 +56,8 @@ const injectBackgroundScript = (manifest, bgScriptRelPath) => {
   return manifest;
 };
 
-const injectHotUpdateHostPermission = (manifest, hotUpdateUrl) => {
-  const { hostname } = url.parse(hotUpdateUrl);
-  const requiredPermission = `*://${hostname}/*`;
+const injectHotUpdateHostPermission = (manifest) => {
+  const requiredPermission = '<all_urls>';
   manifest.permissions = manifest.permissions || [];
   if (!manifest.permissions.includes(requiredPermission)) {
     manifest.permissions.push(requiredPermission);
@@ -67,14 +65,14 @@ const injectHotUpdateHostPermission = (manifest, hotUpdateUrl) => {
   return manifest;
 };
 
-const setupBuild = (appPaths, hotUpdateUrl) => {
+const setupBuild = (appPaths) => {
   // Warn and crash if required files are missing.
   if (!checkRequiredFiles([appPaths.appManifest])) {
     process.exit(1);
   }
 
   fs.emptyDirSync(appPaths.appBuild);
-  processPublicFolder(appPaths, hotUpdateUrl)
+  processPublicFolder(appPaths)
     .catch((err) => {
       console.log(chalk.red('Error processing public folder.\n'));
       console.log(err);

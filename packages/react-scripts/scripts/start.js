@@ -61,7 +61,7 @@ choosePort(HOST, DEFAULT_PORT)
       'web_ext_hot_update'
     );
     // Process public folder, load all bundles, and create webpack config.
-    const bundles = setupBuild(paths, hotUpdateUrl);
+    const bundles = setupBuild(paths);
     const config = makeDevConfig(bundles, hotUpdateUrl);
     // Create a webpack compiler that is configured with custom messages.
     const compiler = withInstructions(webpack(config), useYarn);
@@ -104,7 +104,7 @@ choosePort(HOST, DEFAULT_PORT)
       })
       .on('all', () => {
         console.log('Copying public folder...');
-        processPublicFolder(paths, hotUpdateUrl)
+        processPublicFolder(paths)
           .then(() => {
             if (isInteractive) {
               clearConsole();
