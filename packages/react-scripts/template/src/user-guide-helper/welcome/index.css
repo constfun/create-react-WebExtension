@@ -1,0 +1,14 @@
+/*
+You can use CSS variables.
+https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_variables
+*/
+.Main {
+    --gh-padding: 45px;
+    --gh-bg-color: #fafbfc;
+    --gh-border: 1px solid #e1e4e8;
+}
+
+.Main .welcome-message {
+    padding: 10px var(--gh-padding);
+    background-color: yellow;
+}

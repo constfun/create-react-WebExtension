@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "Donut",
-  "author": "Author",
-  "version": "1.0",
+  "name": "Create React WebExtension",
+  "author": "Unknown",
+  "version": "0.0.1",
   "icons": {
     "16": "icon-16.png",
     "48": "icon-48.png",
@@ -11,14 +11,13 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://github.com/constfun/create-react-WebExtension*react-scripts/template/README.md"],
-      "js": ["js/holmes.js", "js/js-guide.js"]
+      "matches": ["https://github.com/constfun/*.md"],
+      "js": ["js/welcome.js"]
     }
   ],
   "background": {
     "scripts": [
-      "js/browser-polyfill.js",
-      "js/index.js"
+      "js/user-guide-helper.js"
     ],
     "persistent": true
   },
@@ -31,6 +30,6 @@
   ],
   "browser_action": {
     "default_icon": "icon-16.png",
-    "default_title": "Create React WebExtension"
+    "default_title": "Open the Create React WebExtension User Guide"
   }
 }

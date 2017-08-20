@@ -27,6 +27,7 @@ They are preconfigured and hidden so that you can focus on the code.
 - The example extension works in all major browsers. However, CRWX does not automatically make your extension code cross platform. To target multiple browsers you have to take care to use polyfills and to not use incompatible properties in `manifest.json`. The example extension uses [mozilla/webextension-polyfill](https://github.com/mozilla/webextension-polyfill).
 - Likely will not work on Windows. Edge was tested through a virtual machine running on a macOS host. 
 - CRWX will create a production build, ready for packaging. However, the packaging process itself varries significantly between browsers and is considered out of scope for this project.
+- You'll have to restart the server if you add or remove files.
 
 If something doesn’t work please be kind and [report an issue](https://github.com/constfun/create-react-WebExtension/issues/new).
 

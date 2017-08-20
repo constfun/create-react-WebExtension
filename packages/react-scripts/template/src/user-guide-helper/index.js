@@ -1,11 +1,28 @@
 // This script is specified as this WebExtension's background script in public/manifest.json
 // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/manifest.json/background
 
+require('chrome-browser-object-polyfill');
+
+const openTheUserGuide = () => {
+  browser.tabs.create({
+    active: true,
+    url: 'https://github.com/constfun/create-react-WebExtension/blob/master/packages/react-scripts/template/README.md',
+  });
+};
+
+browser.runtime.onInstalled.addListener((details) => {
+  if (details.reason !== 'update') {
+    openTheUserGuide();
+  }
+});
+
+browser.browserAction.onClicked.addListener(openTheUserGuide);
+
 // When the user clicks our browserAction button in the toolbar,
 // we programatically inject a script into the currently active tab.
 // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/browserAction
 // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Modify_a_web_page
-browser.browserAction.onClicked.addListener(_ => {
+// browser.browserAction.onClicked.addListener(_ => {
   // For a smoother experience between Chrome and Firefox we introduce a polyfill for Chrome.
   // Firefox WebExtension API is more modern (standard?) and uses Promises instead of callbacks.
   // The entire public/ directory is coppied into the build/ without modification.
@@ -19,4 +36,8 @@ browser.browserAction.onClicked.addListener(_ => {
   // browser.tabs.executeScript({ file: 'js/typescript-example.js' });
   // browser.tabs.executeScript({ file: 'js/ocaml-example.js' });
   // browser.tabs.executeScript({ file: 'js/js-guide.js' });
-});
+// });
+
+// Open the latest version of the User Guide when the extension is installed.
+// browser.runtime.onInstalled.addListener(() => {
+// });

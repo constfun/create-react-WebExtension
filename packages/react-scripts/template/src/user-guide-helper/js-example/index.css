@@ -1,0 +1,15 @@
+.JsExample {
+    position: relative;
+    width: 100%;
+    background-color: var(--gh-bg-color);
+    border: var(--gh-border);
+    padding: 5px var(--gh-padding);
+}
+
+.JsExample::before {
+    position: absolute;
+    top: 0;
+    right: var(--gh-padding);
+    font-size: 26px;
+    content: '\01f4a9';
+}

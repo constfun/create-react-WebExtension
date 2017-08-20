@@ -110,6 +110,7 @@ choosePort(HOST, DEFAULT_PORT)
               clearConsole();
             }
             console.log(chalk.green('Compiled successfully!'));
+            hotUpdateServer.force();
           })
           .catch((err) => {
             if (isInteractive) {
