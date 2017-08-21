@@ -8,7 +8,7 @@ const printInstructions = useYarn => {
   console.log();
   console.log(
     chalk.green(
-      `You can now load the ${chalk.bold(
+      `You can now install the ${chalk.bold(
         'build'
       )} directory as a temporary extension.`
     )

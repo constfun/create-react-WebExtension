@@ -56,7 +56,7 @@ yarn start
 
 Follow the instructions on the screen to install the extension in your browser:
 
-<img src='https://camo.githubusercontent.com/506a5a0a33aebed2bf0d24d3999af7f582b31808/687474703a2f2f692e696d6775722e636f6d2f616d794e66434e2e706e67' width='600' alt='npm start'>
+![yarn start](images/compiled.png)
 
 Once installed in your browser, the example extension navigates to the latest version of the [User Guide](https://github.com/constfun/create-react-WebExtension/blob/master/packages/react-scripts/template/README.md) and injects itself as a [content script](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Content_scripts) on that page.
 
