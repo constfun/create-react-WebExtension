@@ -9,9 +9,9 @@ WebExtension API is the widely adopted system for extending and modifying the ca
 * [WebExtensions on MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions) - API reference and tutorials for developing extensions.
 * [Examples](https://github.com/mdn/webextensions-examples) - Example extensions from MDN.
 
-This project is a **fork of**, and owes a great debt to, **the all around excellent [Create React App (CRA)](https://github.com/facebookincubator/create-react-app).<br>**
-The latest version of Create React WebExtension (CRWX) is in sync with [create-react-app#v1.0.11](https://github.com/facebookincubator/create-react-app/tree/v1.0.11).<br>
-For those familiar with CRA projects, a detailed description of patches and features is included in `packages/react-scripts/README.md`.
+**This project is a fork of the all around excellent [Create React App (CRA)](https://github.com/facebookincubator/create-react-app).<br>**
+
+The latest version of Create React WebExtension (CRWX) is in sync with [create-react-app#v1.0.10](https://github.com/facebookincubator/create-react-app/tree/v1.0.10).<br>
 
 ## Highlights
 
@@ -24,11 +24,10 @@ They are preconfigured and hidden so that you can focus on the code.
 ## Limitations
 
 - Although based on a mature project, this is a new project that introduces significant changes. You'd be an early adopter.
-- The example extension works in all major browsers. However, CRWX does not automatically make your extension code cross platform. To target multiple browsers you have to take care to use polyfills and to not use incompatible properties in `manifest.json`. The example extension uses [mozilla/webextension-polyfill](https://github.com/mozilla/webextension-polyfill).
-- Likely will not work on Windows. Edge was tested through a virtual machine running on a macOS host. 
+- The User Guide is 90% relevant, but hasn't been updated yet. This project is mostly a super set of CRA features.
+- No Windows support.
+- The example extension works in all major browsers. However, CRWX does not automatically make your extension code cross platform. To target multiple browsers you have to take care to use [polyfills](https://github.com/mozilla/webextension-polyfill) and to not use incompatible properties in the `manifest.json` file. 
 - CRWX will create a production build, ready for packaging. However, the packaging process itself varries significantly between browsers and is considered out of scope for this project.
-- You'll have to restart the server if you add or remove files.
-- In development, `<all_urls>` permission is injected into the manifest to support hot reload.
 
 If something doesn’t work please be kind and [report an issue](https://github.com/constfun/create-react-WebExtension/issues/new).
 
