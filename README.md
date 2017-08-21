@@ -58,7 +58,7 @@ Follow the instructions on the screen to install the extension in your browser:
 
 ![yarn start](images/compiled.png)
 
-Once installed in your browser, the example extension navigates to the latest version of the [User Guide](https://github.com/constfun/create-react-WebExtension/blob/master/packages/react-scripts/template/README.md) and injects itself as a [content script](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Content_scripts) on that page.
+Once installed in your browser, the example extension navigates to the [latest version of the User Guide](https://github.com/constfun/create-react-WebExtension/blob/master/packages/react-scripts/template/README.md) and injects itself as a [content script](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Content_scripts) on that page.
 
 ## Directory Structure
 
@@ -100,13 +100,13 @@ Running `yarn start` populates the `build/` directory with the development build
 
 
 
-Changing any JavaScript in the `src/` directory or any file in the `public/` directory will reload the extension and any open pages that have injected content scripts in them. The extension will also be reloaded any time that you restart the development server.
+Changing any JavaScript in the `src/` directory or any file in the `public/` directory will intelligently reload the extension and affected tabs.
 
 Changing any CSS in the `src/` directory will live update the extension on the screen, without reloading.
 
 You will see the build errors and lint warnings in the console.
 
-<img src='https://camo.githubusercontent.com/41678b3254cf583d3186c365528553c7ada53c6e/687474703a2f2f692e696d6775722e636f6d2f466e4c566677362e706e67' width='600' alt='Build errors'>
+![Build errors](images/syntax-error.png)
 
 ### `yarn test` (or `npm run test`)
 
@@ -114,7 +114,7 @@ By default, runs tests related to files changed since the last commit.
 
 [Read more about testing.](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md#running-tests)
 
-### `yarn build` (or `npm run build`) - 
+### `yarn build` (or `npm run build`) 
 
 When you’re ready to package your extension for distribution, create minified code with `yarn build`.
 
