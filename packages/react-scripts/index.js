@@ -1,3 +1,3 @@
 module.exports = {
-  readmeSearch: require('./lib/readme-search.js'),
+  ReadmeSearch: require('./lib/ReadmeSearch.js'),
 };

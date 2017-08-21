@@ -1,20 +1,15 @@
 'use strict';
 
-(function() {
-  var escapeEl = document.createElement('textarea');
+const React = require('react');
+require('./ReadmeSearch.css');
 
-  window.escapeHTML = function(html) {
-      escapeEl.textContent = html;
-      return escapeEl.innerHTML;
-  };
+const escapeEl = document.createElement('textarea');
+const escapeHTML = function(html) {
+    escapeEl.textContent = html;
+    return escapeEl.innerHTML;
+};
 
-  window.unescapeHTML = function(html) {
-      escapeEl.innerHTML = html;
-      return escapeEl.textContent;
-  };
-})();
-
-module.exports = function (queryString) {
+function readmeSearch(queryString) {
   const query = new RegExp(`(${queryString})`, 'i');
   const firstSection = document.querySelector('#readme > article > h2:nth-of-type(2)')
   let node = firstSection;
@@ -41,7 +36,7 @@ module.exports = function (queryString) {
         let match = query.exec(text);
         if (match !== null) {
           const matchInContext = match.input.substring(match.index - contextLen, match.index + contextLen);
-          const escaped = window.escapeHTML(matchInContext);
+          const escaped = escapeHTML(matchInContext);
           const highlighted = escaped.replace(query, '<mark>$1</mark>');
           context += ' ... ' + highlighted;
         }
@@ -51,3 +46,26 @@ module.exports = function (queryString) {
   }
   return results;
 }
+
+const ReadmeSearch = (props) => {
+  const el = React.createElement;
+  let resultDivs = [];
+  if (props.query.length > 1) {
+    const results = readmeSearch(props.query);
+    resultDivs = results.map(res => {
+      return (
+        el('div',
+          { key: res.href, className: "result" },
+          [
+            el('a', { href: res.href }, res.heading),
+            el('div', { dangerouslySetInnerHTML: res }, null),
+          ]
+        )
+      );
+    });
+  }
+
+  return el('div', { className: ReadmeSearch }, resultDivs);
+};
+
+module.exports = ReadmeSearch;
