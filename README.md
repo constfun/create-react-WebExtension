@@ -9,7 +9,7 @@ WebExtension API is the widely adopted system for extending and modifying the ca
 * [WebExtensions on MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions) - API reference and tutorials for developing extensions.
 * [Examples](https://github.com/mdn/webextensions-examples) - Example extensions from MDN.
 
-**This project is a fork of the all around excellent [Create React App (CRA)](https://github.com/facebookincubator/create-react-app).<br>**
+**This project is a fork of the excellent [Create React App (CRA)](https://github.com/facebookincubator/create-react-app) project.**
 
 The latest version of Create React WebExtension (CRWX) is in sync with [create-react-app#v1.0.10](https://github.com/facebookincubator/create-react-app/tree/v1.0.10).<br>
 
