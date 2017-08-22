@@ -1,9 +1,3 @@
-/*
-  This is the JavaScript version of the Search component.
-  This component is also available in TypeScript, Ocaml, and ReasonML.
-  Run 'yarn inject' for more.
-*/
-
 import * as React from 'react';
 import PoweredBy from './PoweredBy';
 import { ReadmeSearch } from 'react-scripts-webextension';

@@ -20,8 +20,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const chalk = require('chalk');
 const spawn = require('react-dev-utils/crossSpawn');
-const deleteEmpty = require('delete-empty');
-const { features, getFeatureSources } = require('./utils/features');
 
 module.exports = function(
   appPath,
@@ -45,7 +43,6 @@ module.exports = function(
     build: 'react-scripts-web-ext build',
     test: 'react-scripts-web-ext test --env=jsdom',
     eject: 'react-scripts-web-ext eject',
-    inject: 'react-scripts-web-ext inject',
   };
 
   fs.writeFileSync(
@@ -66,17 +63,7 @@ module.exports = function(
     ? path.resolve(originalDirectory, template)
     : path.join(ownPath, 'template');
   if (fs.existsSync(templatePath)) {
-    // Skip sources that belong to features that can be enabled later with inject.
-    const skippedFiles = features.reduce(
-      (srcs, feat) => srcs.concat(getFeatureSources(feat, { absolute: true })),
-      []
-    );
-    fs.copySync(templatePath, appPath, {
-      filter: path => {
-        return skippedFiles.indexOf(path) === -1;
-      },
-    });
-    deleteEmpty.sync(path.join(appPath, 'src'));
+    fs.copySync(templatePath, appPath);
   } else {
     console.error(
       `Could not locate supplied template: ${chalk.green(templatePath)}`
@@ -123,11 +110,7 @@ module.exports = function(
   );
   if (fs.existsSync(templateDependenciesPath)) {
     const templateDependencies = require(templateDependenciesPath).dependencies;
-    args = args.concat(
-      Object.keys(templateDependencies).map(key => {
-        return `${key}@${templateDependencies[key]}`;
-      })
-    );
+    args = args.concat(templateDependencies);
     fs.unlinkSync(templateDependenciesPath);
   }
 

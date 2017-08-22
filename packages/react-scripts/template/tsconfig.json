@@ -3,20 +3,11 @@
     "module": "esnext",
     "target": "es5",
     "lib": ["es6", "dom"],
-    "sourceMap": true,
-    "allowJs": true,
-    "jsx": "react",
     "moduleResolution": "node",
     "rootDir": "src",
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "experimentalDecorators": true,
-    "noUnusedLocals": true,
-    "allowSyntheticDefaultImports": true,
+    "jsx": "react",
+    "sourceMap": true,
+    "allowJs": true,
     "typeRoots": [
       "../../../node_modules/@types",
       "../../../node_modules/web-ext-types"
@@ -24,11 +15,6 @@
   },
   "exclude": [
     "node_modules",
-    "build",
-    "scripts",
-    "acceptance-tests",
-    "webpack",
-    "jest",
-    "src/setupTests.ts"
+    "build"
    ]
 }
