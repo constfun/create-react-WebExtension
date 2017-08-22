@@ -15,7 +15,7 @@
   "content_scripts": [
     {
       "matches": [
-        "https://github.com/constfun/*.md"
+        "https://github.com/constfun/create-react-WebExtension/blob/master/packages/react-scripts/template/README.md"
       ],
       "js": [
         "js/guide-content-script.js"

@@ -83,6 +83,15 @@ The directory structure of a newly generated project looks like this:
             └── styles.css
 ```
 
+## Starting from a Clean Slate
+
+If you find the example code confusing or not helpful, you can start with an empty code base:
+
+1. Delete everything from the `src` and `public` directories. 
+2. Run `yarn start` and follow the error messages.
+
+Refer to the User Guide for solutions to common tasks.
+
 ## List of Commands
 
 Create React WebExtension supports four commands:
@@ -126,23 +135,6 @@ Running `yarn eject` copies all the configuration files and the transitive depen
 
 **Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-## Starting an Extension from Scratch
-
-If you find the example code confusion or not helpful you can easily start with an empty code base:
-
-1. Delete everything from the `src` and `public` directories. 
-2. Run `yarn start` and follow the error messages.
-
-Refer to the User Guide for solutions to common tasks.
-
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
 ## User Guide
 
 The [User Guide](https://github.com/constfun/create-react-WebExtension/blob/master/packages/react-scripts/template/README.md) includes information on different topics, such as:
@@ -182,18 +174,14 @@ The [User Guide](https://github.com/constfun/create-react-WebExtension/blob/mast
 - [Advanced Configuration](https://github.com/constfun/create-react-WebExtension/blob/master/packages/react-scripts/template/README.md#advanced-configuration)
 - [Troubleshooting](https://github.com/constfun/create-react-WebExtension/blob/master/packages/react-scripts/template/README.md#troubleshooting)
 
-A copy of the user guide will be created as `README.md` in your project folder.
-
-## How to Update to New Versions?
-
-Please refer to the [User Guide](https://github.com/constfun/create-react-WebExtension/blob/master/packages/react-scripts/template/README.md#updating-to-new-releases) for this and other information.
+A copy of the user guide will be created as `README.md` file in your project folder.
 
 ## Alternatives
+
+If you don’t agree with the choices made in this project, you might want to explore alternatives with different tradeoffs:
 
 * [mi-g/weh](https://github.com/mi-g/weh)
 * [mozilla/web-ext](https://github.com/mozilla/web-ext)
 * [flybayer/create-react-webextension](https://github.com/flybayer/create-react-webextension)
 
-Happy hacking!
-
-﹎,﹎_﹎:cactus:_﹎﹎:camel:﹎
+﹎,﹎_﹎:cactus:_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:camel:﹎
