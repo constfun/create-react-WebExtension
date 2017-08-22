@@ -11,6 +11,7 @@
     "url": "https://github.com/constfun/create-react-WebExtension/issues"
   },
   "main": "index.js",
+  "typings": "index.d.ts",
   "files": [
     "bin",
     "config",

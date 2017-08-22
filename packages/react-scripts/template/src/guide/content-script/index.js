@@ -9,6 +9,8 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Search from './Search';
+import SearchTypeScript from './SearchTypeScript';
+
 // CSS can be imported, marking it a dependency of this module.
 // These styles will be automatically loaded/unloaded along with the module.
 import './styles.css';
@@ -21,9 +23,10 @@ const Main = () => {
         <h2>Welcome to Create React WebExtension</h2>
         <p>This message and the search bar bellow are displayed by the example extension from <code>src/guide/content-script/index.js</code>.</p>
         <p>This page contains a modified version of the <a href="https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md">Create React App User Guide</a>.</p>
-        <p>For reference, the search bar bellow is reimplemented in all supported programming languages.</p>
+        <p>The search bar bellow is reimplemented in several programming languages for reference.</p>
       </div>
       <Search />
+      <SearchTypeScript />
       {/* <SearchTypeScript />
       <SearchOcaml /> */}
     </div>

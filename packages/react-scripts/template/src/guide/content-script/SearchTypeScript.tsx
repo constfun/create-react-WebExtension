@@ -1,14 +1,22 @@
-import * as React from 'react';
-import PoweredBy from './PoweredBy';
-import { ReadmeSearch } from 'react-scripts-webextension';
+// https://www.typescriptlang.org/docs/handbook/jsx.html
 
-export default class Search extends React.Component {
+// React types are included from @types/react
+import * as React from 'react';
+// react-scripts-webextension include type definitions.
+import { ReadmeSearch } from 'react-scripts-webextension';
+import PoweredBy from './PoweredBy';
+ 
+interface SearchState {
+  query: string;
+}
+
+export default class Search extends React.Component<object, SearchState> {
   constructor() {
     super();
     this.state = { query: '' };
   }
 
-  search = (event) => {
+  search = (event : React.SyntheticEvent<HTMLInputElement>) => {
     this.setState({ query: event.currentTarget.value });
   }
 
@@ -22,7 +30,7 @@ export default class Search extends React.Component {
             value={this.state.query}
             onChange={this.search}
           />
-          <PoweredBy what={`JavaScript ${String.fromCodePoint(0x01F525)}`} />
+          <PoweredBy what={`TypeScript ${String.fromCodePoint(0x01F4A7)}`} />
         </div>
         <ReadmeSearch query={this.state.query} />
       </div>
