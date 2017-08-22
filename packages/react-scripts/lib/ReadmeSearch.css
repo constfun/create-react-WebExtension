@@ -5,3 +5,8 @@
 .ReadmeSearch .result {
     margin-bottom: 16px;
 }
+
+.ReadmeSearch .result a {
+    font-weight: bold;
+    display: block;
+}

@@ -9,63 +9,119 @@ const escapeHTML = function(html) {
     return escapeEl.innerHTML;
 };
 
-function readmeSearch(queryString) {
-  const query = new RegExp(`(${queryString})`, 'i');
-  const firstSection = document.querySelector('#readme > article > h2:nth-of-type(2)')
-  let node = firstSection;
-  let curSection = null;
-  let context = '';
-  let results = [];
-  while (node) {
-    if (node.tagName === 'H2' || node.tagName === 'H3') {
-      if (curSection && context.length) {
-        results.push({
-          heading: curSection.textContent,
-          href: '#' + curSection.firstChild.id,
-          __html: context,
-        });
-      }
+const filterToc = (node) => {
+  return node.innerText === 'Table of Contents';
+};
 
-      curSection = node;
-      context = '';
-    }
-    else {
-      if (context.length < 300) {
-        const text = node.textContent;
-        const contextLen = 100; // chars around the match
-        let match = query.exec(text);
-        if (match !== null) {
-          const matchInContext = match.input.substring(match.index - contextLen, match.index + contextLen);
-          const escaped = escapeHTML(matchInContext);
-          const highlighted = escaped.replace(query, '<mark>$1</mark>');
-          context += ' ... ' + highlighted;
-        }
-      }
-    }
-    node = node.nextElementSibling;
+const rankedSearch = (text, query, numContextChars) => {
+  const fmtQuery = query.trim().replace(/ +/, '|');
+  const reSearch = new RegExp(fmtQuery, 'ig'); 
+  let matchCount = false;
+  let avgIndex = 0;
+  let match;
+  while ((match = reSearch.exec(text)) !== null) {
+    matchCount++; 
+    avgIndex = avgIndex + (match.index - avgIndex) / matchCount;
   }
-  return results;
+  if (matchCount) {
+    const start = Math.max(avgIndex - numContextChars / 2);
+    const end = Math.min(start + numContextChars, text.length);
+    const context = text.substring(start, end);
+    const reMark = new RegExp(`(${fmtQuery})`, 'ig'); 
+    const markedContext = context.replace(reMark, '<mark>$1</mark>')
+    return {
+      rank: matchCount,
+      context: '...' + markedContext + '...',
+    };
+  }
+  else {
+    return null;
+  }
+};
+
+function readmeSearch(sections, queryString, opts = {}) {
+  opts.numContextChars = opts.numContextChars || 300;
+  const results = [];
+  for (let sec of sections) {
+    const res = rankedSearch(sec.text, queryString, opts.numContextChars);
+    if (res) {
+      results.push({
+        heading: sec.name,
+        href: '#' + sec.id,
+        rank: res.rank,
+        __html: res.context,
+      });
+    }
+  }
+  return results.sort((a, b) => b.rank - a.rank);
 }
 
-const ReadmeSearch = (props) => {
-  const el = React.createElement;
-  let resultDivs = [];
-  if (props.query.length > 1) {
-    const results = readmeSearch(props.query);
-    resultDivs = results.map(res => {
-      return (
-        el('div',
-          { key: res.href, className: "result" },
-          [
-            el('a', { href: res.href }, res.heading),
-            el('div', { dangerouslySetInnerHTML: res }, null),
-          ]
-        )
-      );
-    });
+const indexSections = (opts = {}) => {
+  opts.filterFn = opts.filter || filterToc;
+  opts.readmeSelector = opts.readmeSelector || '#readme > article';
+  opts.sectionTagNames = ['H1', 'H2', 'H3', 'H4'];
+  const sections = [];
+  let curNode = document.querySelector(opts.readmeSelector).firstChild;
+  let curSec = null;
+  let curSecText = '';
+  while (curNode) {
+    if (opts.filterFn && opts.filterFn(curNode)) {
+      // Skip to next section.
+      curNode = curNode.nextElementSibling;
+      while (curNode && !opts.sectionTagNames.includes(curNode.tagName)) {
+        curNode = curNode.nextElementSibling;
+      }
+      continue;
+    }
+    if (opts.sectionTagNames.includes(curNode.tagName)) {
+      if (curSec) {
+        sections.push({
+          name: curSec.textContent,
+          id: curSec.firstChild.id,
+          text: curSecText,
+        });
+      }
+      curSec = curNode;
+      curSecText = '';
+    }
+    else {
+      curSecText += escapeHTML(curNode.textContent) + ' ';
+    }
+    curNode = curNode.nextElementSibling;
+  }
+  return sections;
+};
+
+class ReadmeSearch extends React.Component {
+  constructor(props) {
+    super();
+    this.sections = indexSections(props.opts);
   }
 
-  return el('div', { className: ReadmeSearch }, resultDivs);
-};
+  render() {
+    const el = React.createElement;
+    let resultDivs = [];
+    if (this.props.query.length > 1) {
+      const results = readmeSearch(
+        this.sections,
+        this.props.query,
+        this.props.opts
+      ).slice(0, 10);
+      resultDivs = results.map(res => {
+        return (
+          el('div',
+            { key: res.href, className: "result" },
+            [
+              el('a', { href: res.href }, res.heading),
+              el('div', { dangerouslySetInnerHTML: res }, null),
+            ]
+          )
+        );
+      });
+    }
+
+    return el('div', { className: 'ReadmeSearch' }, resultDivs);
+  }
+}
 
 module.exports = ReadmeSearch;
