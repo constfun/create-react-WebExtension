@@ -80,7 +80,7 @@ const injectFeature = function(feature, onSuccess) {
 const features = [
   {
     name: 'TypeScript',
-    include: ['tsconfig.json', 'tslint.json', 'src/typescript-example/*'],
+    include: ['tsconfig.json', 'tslint.json', 'src/guide/content-script/SearchTypeScript.ts'],
     dependencies: [
       '@types/node',
       '@types/react',
@@ -106,7 +106,7 @@ const features = [
   },
   {
     name: 'Ocaml',
-    include: ['bsconfig.json', 'src/ocaml-example/*'],
+    include: ['bsconfig.json', 'src/guide/content-script/SearchOcaml.ml'],
     dependencies: require(path.join(paths.ownPath, 'template/bsconfig.json'))[
       'bs-dependencies'
     ],
