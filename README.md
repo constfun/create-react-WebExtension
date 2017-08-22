@@ -64,20 +64,23 @@ Once installed in your browser, the example extension navigates to the [latest v
 The directory structure of a newly generated project looks like this:
 ```
 .
-|– package.json
-|– README.md         # The User Guide.
-|– public            # Contents of this folder are copied as is into the build.
-|  |– manifest.json  # The all important manifest file for your extension.
-|  |– icon-48.png       
-|  |– js
-|     |– browser-polyfill.js  # Polyfills Chrome with newer APIs, optional.
-|– src
-   |– index.js       # Entry point for the build/js/index.js bundle.
-   |– guide              
-      |– _bundle     # Tells us to bundle the code in this directory separately.
-      |– index.js    # The entry point for the resulting build/js/guide.js bundle.
-      |– index.css   # Imported from and hence is bundled with index.js.
-      ...
+├── README.md
+├── package.json
+├── public
+│   ├── icon-128.png
+│   ├── icon-16.png
+│   └── manifest.json
+└── src
+    └── guide
+        ├── background-script
+        │   ├── _bundle
+        │   └── index.js
+        └── content-script
+            ├── _bundle
+            ├── index.js
+            ├── Search.js
+            ├── PoweredBy.js
+            └── styles.css
 ```
 
 ## List of Commands
