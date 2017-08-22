@@ -16,7 +16,7 @@ const filterToc = (node) => {
 const rankedSearch = (text, query, numContextChars) => {
   const fmtQuery = query.trim().replace(/ +/, '|');
   const reSearch = new RegExp(fmtQuery, 'ig'); 
-  let matchCount = false;
+  let matchCount = 0;
   let avgIndex = 0;
   let match;
   while ((match = reSearch.exec(text)) !== null) {

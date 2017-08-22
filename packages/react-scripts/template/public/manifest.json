@@ -1,35 +1,32 @@
 {
   "manifest_version": 2,
   "name": "Create React WebExtension",
-  "author": "Unknown",
   "version": "0.0.1",
+  "author": "Unknown",
   "icons": {
-    "16": "icon-16.png",
-    "48": "icon-48.png",
-    "96": "icon-96.png",
     "128": "icon-128.png"
   },
-  "content_scripts": [
-    {
-      "matches": ["https://github.com/constfun/*.md"],
-      "js": ["js/welcome.js"]
-    }
-  ],
   "background": {
     "scripts": [
-      "js/user-guide-helper.js"
+      "js/guide-background-script.js"
     ],
     "persistent": true
   },
-  "web_accessible_resources": [
-    "media/*"
-  ],
-  "permissions": [
-    "<all_urls>",
-    "activeTab"
+  "content_scripts": [
+    {
+      "matches": [
+        "https://github.com/constfun/*.md"
+      ],
+      "js": [
+        "js/guide-content-script.js"
+      ]
+    }
   ],
   "browser_action": {
     "default_icon": "icon-16.png",
     "default_title": "Open the Create React WebExtension User Guide"
-  }
+  },
+  "web_accessible_resources": [
+    "media/*"
+  ]
 }

@@ -73,7 +73,6 @@ module.exports = function(
     );
     fs.copySync(templatePath, appPath, {
       filter: path => {
-        console.log(path, skippedFiles);
         return skippedFiles.indexOf(path) === -1;
       },
     });

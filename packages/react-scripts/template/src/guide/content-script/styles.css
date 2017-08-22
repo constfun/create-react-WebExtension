@@ -1,0 +1,40 @@
+.Main {
+    /* https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_variables */
+    --gh-padding: 45px;
+    --gh-border: 1px solid #e1e4e8;
+}
+
+.Main .welcome-message {
+    padding: 10px var(--gh-padding);
+    background-color: yellow;
+}
+ 
+.Main h2 {
+    margin-bottom: 16px;
+}
+
+.Search .bar {
+    /* CSS vendor prefixes are added automatically. */
+    display: flex;
+    justify-content: space-between;
+    padding: 5px var(--gh-padding);
+    border: var(--gh-border);
+    border-width: 1px 0;
+    background-color: #fafbfc;
+}
+
+.Search input {
+    width: 35%;
+    padding: 0 8px;
+    border-radius: 3px;
+    border: var(--gh-border);
+}
+
+.PoweredBy {
+    display: flex;
+    align-items: center;
+}
+
+.PoweredBy span {
+    font-size: 24px;
+}

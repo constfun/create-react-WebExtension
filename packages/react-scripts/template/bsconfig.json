@@ -1,5 +1,4 @@
 {
-    "name": "hello",
     "sources": {
         "dir": "src/ocaml-example-"
     },
