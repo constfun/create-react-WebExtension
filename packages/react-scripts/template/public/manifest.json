@@ -24,7 +24,8 @@
   ],
   "browser_action": {
     "default_icon": "icon-16.png",
-    "default_title": "Open the Create React WebExtension User Guide"
+    "default_title": "Open the Create React WebExtension User Guide",
+    "default_popup": "guide-popup.html"
   },
   "web_accessible_resources": [
     "media/*"

@@ -1,0 +1,7 @@
+.Popup {
+    white-space: nowrap;
+}
+
+.Popup:hover {
+    cursor: pointer;
+}

@@ -208,6 +208,7 @@ module.exports = (bundles, opts = {}) => {
         // In production, they would get copied to the `build` folder.
         {
           exclude: [
+            /\.html$/,
             /\.(js|jsx)$/,
             /\.(ts|tsx)$/,
             /\.css$/,

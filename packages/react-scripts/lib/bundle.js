@@ -8,7 +8,7 @@ const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 
 const existsOrNull = path => fs.existsSync(path) ? path : null;
 
-const validIndexExts = ['ml', 'tsx', 'ts', 're', 'jsx', 'js']
+const validIndexExts = ['tsx', 'ts', 'jsx', 'js']
 const findIndexFile = bundlePath => {
   return (
     // From best option to only option.

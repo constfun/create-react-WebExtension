@@ -1,5 +1,5 @@
 /*
-  This script is bundled into the build/js/guide-content-script.js file because:
+  This script is bundled into the js/guide-content-script.js file because:
       - There is an empty _bundle file in this directory.
       - The current file is named 'index.js' making it the entry point for the bundle.
       - The bundle path becomes the bundle name.
