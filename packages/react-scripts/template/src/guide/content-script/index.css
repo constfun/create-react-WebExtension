@@ -1,0 +1,14 @@
+.Main:before {
+    position: absolute;
+    right: 0;
+    content: '.js \01F525';
+}
+
+.Main .message {
+    padding: 10px 45px;
+    background-color: yellow;
+}
+
+.Main h2 {
+    margin-bottom: 16px;
+}

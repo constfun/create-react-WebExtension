@@ -1,0 +1,21 @@
+.Search:before {
+    position: absolute;
+    right: 0;
+    content: '.ts \01F4A7';
+}
+
+.Search .bar {
+    padding: 5px 45px;
+    border-color: #e1e4e8;
+    border-style: solid;
+    border-width: 1px 0;
+    background-color: #fafbfc;
+}
+
+.Search input {
+    width: 35%;
+    padding: 0 8px;
+    border: inherit;
+    border-width: 1px;
+    border-radius: 3px;
+}

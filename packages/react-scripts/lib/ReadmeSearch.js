@@ -16,19 +16,19 @@ const filterToc = (node) => {
 
 const rankedSearch = (text, query, numContextChars) => {
   const fmtQuery = query.trim().replace(/ +/, '|');
-  const reSearch = new RegExp(fmtQuery, 'ig'); 
+  const reSearch = new RegExp(fmtQuery, 'ig');
   let matchCount = 0;
   let avgIndex = 0;
   let match;
   while ((match = reSearch.exec(text)) !== null) {
-    matchCount++; 
+    matchCount++;
     avgIndex = avgIndex + (match.index - avgIndex) / matchCount;
   }
   if (matchCount) {
     const start = Math.max(avgIndex - numContextChars / 2);
     const end = Math.min(start + numContextChars, text.length);
     const context = text.substring(start, end);
-    const reMark = new RegExp(`(${fmtQuery})`, 'ig'); 
+    const reMark = new RegExp(`(${fmtQuery})`, 'ig');
     const markedContext = context.replace(reMark, '<mark>$1</mark>')
     return {
       rank: matchCount,
@@ -112,10 +112,8 @@ class ReadmeSearch extends React.Component {
         return (
           el('div',
             { key: res.href, className: "result" },
-            [
-              el('a', { href: res.href }, res.heading),
-              el('div', { dangerouslySetInnerHTML: res }, null),
-            ]
+            el('a', { href: res.href }, res.heading),
+            el('div', { dangerouslySetInnerHTML: res }, null)
           )
         );
       });

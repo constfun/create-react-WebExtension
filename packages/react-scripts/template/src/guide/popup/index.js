@@ -6,9 +6,11 @@
         guide/popup -> guide-popup.js
 */
 
+import 'chrome-browser-object-polyfill';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './Popup.css';
+
 
 const Popup = () => {
   const openTheUserGuide = () => {

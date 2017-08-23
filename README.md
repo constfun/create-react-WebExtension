@@ -55,9 +55,11 @@ yarn start
 
 Follow the instructions on the screen to install the extension in your browser:
 
-![yarn start](images/compiled.png)
+![Screenshot of terminal on yarn start](images/compiled.png)
 
 Once installed in your browser, the example extension navigates to the [latest version of the User Guide](https://github.com/constfun/create-react-WebExtension/blob/master/packages/react-scripts/template/README.md) and injects itself as a [content script](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Content_scripts) on that page.
+
+![Screenshot of browser when installed](images/installed.png)
 
 ## Directory Structure
 
