@@ -10,6 +10,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Search from './Search';
 import SearchTypeScript from './SearchTypeScript';
+import SearchReason from './SearchReason';
 
 // CSS can be imported, marking it a dependency of this module.
 // These styles will be automatically loaded/unloaded along with the module.

@@ -1,6 +1,7 @@
 {
     "sources": [
-        "src/guide/SearchOcaml.ml"
+        "src/guide/content-script/SearchOcaml.ml",
+        "src/guide/content-script/SearchReason.re"
     ],
     "bs-dependencies": [
         "reason-react"

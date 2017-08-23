@@ -27,8 +27,7 @@ const bsbSourceDirs = bsbSources => {
     return [bsbSources];
   } else if (Array.isArray(bsbSources)) {
     return bsbSources.reduce((acc, item) =>
-      acc.concat(bsbSourceDirs(item), [])
-    );
+      acc.concat(bsbSourceDirs(item)), []);
   } else if (bsbSources === undefined) {
     return [];
   } else {
