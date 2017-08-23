@@ -28,12 +28,12 @@ const path = require('path');
 const chalk = require('chalk');
 const fs = require('fs-extra');
 const webpack = require('webpack');
-const makeProdConfig = require('../config/webpack.config.prod');
+const makeConfig = require('../config/webpack.config');
 const paths = require('../config/paths');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const printHostingInstructions = require('react-dev-utils/printHostingInstructions');
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
-const { setupBuild } = require('./utils/setup');
+const { setupBuild } = require('../lib/setup');
 
 const measureFileSizesBeforeBuild =
   FileSizeReporter.measureFileSizesBeforeBuild;
@@ -96,10 +96,13 @@ measureFileSizesBeforeBuild(paths.appBuild).then(build).then(
 
 // Create the production build and print the deployment instructions.
 function build(previousFileSizes) {
-  console.log('Creating an optimized production build...');
+  console.log('Creating a production build...');
 
   const bundles = setupBuild(paths);
-  const config = makeProdConfig(bundles);
+  const config = makeConfig(bundles, {
+    outputPath: paths.appBuild,
+    sourceMaps: 'source-map',
+  });
   const compiler = webpack(config);
   return new Promise((resolve, reject) => {
     compiler.run((err, stats) => {

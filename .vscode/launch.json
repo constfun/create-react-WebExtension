@@ -7,8 +7,15 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "yarn run start",
+            "name": "yarn start",
             "program": "${workspaceRoot}/packages/react-scripts/scripts/start.js",
+            "cwd": "${workspaceRoot}/packages/react-scripts"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "yarn build",
+            "program": "${workspaceRoot}/packages/react-scripts/scripts/build.js",
             "cwd": "${workspaceRoot}/packages/react-scripts"
         }
     ]

@@ -48,18 +48,19 @@ function getServedPath(appPackageJson) {
   return ensureSlash(servedUrl, true);
 }
 
+const buildPath = process.env.NODE_ENV === 'production' ?
+  'build/prod' : 'build/dev';
+
 // config after eject: we're in ./config/
 module.exports = {
   dotenv: resolveApp('.env'),
-  appBuild: resolveApp('build'),
+  appBuild: resolveApp(buildPath),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('src/index.html'),
   appManifest: resolveApp('public/manifest.json'),
   appIndexJs: resolveApp('src/index.js'),
   appPackageJson: resolveApp('package.json'),
-  appBsconfig: resolveApp('bsconfig.json'),
   appTsconfig: resolveApp('tsconfig.json'),
-  bsbOutputPath: resolveApp('.bsb'),
   appSrc: resolveApp('src'),
   yarnLockFile: resolveApp('yarn.lock'),
   testsSetup: resolveApp('src/setupTests.js'),
@@ -75,15 +76,13 @@ const resolveOwn = relativePath => path.resolve(__dirname, '..', relativePath);
 module.exports = {
   dotenv: resolveApp('.env'),
   appPath: resolveApp('.'),
-  appBuild: resolveApp('build'),
+  appBuild: resolveApp(buildPath),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('src/index.html'),
   appManifest: resolveApp('public/manifest.json'),
   appIndexJs: resolveApp('src/index.js'),
   appPackageJson: resolveApp('package.json'),
-  appBsconfig: resolveApp('bsconfig.json'),
   appTsconfig: resolveApp('tsconfig.json'),
-  bsbOutputPath: resolveApp('.bsb'),
   appSrc: resolveApp('src'),
   yarnLockFile: resolveApp('yarn.lock'),
   testsSetup: resolveApp('src/setupTests.js'),
@@ -112,15 +111,13 @@ if (
   module.exports = {
     dotenv: resolveOwn('template/.env'),
     appPath: resolveApp('.'),
-    appBuild: resolveOwn('../../build'),
+    appBuild: resolveOwn(`../../${buildPath}`),
     appPublic: resolveOwn('template/public'),
     appHtml: resolveOwn('template/src/index.html'),
     appManifest: resolveOwn('template/public/manifest.json'),
     appIndexJs: resolveOwn('template/src/index.js'),
     appPackageJson: resolveOwn('package.json'),
-    appBsconfig: resolveOwn('template/bsconfig.json'),
     appTsconfig: resolveOwn('template/tsconfig.json'),
-    bsbOutputPath: resolveOwn('.bsb'),
     appSrc: resolveOwn('template/src'),
     yarnLockFile: resolveOwn('template/yarn.lock'),
     testsSetup: resolveOwn('template/src/setupTests.js'),

@@ -8,8 +8,6 @@
 
 # production
 /build
-# BuckleScript always builds to this dir
-/lib
 
 # misc
 .DS_Store

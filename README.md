@@ -18,7 +18,7 @@ The latest version of Create React WebExtension (CRWX) is in sync with [create-r
 - Get started immediately, no need to install or configure tools like Webpack or Babel.<br>
 They are preconfigured and hidden so that you can focus on the code.
 - Live reload of JavaScript and CSS as you work on your extension. Works seamlessly in Chrome, Firefox, and Opera, even on pages protected by HTTPS and Content Security Policy.
-- You can use TypeScript, Ocaml, ReasonML, or JavaScript and import modules between them.
+- You can use TypeScript or JavaScript and import modules between them.
 - At any time, you can "eject" Create React WebExtension from your project to relinquish full control over the webpack configuration.
 
 ## Limitations

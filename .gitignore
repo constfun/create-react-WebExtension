@@ -2,8 +2,6 @@
 /node_modules/
 /*/*/node_modules
 build
-.merlin
-/packages/react-scripts/lib
 .DS_Store
 *.tgz
 *.pem

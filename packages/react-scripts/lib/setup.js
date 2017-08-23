@@ -42,6 +42,7 @@ const setupHotUpdateSupport = (appPaths) => {
   // make sure we don't get a cached version.
   delete require.cache[require.resolve(appPaths.appManifest)];
   let manifest = require(appPaths.appManifest);
+  manifest.name += ' (Dev Build)';
   manifest = injectBackgroundScript(manifest, bgScriptRelPath);
   manifest = injectHotUpdateHostPermission(manifest);
   fs.writeFileSync(manifestInBuild, JSON.stringify(manifest, null, 2));
