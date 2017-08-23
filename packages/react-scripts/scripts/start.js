@@ -36,9 +36,9 @@ const {
 } = require('react-dev-utils/WebpackDevServerUtils');
 const paths = require('../config/paths');
 const makeDevConfig = require('../config/webpack.config.dev');
-const makeHotUpdateServer = require('../lib/hot-update/server');
-const { setupBuild, processPublicFolder } = require('../lib/setup');
-const { withInstructions, printCompilationStats } = require('../lib/format');
+const makeHotUpdateServer = require('../hot-update/server');
+const { setupBuild, processPublicFolder } = require('./utils/setup');
+const { withInstructions, printCompilationStats } = require('./utils/format');
 
 const isInteractive = process.stdout.isTTY;
 const useYarn = fs.existsSync(paths.yarnLockFile);

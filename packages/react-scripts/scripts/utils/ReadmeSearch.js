@@ -1,3 +1,4 @@
+// @remove-file-on-eject
 'use strict';
 
 const React = require('react');

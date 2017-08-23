@@ -1,7 +1,7 @@
 {
     "name": "crwx",
     "sources": {
-        "dir": "src/guide",
+        "dir": "template/src/guide",
         "subdirs": ["content-script"]
     },
     "bs-dependencies": [

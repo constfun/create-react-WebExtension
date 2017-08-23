@@ -33,7 +33,7 @@ const paths = require('../config/paths');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const printHostingInstructions = require('react-dev-utils/printHostingInstructions');
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
-const { setupBuild } = require('../lib/setup');
+const { setupBuild } = require('./utils/setup');
 
 const measureFileSizesBeforeBuild =
   FileSizeReporter.measureFileSizesBeforeBuild;

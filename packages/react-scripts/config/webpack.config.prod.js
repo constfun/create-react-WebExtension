@@ -238,7 +238,7 @@ module.exports = bundles => {
           include: paths.appSrc,
           use: [
             {
-              loader: require.resolve('../lib/filter-loader'),
+              loader: require.resolve('./filter-loader'),
               options: {
                 filterFn: () => fs.existsSync(paths.appTsconfig),
                 failMessage: `tsconfig.json was not found in ${paths.appTsconfig}`,
@@ -253,11 +253,7 @@ module.exports = bundles => {
         {
           test: /\.(re|ml)$/,
           include: paths.appSrc,
-          loader: require.resolve('../lib/bs-loader'),
-          options: {
-            bsconfig: paths.appBsconfig,
-            bsbOutputPath: paths.bsbOutputPath,
-          },
+          loader: require.resolve('bs-loader'),
         },
         // The notation here is somewhat confusing.
         // "postcss" loader applies autoprefixer to our CSS.

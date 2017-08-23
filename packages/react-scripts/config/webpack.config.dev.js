@@ -20,7 +20,7 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
-const JsonpTemplateReplacePlugin = require('../lib/hot-update/JsonpTemplateReplacePlugin');
+const JsonpTemplateReplacePlugin = require('../hot-update/JsonpTemplateReplacePlugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 
@@ -39,7 +39,7 @@ module.exports = (bundles, hotUpdateUrl) => {
   // We also compile the hot update background script as a separate entry.
   const entry = {
     'hot-update-background-script': [
-      require.resolve('../lib/hot-update/background-script'),
+      require.resolve('../hot-update/background-script'),
     ],
   };
   bundles
@@ -51,7 +51,7 @@ module.exports = (bundles, hotUpdateUrl) => {
         // When you save a file, the client will hot load CSS or reload the extension in case of JS changes.
         // We need to know the absolute url of the server since we can't use window.location to infer
         // it. The client is running in a sandboxed script where window.location is random.
-        require.resolve('../lib/hot-update/client'),
+        require.resolve('../hot-update/client'),
         // We ship a few polyfills by default:
         require.resolve('./polyfills'),
         // Finally, this is your app's code:
@@ -254,7 +254,7 @@ module.exports = (bundles, hotUpdateUrl) => {
           include: paths.appSrc,
           use: [
             {
-              loader: require.resolve('../lib/filter-loader'),
+              loader: require.resolve('./filter-loader'),
               options: {
                 filterFn: () => fs.existsSync(paths.appTsconfig),
                 failMessage: `tsconfig.json was not found in ${paths.appTsconfig}`,
@@ -269,11 +269,7 @@ module.exports = (bundles, hotUpdateUrl) => {
         {
           test: /\.(re|ml)$/,
           include: paths.appSrc,
-          loader: require.resolve('../lib/bs-loader'),
-          options: {
-            bsconfig: paths.appBsconfig,
-            bsbOutputPath: paths.bsbOutputPath,
-          },
+          loader: require.resolve('bs-loader'),
         },
         // "postcss" loader applies autoprefixer to our CSS.
         // "css" loader resolves paths in CSS and adds assets as dependencies.

@@ -3,7 +3,7 @@
 /*/*/node_modules
 build
 .merlin
-.bsb
+/packages/react-scripts/lib
 .DS_Store
 *.tgz
 *.pem
