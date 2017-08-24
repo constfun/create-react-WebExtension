@@ -18,13 +18,13 @@ const printInstructions = useYarn => {
   console.log('    * Visit about:debugging');
   console.log('    * Check Enable add-on debugging');
   console.log('    * Click Load Temporary Add-on');
-  console.log('    * Select the build/manifest.json file');
+  console.log('    * Select the build/dev/manifest.json file');
   console.log();
   console.log('For Chrome and Opera:');
   console.log('    * Visit chrome://extensions or opera://extensions');
   console.log('    * Enable Developer Mode');
   console.log('    * Click Load unpacked extension');
-  console.log('    * Select the build/ directory');
+  console.log('    * Select the build/dev directory');
   console.log();
   console.log('For Edge:');
   console.log('    https://docs.microsoft.com/en-us/microsoft-edge/extensions/guides/adding-and-removing-extensions');
