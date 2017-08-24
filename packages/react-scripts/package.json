@@ -17,7 +17,8 @@
     "config",
     "scripts",
     "template",
-    "lib"
+    "lib",
+    "index.d.ts"
   ],
   "bin": {
     "react-scripts-web-ext": "./bin/react-scripts-webextension.js"
