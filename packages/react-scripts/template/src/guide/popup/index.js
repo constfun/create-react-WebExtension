@@ -9,7 +9,7 @@
 import 'chrome-browser-object-polyfill';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import './Popup.css';
+import './index.css';
 
 
 const Popup = () => {

@@ -68,6 +68,7 @@ The directory structure of a newly generated project looks like this:
 .
 ├── README.md
 ├── package.json
+├── tsconfig.json
 ├── public
 │   ├── icon-128.png
 │   ├── icon-16.png
@@ -77,12 +78,17 @@ The directory structure of a newly generated project looks like this:
         ├── background-script
         │   ├── _bundle
         │   └── index.js
-        └── content-script
+        ├── content-script
+        │   ├── _bundle
+        │   ├── Search.css
+        │   ├── Search.tsx
+        │   ├── index.css
+        │   └── index.js
+        └── popup
             ├── _bundle
-            ├── index.js
-            ├── Search.js
-            ├── PoweredBy.js
-            └── styles.css
+            ├── index.html
+            ├── index.css
+            └── index.js
 ```
 
 ## Starting from a Clean Slate
