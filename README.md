@@ -23,9 +23,9 @@ They are preconfigured and hidden so that you can focus on the code.
 
 ## Limitations
 
-- Although based on a mature project, this is a new project that introduces significant changes. You'd be an early adopter.
+- This is a new project. You'd be an early adopter.
 - The User Guide is 90% relevant, but hasn't been updated yet. This project is mostly a super set of CRA features.
-- No Windows support.
+- Not tested on Windows.
 - The example extension works in all major browsers. However, CRWX does not automatically make your extension code cross platform. To target multiple browsers you have to take care to use [polyfills](https://github.com/mozilla/webextension-polyfill) and to not use incompatible properties in the `manifest.json` file. 
 - CRWX will create a production build, ready for packaging. However, the packaging process itself varries significantly between browsers and is considered out of scope for this project.
 
