@@ -1,16 +1,7 @@
-/*
-  This script is bundled into the js/guide-popup.js file because:
-      - There is an empty _bundle file in this directory.
-      - The current file is named 'index.js' making it the entry point for the bundle.
-      - The bundle path becomes the bundle name.
-        guide/popup -> guide-popup.js
-*/
-
 import 'chrome-browser-object-polyfill';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './index.css';
-
 
 const Popup = () => {
   const openTheUserGuide = () => {

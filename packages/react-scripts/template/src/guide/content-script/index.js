@@ -1,11 +1,3 @@
-/*
-  This script is bundled into the js/guide-content-script.js file because:
-      - There is an empty _bundle file in this directory.
-      - The current file is named 'index.js' making it the entry point for the bundle.
-      - The bundle path becomes the bundle name.
-        guide/content-script -> guide-content-script.js
-*/
-
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './index.css';
@@ -31,7 +23,6 @@ const Main = () => {
   );
 };
 
-// Insert our Main component at the top of the README.md document on GitHub.
 const ourContainer = document.createElement('div');
 const readme = document.getElementById('readme');
 const article = readme.querySelector('article');
