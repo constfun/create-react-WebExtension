@@ -11,7 +11,7 @@ WebExtension API is the widely adopted system for extending and modifying the ca
 
 **This project is a fork of the excellent [Create React App (CRA)](https://github.com/facebookincubator/create-react-app) project.**
 
-The latest version of Create React WebExtension (CRWX) is in sync with [create-react-app#v1.0.10](https://github.com/facebookincubator/create-react-app/tree/v1.0.10).<br>
+The latest version of Create React WebExtension (CRWX) is based on [create-react-app#v1.0.10](https://github.com/facebookincubator/create-react-app/tree/v1.0.10).<br>
 
 ## Highlights
 
