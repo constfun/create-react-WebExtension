@@ -14,8 +14,8 @@ const Main = () => {
           &nbsp;Create React App User Guide</a>.
         </p>
         <p>
-          This message and the search bar bellow are displayed by the
-          example extension from <code>src/guide/content-script/index.js</code>
+          This message and the search bar bellow are part of the <strong>example extension</strong>.<br/>
+          To start from a clean slate, delete everything from the <code>src</code> and <code>public</code> directories.
         </p>
       </div>
       <Search />
