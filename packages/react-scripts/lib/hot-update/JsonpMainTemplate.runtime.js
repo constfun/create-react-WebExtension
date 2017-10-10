@@ -10,7 +10,9 @@ module.exports = function () {
         }
     } //$semicolon
 
-    const IS_BACKGROUND_SCRIPT = !!browser.extension.getBackgroundPage;
+    const IS_BACKGROUND_SCRIPT =
+        (chrome && chrome.extension.getBackgroundPage) ||
+        (browser && browser.extension.getBackgroundPage);
 
     // Polyfill chrome.runtime.sendMessage to return a promise.
     const browserRuntimeSendMessage = (message) => {

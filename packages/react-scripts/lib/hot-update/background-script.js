@@ -1,8 +1,7 @@
 // WARNING! In development, this script is automatically added as a "background script" in manifest.json.
-/* global browser */
 'use strict';
 
-require('chrome-browser-object-polyfill');
+let browser = require('./browser-polyfill');
 
 let connectionFailureHasBeenReported = false;
 let devServerRestarted = false;

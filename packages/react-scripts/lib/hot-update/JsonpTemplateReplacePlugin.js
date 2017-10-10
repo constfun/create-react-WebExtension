@@ -76,9 +76,6 @@ module.exports = class JsonpTemplateReplacePlugin {
         const hotUpdateRootUrl = `${protocol}//${host}/`;
         const currentHotUpdateManifestUrl =
           '"' + hotUpdateRootUrl + currentHotUpdateMainFilename.substr(1);
-        const browserPolyfillSource = Template.getFunctionContent(
-          require('chrome-browser-object-polyfill/dist/libs/polyfill')
-        );
         const runtimeSource = Template.getFunctionContent(
           require('./JsonpMainTemplate.runtime.js')
         )
@@ -87,7 +84,6 @@ module.exports = class JsonpTemplateReplacePlugin {
           .replace(/\$hotChunkFilename\$/g, currentHotUpdateChunkFilename)
           .replace(/\$hash\$/g, JSON.stringify(hash));
         return `
-${browserPolyfillSource}
 function hotDisposeChunk(chunkId) {
     delete installedChunks[chunkId];
 }
