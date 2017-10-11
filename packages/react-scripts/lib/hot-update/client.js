@@ -1,7 +1,7 @@
 /* global __webpack_require__ */
 'use strict';
 
-let browser = require('./browser-polyfill');
+let {browser, browserRuntimeSendMessage} = require('./browser-polyfill');
 
 const IS_BACKGROUND_SCRIPT = !!browser.extension.getBackgroundPage;
 const __COMPILATION_HASH__ = __webpack_require__.h();
@@ -57,7 +57,7 @@ else {
   };
 
   const reloadExtension = () => {
-    browser.runtime.sendMessage({ action: 'reload-extension' });
+    browserRuntimeSendMessage({ action: 'reload-extension' });
   };
 
   const port = browser.runtime.connect({ name: 'hot-update-port' });
