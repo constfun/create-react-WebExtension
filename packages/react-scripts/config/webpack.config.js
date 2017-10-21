@@ -230,7 +230,7 @@ module.exports = (bundles, opts = {}) => {
           test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
           loader: require.resolve('url-loader'),
           options: {
-            limit: 10000,
+            limit: 0,
             name: 'media/[name].[hash:8].[ext]',
           },
         },
