@@ -11,7 +11,7 @@ try {
 
 // Polyfill chrome.runtime.sendMessage to return a promise.
 const browserRuntimeSendMessage = (message) => {
-    if (chrome) {
+    if (/Chrome/.test(navigator.userAgent)) {
         return new Promise((resolve, reject) => {
             chrome.runtime.sendMessage(message, resp => {
                 if (!resp) {

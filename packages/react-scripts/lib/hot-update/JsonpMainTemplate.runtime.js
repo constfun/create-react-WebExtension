@@ -14,9 +14,13 @@ module.exports = function () {
         (chrome && !!chrome.extension.getBackgroundPage) ||
         (browser && !!browser.extension.getBackgroundPage);
 
+    const IS_EXTENSION_URL =
+        /^moz-extension:/.test(window.location.href) ||
+        /^chrome-extension:/.test(window.location.href);
+
     // Polyfill chrome.runtime.sendMessage to return a promise.
     const browserRuntimeSendMessage = (message) => {
-        if (window.chrome) {
+        if (/Chrome/.test(navigator.userAgent)) {
             return new Promise((resolve, reject) => {
                 chrome.runtime.sendMessage(message, resp => {
                     if (!resp) {
@@ -33,9 +37,11 @@ module.exports = function () {
 
     // eslint-disable-next-line no-unused-vars
     function hotDownloadUpdateChunk(chunkId) {
-        if (IS_BACKGROUND_SCRIPT) {
+        if (IS_BACKGROUND_SCRIPT || IS_EXTENSION_URL) {
             // Background scripts are runing in the same context as the background page,
             // so we can execute a script by simply injecting a script tag.
+            // Frames can be loaded from extension urls, even though they are content scripts,
+            // so such frames and also simple inject a script tag.
             var head = document.getElementsByTagName('head')[0];
             var script = document.createElement('script');
             script.type = 'text/javascript';

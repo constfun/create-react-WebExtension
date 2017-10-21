@@ -81,7 +81,7 @@ browser.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
   if (message.action === 'execute-script') {
     // Install script, on behalf of the sending content script.
-    browser.tabs.executeScript(sender.tab.id, { file: message.file });
+    browser.tabs.executeScript(sender.tab.id, { file: message.file, frameId: sender.frameId });
   }
   else if (message.action === 'reload-extension') {
     reloadExtension();
