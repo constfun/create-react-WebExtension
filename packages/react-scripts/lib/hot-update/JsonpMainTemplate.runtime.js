@@ -10,9 +10,10 @@ module.exports = function () {
         }
     } //$semicolon
 
+    const IS_CHROME = /Chrome/.test(navigator.userAgent);
     const IS_BACKGROUND_SCRIPT =
-        (chrome && !!chrome.extension.getBackgroundPage) ||
-        (browser && !!browser.extension.getBackgroundPage);
+        (IS_CHROME && !!chrome.extension.getBackgroundPage) ||
+        !!browser.extension.getBackgroundPage;
 
     const IS_EXTENSION_URL =
         /^moz-extension:/.test(window.location.href) ||
@@ -20,7 +21,7 @@ module.exports = function () {
 
     // Polyfill chrome.runtime.sendMessage to return a promise.
     const browserRuntimeSendMessage = (message) => {
-        if (/Chrome/.test(navigator.userAgent)) {
+        if (IS_CHROME) {
             return new Promise((resolve, reject) => {
                 chrome.runtime.sendMessage(message, resp => {
                     if (!resp) {
