@@ -1,6 +1,6 @@
 {
   "name": "react-scripts-webextension",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "Configuration and scripts for Create React WebExtension.",
   "repository": "constfun/create-react-WebExtension",
   "license": "BSD-3-Clause",
