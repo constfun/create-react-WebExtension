@@ -2,15 +2,19 @@ import * as React from 'react';
 import { ReadmeSearch } from 'react-scripts-webextension';
 import './Search.css';
 
+interface SearchProps {
+  initialQuery?: string;
+}
+
 interface SearchState {
   query: string;
 }
 
-export default class Search extends React.Component<object, SearchState> {
-  constructor() {
-    super();
+export default class Search extends React.Component<SearchProps, SearchState> {
+  constructor(props: SearchProps) {
+    super(props);
     this.state = {
-      query: ''
+      query: props.initialQuery ? props.initialQuery : '',
     };
   }
 
