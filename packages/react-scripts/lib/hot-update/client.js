@@ -3,7 +3,7 @@
 
 let {browser, browserRuntimeSendMessage} = require('./browser-polyfill');
 
-const IS_BACKGROUND_SCRIPT = !!browser.extension.getBackgroundPage;
+const IS_BACKGROUND_SCRIPT = !!browser.runtime.getBackgroundPage;
 const __COMPILATION_HASH__ = __webpack_require__.h();
 
 const stripAnsi = require('strip-ansi');

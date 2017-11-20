@@ -10,18 +10,20 @@ module.exports = function () {
         }
     } //$semicolon
 
-    const IS_CHROME = /Chrome/.test(navigator.userAgent);
-    const IS_BACKGROUND_SCRIPT =
-        (IS_CHROME && !!chrome.extension.getBackgroundPage) ||
-        !!browser.extension.getBackgroundPage;
+    const isChrome = () => {
+        return /Chrome/.test(navigator.userAgent);
+    }
 
-    const IS_EXTENSION_URL =
-        /^moz-extension:/.test(window.location.href) ||
-        /^chrome-extension:/.test(window.location.href);
+    const isExtensionUrl = () => {
+        return (
+            /^moz-extension:/.test(window.location.href) ||
+            /^chrome-extension:/.test(window.location.href)
+        );
+    }
 
     // Polyfill chrome.runtime.sendMessage to return a promise.
     const browserRuntimeSendMessage = (message) => {
-        if (IS_CHROME) {
+        if (isChrome()) {
             return new Promise((resolve, reject) => {
                 chrome.runtime.sendMessage(message, resp => {
                     if (!resp) {
@@ -38,11 +40,10 @@ module.exports = function () {
 
     // eslint-disable-next-line no-unused-vars
     function hotDownloadUpdateChunk(chunkId) {
-        if (IS_BACKGROUND_SCRIPT || IS_EXTENSION_URL) {
+        if (isExtensionUrl()) {
             // Background scripts are runing in the same context as the background page,
             // so we can execute a script by simply injecting a script tag.
-            // Frames can be loaded from extension urls, even though they are content scripts,
-            // so such frames and also simple inject a script tag.
+            // Frames can be loaded from extension urls and can also simply inject a script tag.
             var head = document.getElementsByTagName('head')[0];
             var script = document.createElement('script');
             script.type = 'text/javascript';
@@ -71,8 +72,8 @@ module.exports = function () {
 
     // eslint-disable-next-line no-unused-vars
     function hotDownloadManifest() {
-        if (IS_BACKGROUND_SCRIPT) {
-            // Background scripts can download the manifest directly.
+        if (isExtensionUrl()) {
+            // Background, popup, and option scripts can download the manifest directly.
             return fetch($hotUpdateManifestUrl$)
                 .then(resp => {
                     switch (resp.status) {

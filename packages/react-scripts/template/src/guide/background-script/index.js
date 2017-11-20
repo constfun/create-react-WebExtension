@@ -1,11 +1,11 @@
-import 'chrome-browser-object-polyfill';
+const brow = /Chrome/.test(navigator.userAgent) ? chrome : browser;
 
-browser.runtime.onInstalled.addListener((details) => {
+brow.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'update') {
     return;
   }
 
-  browser.tabs.create({
+  brow.tabs.create({
     active: true,
     url: 'https://github.com/constfun/create-react-WebExtension/blob/master/packages/react-scripts/template/README.md',
   });
