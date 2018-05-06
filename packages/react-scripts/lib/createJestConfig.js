@@ -29,8 +29,8 @@ module.exports = (resolve, rootDir) => {
     setupTestFrameworkScriptFile: setupTestsFile,
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
     testMatch: [
-      '<rootDir>/src/**/__tests__/**/*.ts?(x)',
-      '<rootDir>/src/**/?(*.)(spec|test).ts?(x)',
+      '<rootDir>/src/**/__tests__/**/*.(t|j)s?(x)',
+      '<rootDir>/src/**/?(*.)(spec|test).(t|j)s?(x)',
     ],
     testEnvironment: 'node',
     testURL: 'http://localhost',
