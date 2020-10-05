@@ -32,7 +32,7 @@ const requireIndexFile = bundlePath => {
 // a main.js, and an optional index.html and main.css.
 const loadChildBundles = searchPath => {
   return find
-    .fileSync(/\/_bundle$/, searchPath)
+    .fileSync(/(\\|\/)_bundle$/, searchPath)
     .filter(file => path.dirname(file) !== searchPath)
     .map(bundleFile => loadOneChildBundle(searchPath, bundleFile));
 };
@@ -41,7 +41,7 @@ const loadOneChildBundle = (searchPath, bundleFile) => {
   const bundlePath = path.dirname(bundleFile);
   const bundleName = bundlePath
     .substr(searchPath.length + 1)
-    .replace(new RegExp(path.sep, 'g'), '-');
+    .replace(new RegExp('\\' + path.sep, 'g'), '-');
 
   const bundle = {
     bundleName,
